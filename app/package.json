@@ -1,6 +1,6 @@
 {
-  "name": "react-ts-app",
-  "version": "0.1.0",
+  "name": "frontend",
+  "version": "0.0.1",
   "private": true,
   "dependencies": {
     "@react-google-maps/api": "^2.20.7",
@@ -8,10 +8,12 @@
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
+    "@types/amap-js-sdk": "^1.4.6",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.126",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
+    "amap-js": "^2.4.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-scripts": "5.0.1",
