@@ -1,4 +1,5 @@
 // 页面组件导出
+export { default as AttractionDetailPage } from './AttractionDetailPage';
 export { default as ExpertProfilePage } from './ExpertProfilePage';
 export { default as Homepage } from './Homepage';
 export { default as ItineraryResults } from './ItineraryResults';

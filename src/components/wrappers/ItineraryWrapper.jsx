@@ -54,6 +54,11 @@ export default function ItineraryWrapper() {
     openArticleModal();
   }, [setSelectedExpert, setSelectedAttractionName, openArticleModal]);
 
+  const handleViewAttractionDetails = useCallback((attraction) => {
+    // 可以导航到景点详情页面
+    navigate('/attraction-detail', { state: { attraction } });
+  }, [navigate]);
+
   const handleFindExperts = useCallback((attraction) => {
     setSelectedAttraction(attraction);
     openExpertList();
@@ -103,6 +108,7 @@ export default function ItineraryWrapper() {
       itinerary={itinerary}
       onBack={handleBackToHome}
       onViewExpertArticle={handleViewExpertArticle}
+      onViewAttractionDetails={handleViewAttractionDetails}
       onFindExperts={handleFindExperts}
       onReplaceAttraction={handleReplaceAttraction}
       onResetItinerary={handleResetItinerary}

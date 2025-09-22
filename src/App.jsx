@@ -22,6 +22,7 @@ import DefaultLayOut from "@/layout/DefaultLayOut";
 // Lazy load components to improve initial load time
 const Homepage = lazy(() => import('./components/pages/Homepage'));
 const ItineraryWrapper = lazy(() => import('./components/wrappers/ItineraryWrapper'));
+const AttractionDetailPage = lazy(() => import('./components/pages/AttractionDetailPage'));
 const PostDetailPage = lazy(() => import('./components/pages/PostDetailPage'));
 const ExpertProfilePage = lazy(() => import('./components/pages/ExpertProfilePage'));
 const ExpertArticleModal = lazy(() => import('./components/modals/ExpertArticleModal'));
@@ -365,6 +366,15 @@ export default function App() {
                 onStartPlanning={handleStartPlanning}
               />
             )}
+
+            {currentPage === PAGES.ATTRACTION_DETAIL && (
+              <AttractionDetailPage
+                attraction={selectedAttraction}
+                onBack={handleBackFromAttractionDetail}
+                onViewReview={handleViewReview}
+              />
+            )}
+
             {currentPage === PAGES.EXPERT_PROFILE && (
               <ExpertProfilePage
                 expert={selectedExpert}
