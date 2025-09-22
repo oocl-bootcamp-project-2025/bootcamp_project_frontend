@@ -301,14 +301,6 @@ export default function ItineraryResults({
                   <h3 className="text-lg font-semibold">
                     第{days.indexOf(selectedTab) + 1}天详细行程
                   </h3>
-                  <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowResetConfirm(true)}
-                  >
-                    <RotateCcw className="w-4 h-4 mr-1" />
-                    重新规划
-                  </Button>
                 </div>
 
                 {/* 单日景点列表 */}

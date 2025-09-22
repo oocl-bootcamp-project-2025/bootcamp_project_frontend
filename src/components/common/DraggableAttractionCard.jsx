@@ -10,7 +10,6 @@ export default function DraggableAttractionCard({
   index,
   dayKey,
   onMove,
-  onViewDetails,
   onFindExperts,
   onReplace,
   bookings = []
