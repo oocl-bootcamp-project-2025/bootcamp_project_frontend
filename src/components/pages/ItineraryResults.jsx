@@ -153,8 +153,8 @@ export default function ItineraryResults({
                 key={dayKey}
                 onClick={() => setSelectedDay(dayKey)}
                 className={`flex-shrink-0 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${selectedDay === dayKey
-                    ? 'border-orange-500 text-orange-600 bg-orange-50'
-                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                  ? 'border-orange-500 text-orange-600 bg-orange-50'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
                   }`}
               >
                 第 {index + 1} 天
