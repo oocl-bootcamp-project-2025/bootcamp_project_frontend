@@ -16,28 +16,35 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
     const [selectedLocation, setSelectedLocation] = useState(null);
     const updateTimeoutRef = useRef(null);
 
-    // 根据选中的标签页和行程数据生成位置信息
-    const getFilteredLocations = () => {
+    // 获取所有景点位置信息
+    const getAllLocations = () => {
+        if (!itinerary) return [];
+
+        const allLocations = [];
+        Object.keys(itinerary).forEach((dayKey, dayIndex) => {
+            const dayAttractions = itinerary[dayKey] || [];
+            dayAttractions.forEach((attraction) => {
+                allLocations.push({
+                    name: attraction.name,
+                    position: getAttractionPosition(attraction.name),
+                    day: dayIndex + 1,
+                    id: attraction.id,
+                    attraction: attraction,
+                    isCurrentDay: selectedTab === 'overview' || selectedTab === dayKey // 标记是否为当前选中天数
+                });
+            });
+        });
+        return allLocations;
+    };
+
+    // 获取当前选中标签对应的景点（用于地图视角调整）
+    const getCurrentTabLocations = () => {
         if (!itinerary) return [];
 
         if (selectedTab === 'overview') {
-            // 总览模式：显示所有景点
-            const allLocations = [];
-            Object.keys(itinerary).forEach((dayKey, dayIndex) => {
-                const dayAttractions = itinerary[dayKey] || [];
-                dayAttractions.forEach((attraction) => {
-                    allLocations.push({
-                        name: attraction.name,
-                        position: getAttractionPosition(attraction.name),
-                        day: dayIndex + 1,
-                        id: attraction.id,
-                        attraction: attraction
-                    });
-                });
-            });
-            return allLocations;
+            return getAllLocations();
         } else {
-            // 具体天数模式：只显示当天的景点
+            // 具体天数模式：只返回当天的景点用于计算视角
             const dayAttractions = itinerary[selectedTab] || [];
             const dayNumber = parseInt(selectedTab.replace('day', ''));
             return dayAttractions.map((attraction) => ({
@@ -64,9 +71,14 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
         return positions[name] || [116.397428, 39.909187]; // 默认坐标
     };
 
-    // 使用 useMemo 缓存 filteredLocations，避免不必要的重新计算
-    const filteredLocations = useMemo(() => {
-        return getFilteredLocations();
+    // 所有景点位置（用于标记显示）
+    const allLocations = useMemo(() => {
+        return getAllLocations();
+    }, [itinerary, selectedTab]);
+
+    // 当前标签对应的景点（用于地图视角调整）
+    const currentTabLocations = useMemo(() => {
+        return getCurrentTabLocations();
     }, [selectedTab, itinerary]);
 
     // 监控selectedLocation状态变化
@@ -86,7 +98,7 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
         const hasSelectedTabChanged = prevSelectedTab !== selectedTab;
 
         // 如果选中的标签页变化且地图已初始化，调整视图
-        if (hasSelectedTabChanged && map && filteredLocations && filteredLocations.length > 0) {
+        if (hasSelectedTabChanged && map && currentTabLocations && currentTabLocations.length > 0) {
             // 减少console输出，避免控制台刷屏
             // console.log("Selected tab changed, adjusting map view:", selectedTab);
 
@@ -106,7 +118,7 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
 
             try {
                 // 筛选出有效的位置数据
-                const validLocations = filteredLocations.filter(location =>
+                const validLocations = currentTabLocations.filter(location =>
                     location.position &&
                     location.position.length === 2 &&
                     !isNaN(location.position[0]) &&
@@ -137,7 +149,7 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
                 clearTimeout(updateTimeoutRef.current);
             }
         };
-    }, [selectedTab, filteredLocations, mapError, isUpdatingView, prevSelectedTab, map]);
+    }, [selectedTab, currentTabLocations, mapError, isUpdatingView, prevSelectedTab, map]);
 
     // 调整地图视图的辅助函数
     const adjustMapView = (validLocations) => {
@@ -187,21 +199,21 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
                     else if (maxRange > 0.01) zoom = 14; // 很小范围
                     else zoom = 15; // 最小范围
 
-                    console.log("Range analysis - lngRange:", lngRange, "latRange:", latRange, "maxRange:", maxRange, "zoom:", zoom);
-                    console.log("Using center and zoom:", [centerLng, centerLat], zoom);
-                    map.setZoomAndCenter(zoom, [centerLng, centerLat]);
+                    // 使用动画平滑过渡到新的中心点和缩放级别
+                    // setZoomAndCenter的第三个参数immediately为false表示使用动画
+                    map.setZoomAndCenter(zoom, [centerLng, centerLat], false);
 
                 } catch (boundsError) {
                     console.error("Center and zoom method failed:", boundsError);
                 }
 
-                // 延迟更新状态
+                // 延迟更新状态，等待地图动画完成
                 setTimeout(() => {
                     setIsUpdatingView(false);
                     clearTimeout(updateTimeoutRef.current);
                     setPrevSelectedTab(selectedTab);
                     console.log("Map view update completed");
-                }, 500);
+                }, 1000); // 增加到1000ms，确保动画完成
 
             } else {
                 console.log("No valid positions found");
@@ -241,19 +253,19 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
                 // 检查边界是否有效（有多个点）
                 if (markers.length > 1) {
                     try {
-                        map.setFitView(bounds);
+                        map.setFitView(bounds, false); // 启用动画
                     } catch (fitViewError) {
                         console.warn("setFitView failed in handleMarkersUpdate, using fallback", fitViewError);
                         // 回退：计算中心点
                         const positions = markers.map(marker => marker.getPosition());
                         const avgLng = positions.reduce((sum, pos) => sum + pos.lng, 0) / positions.length;
                         const avgLat = positions.reduce((sum, pos) => sum + pos.lat, 0) / positions.length;
-                        map.setZoomAndCenter(13, [avgLng, avgLat]);
+                        map.setZoomAndCenter(13, [avgLng, avgLat], false);
                     }
                 } else if (markers.length === 1) {
                     // 只有一个标记时，直接设置中心点和缩放级别
                     const position = markers[0].getPosition();
-                    map.setZoomAndCenter(16, [position.lng, position.lat]);
+                    map.setZoomAndCenter(16, [position.lng, position.lat], false);
                 }
 
                 // 初始化之前选中的标签页
@@ -302,14 +314,16 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
                     <>
                         <MapMarkers
                             map={map}
-                            locations={filteredLocations}
+                            locations={allLocations}
+                            selectedTab={selectedTab}
                             onMarkersUpdate={handleMarkersUpdate}
                             onLocationClick={handleLocationClick}
                             isUpdatingView={isUpdatingView}
                         />
                         <MapRoutes
                             map={map}
-                            locations={filteredLocations}
+                            locations={allLocations}
+                            selectedTab={selectedTab}
                         />
                     </>
                 )}

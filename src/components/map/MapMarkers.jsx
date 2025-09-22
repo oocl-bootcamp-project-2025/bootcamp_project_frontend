@@ -6,6 +6,7 @@ import './css/MapMarkers.css';
 const MapMarkers = ({
     map,
     locations,
+    selectedTab,
     onMarkersUpdate,
     onLocationClick,
     isUpdatingView
@@ -78,12 +79,18 @@ const MapMarkers = ({
                             !isNaN(location.position[1])) {
 
                             const day = location.day || 1;
+                            const isCurrentDay = selectedTab === 'overview' || selectedTab === `day${day}`;
+                            const markerClass = isCurrentDay ? `marker marker-day-${day} marker-active` : `marker marker-day-${day} marker-inactive`;
+
                             const marker = new window.AMap.Marker({
                                 position: location.position,
                                 title: location.name,
-                                content: `<div class="marker marker-day-${day}">${location.name.substring(0, 1)}</div>`,
+                                content: `<div class="${markerClass}">${location.name.substring(0, 1)}</div>`,
                                 offset: new window.AMap.Pixel(-15, -15)
                             });
+
+                            // 保存location数据到marker，以便后续更新样式
+                            marker._locationData = location;
 
                             marker.setMap(map);
                             allMarkers.push(marker);
@@ -148,6 +155,23 @@ const MapMarkers = ({
             }
         }
     }, [map, locations]); // 移除 onLocationClick 和 isUpdatingView 依赖
+
+    // 当selectedTab变化时，更新现有标记的样式而不重新创建
+    useEffect(() => {
+        if (markersRef.current.length > 0) {
+            markersRef.current.forEach(marker => {
+                if (marker._locationData) {
+                    const location = marker._locationData;
+                    const day = location.day || 1;
+                    const isCurrentDay = selectedTab === 'overview' || selectedTab === `day${day}`;
+                    const markerClass = isCurrentDay ? `marker marker-day-${day} marker-active` : `marker marker-day-${day} marker-inactive`;
+
+                    // 更新标记的内容（样式）
+                    marker.setContent(`<div class="${markerClass}">${location.name.substring(0, 1)}</div>`);
+                }
+            });
+        }
+    }, [selectedTab]);
 
     // 组件卸载时清理标记
     useEffect(() => {

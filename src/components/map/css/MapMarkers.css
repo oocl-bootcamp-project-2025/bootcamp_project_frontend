@@ -14,23 +14,45 @@
 
 /* 每天不同颜色的标记 */
 .marker-day-1 {
-    background-color: #ff4757; /* 红色 - 第1天 */
+    background-color: #ff4757;
+    /* 红色 - 第1天 */
 }
 
 .marker-day-2 {
-    background-color: #2e86de; /* 蓝色 - 第2天 */
+    background-color: #2e86de;
+    /* 蓝色 - 第2天 */
 }
 
 .marker-day-3 {
-    background-color: #26de81; /* 绿色 - 第3天 */
+    background-color: #26de81;
+    /* 绿色 - 第3天 */
 }
 
 .marker-day-4 {
-    background-color: #f368e0; /* 粉色 - 第4天 */
+    background-color: #f368e0;
+    /* 粉色 - 第4天 */
 }
 
 .marker-day-5 {
-    background-color: #ff9f43; /* 橙色 - 第5天 */
+    background-color: #ff9f43;
+    /* 橙色 - 第5天 */
+}
+
+/* 活跃状态 - 当前选中的天数 */
+.marker.marker-active {
+    opacity: 1;
+    transform: scale(1.1);
+    z-index: 1000;
+    box-shadow: 0 0.1875rem 0.75rem rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+}
+
+/* 非活跃状态 - 未选中的天数 */
+.marker.marker-inactive {
+    opacity: 0.5;
+    transform: scale(0.9);
+    z-index: 100;
+    transition: all 0.3s ease;
 }
 
 /* 响应式调整 */
