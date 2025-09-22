@@ -6,7 +6,7 @@ import MapLoadingStates from './MapLoadingStates';
 import MapMarkers from './MapMarkers';
 import MapRoutes from './MapRoutes';
 
-const MapContainer = ({ selectedTab, itinerary }) => {
+const MapContainer = ({ selectedTab, itinerary, searchData }) => {
     const [map, setMap] = useState(null);
     const [showJourney, setShowJourney] = useState(false);
     const [prevSelectedTab, setPrevSelectedTab] = useState(null);
@@ -19,23 +19,33 @@ const MapContainer = ({ selectedTab, itinerary }) => {
     // 根据选中的标签页和行程数据生成位置信息
     const getFilteredLocations = () => {
         if (!itinerary) return [];
-        
+
         if (selectedTab === 'overview') {
             // 总览模式：显示所有景点
-            return Object.values(itinerary).flat().map((attraction, index) => ({
-                name: attraction.name,
-                position: getAttractionPosition(attraction.name),
-                day: Math.floor(index / 2) + 1, // 简单分配天数
-                id: attraction.id
-            }));
+            const allLocations = [];
+            Object.keys(itinerary).forEach((dayKey, dayIndex) => {
+                const dayAttractions = itinerary[dayKey] || [];
+                dayAttractions.forEach((attraction) => {
+                    allLocations.push({
+                        name: attraction.name,
+                        position: getAttractionPosition(attraction.name),
+                        day: dayIndex + 1,
+                        id: attraction.id,
+                        attraction: attraction
+                    });
+                });
+            });
+            return allLocations;
         } else {
             // 具体天数模式：只显示当天的景点
             const dayAttractions = itinerary[selectedTab] || [];
-            return dayAttractions.map((attraction, index) => ({
+            const dayNumber = parseInt(selectedTab.replace('day', ''));
+            return dayAttractions.map((attraction) => ({
                 name: attraction.name,
                 position: getAttractionPosition(attraction.name),
-                day: parseInt(selectedTab.replace('day', '')),
-                id: attraction.id
+                day: dayNumber,
+                id: attraction.id,
+                attraction: attraction
             }));
         }
     };
@@ -158,12 +168,12 @@ const MapContainer = ({ selectedTab, itinerary }) => {
                     // 直接使用中心点和缩放级别方法，更可靠
                     const centerLng = (minLng + maxLng) / 2;
                     const centerLat = (minLat + maxLat) / 2;
-                    
+
                     // 根据范围大小决定缩放级别
                     const lngRange = maxLng - minLng;
                     const latRange = maxLat - minLat;
                     const maxRange = Math.max(lngRange, latRange);
-                    
+
                     let zoom;
                     // 优化缩放级别计算，确保景点能完整显示
                     if (maxRange > 0.5) zoom = 9;       // 很大范围
@@ -181,7 +191,7 @@ const MapContainer = ({ selectedTab, itinerary }) => {
                 } catch (boundsError) {
                     console.error("Center and zoom method failed:", boundsError);
                 }
-                
+
                 // 延迟更新状态
                 setTimeout(() => {
                     setIsUpdatingView(false);
@@ -268,7 +278,7 @@ const MapContainer = ({ selectedTab, itinerary }) => {
         setMapError(false);
         setIsLoading(true);
         setPrevSelectedTab(null);
-        
+
         // 调用地图核心组件的重试函数
         if (window.mapCoreRetry) {
             window.mapCoreRetry();
@@ -283,30 +293,30 @@ const MapContainer = ({ selectedTab, itinerary }) => {
     return (
         <div className="amap-container">
             <div className="map-wrapper">
-                <MapCore 
+                <MapCore
                     onMapReady={handleMapReady}
                     onMapError={handleMapError}
                     onMapLoading={handleMapLoading}
                 />
-                
+
                 {/* 只有在地图准备就绪后才渲染标记和路线 */}
                 {map && (
                     <>
-                        <MapMarkers 
+                        <MapMarkers
                             map={map}
                             locations={filteredLocations}
                             onMarkersUpdate={handleMarkersUpdate}
                             onLocationClick={handleLocationClick}
                             isUpdatingView={isUpdatingView}
                         />
-                        <MapRoutes 
+                        <MapRoutes
                             map={map}
                             locations={filteredLocations}
                         />
                     </>
                 )}
-                
-                <MapLoadingStates 
+
+                <MapLoadingStates
                     isLoading={isLoading}
                     mapError={mapError}
                     isUpdating={isUpdatingView}
@@ -317,15 +327,15 @@ const MapContainer = ({ selectedTab, itinerary }) => {
                 {selectedLocation && (
                     <div className="location-card-overlay" onClick={() => setSelectedLocation(null)}>
                         <div className="location-card-container" onClick={(e) => e.stopPropagation()}>
-                            <button 
+                            <button
                                 className="close-card-button"
                                 onClick={() => setSelectedLocation(null)}
                                 aria-label="关闭"
                             >
                                 ×
                             </button>
-                            <Card 
-                                name={selectedLocation.name} 
+                            <Card
+                                name={selectedLocation.name}
                                 day={selectedLocation.day}
                             />
                             <div style={{ fontSize: '10px', color: '#999', marginTop: '5px', borderTop: '1px solid #eee', paddingTop: '5px' }}>
@@ -334,7 +344,7 @@ const MapContainer = ({ selectedTab, itinerary }) => {
                         </div>
                     </div>
                 )}
-                
+
                 {/* 调试信息显示 */}
                 {selectedLocation && (
                     <div style={{

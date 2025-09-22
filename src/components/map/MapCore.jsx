@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import './css/MapCore.css';
 
-const MapCore = ({ 
-    onMapReady, 
-    onMapError, 
+const MapCore = ({
+    onMapReady,
+    onMapError,
     onMapLoading,
-    center = [116.397428, 39.909187], 
-    zoom = 12 
+    center = [116.397428, 39.909187],
+    zoom = 12
 }) => {
     const mapRef = useRef(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -49,7 +49,15 @@ const MapCore = ({
                 zoom: zoom,
                 resizeEnable: true,
                 preloadMode: true,
-                optimizeRender: true
+                optimizeRender: true,
+                scrollWheel: true,        // 启用鼠标滚轮缩放
+                doubleClickZoom: true,    // 启用双击缩放
+                keyboardEnable: true,     // 启用键盘控制
+                dragEnable: true,         // 启用拖拽平移
+                zoomEnable: true,         // 启用缩放功能
+                rotateEnable: false,      // 禁用旋转（保持地图正北向上）
+                touchZoom: true,          // 启用触摸缩放
+                touchZoomCenter: 1        // 触摸缩放以双指中心为缩放中心点
             });
 
             // 地图加载完成事件
@@ -73,8 +81,31 @@ const MapCore = ({
 
             mapRef.current = map;
 
+            // 确保地图容器能接收滚轮事件并阻止事件冒泡
+            const mapContainer = document.getElementById('mapContainer');
+            if (mapContainer) {
+                mapContainer.style.pointerEvents = 'auto';
+
+                // 添加滚轮事件监听器，确保地图缩放功能
+                const handleWheel = (e) => {
+                    e.stopPropagation(); // 阻止事件冒泡到父级元素
+                };
+
+                mapContainer.addEventListener('wheel', handleWheel, { passive: false });
+
+                // 存储清理函数
+                mapRef.current._wheelCleanup = () => {
+                    mapContainer.removeEventListener('wheel', handleWheel);
+                };
+            }
+
             // 返回清理函数
             return () => {
+                // 清理滚轮事件监听器
+                if (mapRef.current && mapRef.current._wheelCleanup) {
+                    mapRef.current._wheelCleanup();
+                }
+
                 // 移除错误事件监听
                 map.off('error');
                 map.off('complete');

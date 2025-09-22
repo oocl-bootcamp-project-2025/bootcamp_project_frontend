@@ -1,5 +1,5 @@
-import { Calendar, ChevronDown, ChevronLeft, ChevronUp, Clock, MapPin, Plus } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { Calendar, ChevronLeft, Clock, MapPin, Plus } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import AMapComponent from '../map/AMapComponent';
 import { Button } from '../ui/button';
 import './css/ItineraryOverviewCard.css';
@@ -22,6 +22,7 @@ export default function ItineraryResults({
   const [isExpanded, setIsExpanded] = useState(false);
   const [dragStart, setDragStart] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [currentTranslateY, setCurrentTranslateY] = useState(0);
   const panelRef = useRef(null);
 
   // 初始化行程数据
@@ -109,34 +110,130 @@ export default function ItineraryResults({
 
   // 处理触摸开始
   const handleTouchStart = (e) => {
+    // 只在拖拽手柄上才开始拖拽，避免影响地图交互
+    if (!e.target.closest('.panel-handle')) return;
+
     setDragStart(e.touches[0].clientY);
     setIsDragging(true);
+    setCurrentTranslateY(0); // 重置拖拽偏移
+    e.preventDefault();
   };
 
   // 处理触摸移动
   const handleTouchMove = (e) => {
     if (!isDragging || !dragStart) return;
 
-    const currentY = e.touches[0].clientY;
-    const diff = dragStart - currentY;
-
-    if (diff > 50 && !isExpanded) {
-      setIsExpanded(true);
-    } else if (diff < -50 && isExpanded) {
-      setIsExpanded(false);
+    // 只在面板区域内阻止默认行为，不影响地图交互
+    if (e.target.closest('.itinerary-panel') || e.target.closest('.panel-handle')) {
+      e.preventDefault();
+      e.stopPropagation();
     }
+
+    const currentY = e.touches[0].clientY;
+    const diff = currentY - dragStart; // 注意：这里是 currentY - dragStart，向下为正
+
+    // 计算拖拽偏移（像素转百分比）
+    const dragOffsetPercent = (diff / window.innerHeight) * 100;
+
+    // 限制拖拽范围：向上最多拖拽30%，向下最多拖拽30%
+    const limitedOffset = Math.max(-30, Math.min(30, dragOffsetPercent));
+
+    setCurrentTranslateY(limitedOffset);
   };
 
   // 处理触摸结束
   const handleTouchEnd = () => {
+    if (!isDragging) return;
+
     setIsDragging(false);
     setDragStart(null);
+
+    // 根据拖拽距离决定最终状态
+    const threshold = 10; // 阈值：拖拽超过10%才切换状态
+
+    if (currentTranslateY < -threshold) {
+      // 向上拖拽超过阈值，展开面板
+      setIsExpanded(true);
+    } else if (currentTranslateY > threshold) {
+      // 向下拖拽超过阈值，收起面板
+      setIsExpanded(false);
+    }
+    // 其他情况保持当前状态不变
+
+    // 重置拖拽偏移
+    setCurrentTranslateY(0);
   };
 
-  // 切换展开状态
-  const toggleExpanded = () => {
-    setIsExpanded(!isExpanded);
+  // 鼠标支持（桌面端）
+  const handleMouseDown = (e) => {
+    // 只在拖拽手柄上才开始拖拽，避免影响地图交互
+    if (!e.target.closest('.panel-handle')) return;
+
+    setDragStart(e.clientY);
+    setIsDragging(true);
+    setCurrentTranslateY(0); // 重置拖拽偏移
+    e.preventDefault();
   };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging || !dragStart) return;
+
+    // 只在面板区域内阻止默认行为，不影响地图滚轮缩放
+    if (e.target.closest('.itinerary-panel') || e.target.closest('.panel-handle')) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    const currentY = e.clientY;
+    const diff = currentY - dragStart; // 注意：这里是 currentY - dragStart，向下为正
+
+    // 计算拖拽偏移（像素转百分比）
+    const dragOffsetPercent = (diff / window.innerHeight) * 100;
+
+    // 限制拖拽范围：向上最多拖拽30%，向下最多拖拽30%
+    const limitedOffset = Math.max(-30, Math.min(30, dragOffsetPercent));
+
+    setCurrentTranslateY(limitedOffset);
+  };
+
+  const handleMouseUp = () => {
+    if (!isDragging) return;
+
+    setIsDragging(false);
+    setDragStart(null);
+
+    // 根据拖拽距离决定最终状态
+    const threshold = 10; // 阈值：拖拽超过10%才切换状态
+
+    if (currentTranslateY < -threshold) {
+      // 向上拖拽超过阈值，展开面板
+      setIsExpanded(true);
+    } else if (currentTranslateY > threshold) {
+      // 向下拖拽超过阈值，收起面板
+      setIsExpanded(false);
+    }
+    // 其他情况保持当前状态不变
+
+    // 重置拖拽偏移
+    setCurrentTranslateY(0);
+  };
+
+  // 添加全局鼠标和触摸事件监听
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd);
+
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
+      };
+    }
+  }, [isDragging, dragStart, isExpanded, currentTranslateY]);
 
   const days = Object.keys(currentItinerary);
 
@@ -183,7 +280,11 @@ export default function ItineraryResults({
 
       {/* 地图底层 */}
       <div className="map-layer">
-        <AMapComponent selectedTab={selectedTab} itinerary={currentItinerary} />
+        <AMapComponent
+          selectedTab={selectedTab}
+          itinerary={currentItinerary}
+          searchData={searchData}
+        />
 
         {/* 我的位置按钮 */}
         <button className="location-button">
@@ -208,18 +309,20 @@ export default function ItineraryResults({
       {/* 详细行程面板 */}
       <div
         ref={panelRef}
-        className={`itinerary-panel ${isExpanded ? 'expanded' : 'collapsed'}`}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
+        className={`itinerary-panel ${isExpanded ? 'expanded' : 'collapsed'} ${isDragging ? 'dragging' : ''}`}
+        style={isDragging ? {
+          transform: isExpanded
+            ? `translateY(calc(120px + ${currentTranslateY}%))`
+            : `translateY(calc(100% - 160px + ${currentTranslateY}%))`
+        } : undefined}
       >
         {/* 拖拽指示器 */}
-        <div className="panel-handle" onClick={toggleExpanded}>
+        <div
+          className="panel-handle"
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+        >
           <div className="handle-bar"></div>
-          <span className="handle-text">
-            {isExpanded ? '收起行程' : '查看详细行程'}
-          </span>
-          {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
         </div>
 
         {/* 标签页导航 */}

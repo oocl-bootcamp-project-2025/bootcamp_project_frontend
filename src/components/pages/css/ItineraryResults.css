@@ -63,6 +63,21 @@
   right: 0;
   bottom: 0;
   z-index: 1;
+  pointer-events: auto;
+  /* 确保地图能接收鼠标事件 */
+}
+
+/* 确保地图在拖拽过程中仍然可交互 */
+.dragging .map-layer {
+  pointer-events: auto;
+  /* 拖拽时仍保持地图可交互 */
+}
+
+/* 地图容器样式 */
+.map-layer #mapContainer {
+  pointer-events: auto;
+  user-select: none;
+  /* 防止拖拽时选中文本 */
 }
 
 .location-button {
@@ -135,19 +150,24 @@
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 100;
   max-width: 480px;
   margin: 0 auto;
+  min-height: calc(100vh - 60px);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.itinerary-panel.dragging {
+  transition: none;
+  /* 拖拽时禁用过渡动画 */
 }
 
 .itinerary-panel.collapsed {
-  transform: translateY(calc(100% - 180px));
+  transform: translateY(calc(100% - 160px));
 }
 
 .itinerary-panel.expanded {
-  transform: translateY(80px);
-  height: calc(100vh - 80px);
+  transform: translateY(120px);
 }
 
 /* 拖拽指示器 */
@@ -156,26 +176,33 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  cursor: grab;
   border-bottom: 1px solid #f0f0f0;
   position: relative;
+  touch-action: none;
+  /* 防止原生手势干扰 */
+  min-height: 40px;
+  /* 确保足够的点击区域 */
+}
+
+.panel-handle:active {
+  cursor: grabbing;
 }
 
 .handle-bar {
-  width: 40px;
-  height: 4px;
-  background: #ddd;
-  border-radius: 2px;
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
+  width: 50px;
+  height: 5px;
+  background: #ccc;
+  border-radius: 3px;
+  transition: background-color 0.2s;
 }
 
-.handle-text {
-  font-size: 14px;
-  color: #666;
-  margin-right: 8px;
+.panel-handle:hover .handle-bar {
+  background: #999;
+}
+
+.panel-handle:active .handle-bar {
+  background: #666;
 }
 
 /* 标签页 */

@@ -43,7 +43,8 @@ const MapLoadingStates = ({ isLoading, mapError, isUpdating, onRetry }) => {
         <>
             {isLoading && renderLoading()}
             {mapError && renderMapError()}
-            {isUpdating && renderUpdating()}
+            {/* 隐藏更新提示，保持地图动画功能 */}
+            {/* {isUpdating && renderUpdating()} */}
         </>
     );
 };
