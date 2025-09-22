@@ -3,37 +3,45 @@ import ReactDOMServer from 'react-dom/server';
 import Card from './Card';
 import './css/MapMarkers.css';
 
-const MapMarkers = ({ 
-    map, 
-    locations, 
+const MapMarkers = ({
+    map,
+    locations,
     onMarkersUpdate,
     onLocationClick,
-    isUpdatingView 
+    isUpdatingView
 }) => {
     const markersRef = useRef([]);
 
     // 更新标记显示
     useEffect(() => {
-        console.log("MapMarkers useEffect triggered");
-        console.log("Dependencies - map:", !!map, "locations count:", locations?.length, "isUpdatingView:", isUpdatingView);
-        
         if (!map || !window.AMap) {
-            console.log("Map or AMap not available, skipping");
             return;
         }
 
-        console.log("Filtered locations:", locations);
-
-        // 如果正在更新视图，延迟标记更新
-        if (isUpdatingView) {
-            console.log("View is updating, delaying marker update");
-            setTimeout(() => {
-                updateMarkers();
-            }, 300);
+        // 简化逻辑：只在真正需要时更新标记
+        if (!locations || locations.length === 0) {
+            // 如果没有位置数据，清除现有标记
+            markersRef.current.forEach(marker => {
+                if (marker && typeof marker.setMap === 'function') {
+                    marker.setMap(null);
+                }
+            });
+            markersRef.current = [];
             return;
         }
 
-        updateMarkers();
+        // 只有当标记数量或位置发生实际变化时才更新
+        const shouldUpdate = markersRef.current.length !== locations.length ||
+            !markersRef.current.every((marker, index) => {
+                const location = locations[index];
+                return location && marker.getPosition() &&
+                    marker.getPosition().lng === location.position[0] &&
+                    marker.getPosition().lat === location.position[1];
+            });
+
+        if (shouldUpdate) {
+            updateMarkers();
+        }
 
         // 封装标记更新逻辑，方便复用
         function updateMarkers() {
@@ -61,7 +69,7 @@ const MapMarkers = ({
 
                 if (locations && locations.length > 0) {
                     console.log(`Creating ${locations.length} markers`);
-                    
+
                     // 使用同步方式创建标记，确保事件绑定可靠
                     locations.forEach((location, index) => {
                         if (location.position &&
@@ -86,7 +94,7 @@ const MapMarkers = ({
                                 console.log("Marker clicked:", location.name);
                                 console.log("Location data:", location);
                                 console.log("onLocationClick function:", onLocationClick);
-                                
+
                                 if (onLocationClick && typeof onLocationClick === 'function') {
                                     console.log("Calling onLocationClick...");
                                     onLocationClick(location);
@@ -96,7 +104,7 @@ const MapMarkers = ({
                                 }
                                 console.log("=== CLICK HANDLER END ===");
                             };
-                            
+
                             // 确保事件绑定成功
                             try {
                                 marker.on('click', handleClick);
@@ -139,7 +147,7 @@ const MapMarkers = ({
                 console.error("Error updating markers:", error);
             }
         }
-    }, [map, locations, onLocationClick, isUpdatingView]);
+    }, [map, locations]); // 移除 onLocationClick 和 isUpdatingView 依赖
 
     // 组件卸载时清理标记
     useEffect(() => {

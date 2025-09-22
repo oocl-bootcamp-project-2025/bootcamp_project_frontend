@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Card from './Card';
 import './css/MapContainer.css';
 import MapCore from './MapCore';
@@ -64,7 +64,10 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
         return positions[name] || [116.397428, 39.909187]; // 默认坐标
     };
 
-    const filteredLocations = getFilteredLocations();
+    // 使用 useMemo 缓存 filteredLocations，避免不必要的重新计算
+    const filteredLocations = useMemo(() => {
+        return getFilteredLocations();
+    }, [selectedTab, itinerary]);
 
     // 监控selectedLocation状态变化
     useEffect(() => {
@@ -84,8 +87,8 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
 
         // 如果选中的标签页变化且地图已初始化，调整视图
         if (hasSelectedTabChanged && map && filteredLocations && filteredLocations.length > 0) {
-            console.log("Selected tab changed, adjusting map view:", selectedTab);
-            console.log("filteredLocations for selected tab:", filteredLocations);
+            // 减少console输出，避免控制台刷屏
+            // console.log("Selected tab changed, adjusting map view:", selectedTab);
 
             // 设置视图更新标志
             setIsUpdatingView(true);
@@ -261,15 +264,10 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
         }
     };
 
-    // 处理景点点击事件
-    const handleLocationClick = (location) => {
-        console.log("=== HANDLE LOCATION CLICK ===");
-        console.log("handleLocationClick called with:", location);
-        console.log("Setting selectedLocation to:", location);
+    // 处理景点点击事件 - 使用useCallback避免不必要的重新渲染
+    const handleLocationClick = useCallback((location) => {
         setSelectedLocation(location);
-        console.log("selectedLocation state should be updated");
-        console.log("=== HANDLE LOCATION CLICK END ===");
-    };
+    }, []);
 
     // 重试加载地图
     const handleRetry = () => {
