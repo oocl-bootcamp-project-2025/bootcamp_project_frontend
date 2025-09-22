@@ -1,6 +1,6 @@
 // Card.js
 import React from 'react';
-import './Card.css'; // 导入样式文件
+import '../Card.css'; // 导入样式文件
 
 const Card = ({ name, day }) => {
     return (
