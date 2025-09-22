@@ -1,6 +1,6 @@
+import { Button } from 'antd';
 import { Building, Calendar, Camera, ChevronDown, Clock, Coffee, Compass, Heart, MapPin, Mountain, Search, Users, UtensilsCrossed } from 'lucide-react';
-import { useState } from 'react';
-import { Button } from '../ui/button';
+import { useEffect, useRef, useState } from 'react';
 import { Input } from '../ui/input';
 
 // 导入常量和工具函数
@@ -18,7 +18,8 @@ export default function Homepage({ onStartPlanning }) {
   const [showDepartureTime, setShowDepartureTime] = useState(false);
   const [showReturnTime, setShowReturnTime] = useState(false);
   const [preference, setPreference] = useState([]);
-
+  const departureTimeRef = useRef(null);
+  const returnTimeRef = useRef(null);
 
   const preferenceOptions = [
     { id: 'niche', label: '小众探索', icon: Compass, color: 'bg-purple-100 text-purple-700 border-purple-200' },
@@ -120,6 +121,27 @@ export default function Homepage({ onStartPlanning }) {
     }
   };
 
+  // 点击外部收起时间选择器
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        departureTimeRef.current &&
+        !departureTimeRef.current.contains(event.target)
+      ) {
+        setShowDepartureTime(false);
+      }
+      if (
+        returnTimeRef.current &&
+        !returnTimeRef.current.contains(event.target)
+      ) {
+        setShowReturnTime(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-blue-50">
@@ -193,7 +215,7 @@ export default function Homepage({ onStartPlanning }) {
                 <Clock className="w-4 h-4 mr-2 text-blue-500" />
                 出发时间
               </label>
-              <div className="relative">
+              <div className="relative" ref={departureTimeRef}>
                 <button
                   onClick={() => setShowDepartureTime(!showDepartureTime)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md text-left focus:ring-2 focus:ring-orange-500 focus:border-transparent flex items-center justify-between"
@@ -245,7 +267,7 @@ export default function Homepage({ onStartPlanning }) {
                 <Clock className="w-4 h-4 mr-2 text-indigo-500" />
                 返回时间
               </label>
-              <div className="relative">
+              <div className="relative" ref={returnTimeRef}>
                 <button
                   onClick={() => setShowReturnTime(!showReturnTime)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md text-left focus:ring-2 focus:ring-orange-500 focus:border-transparent flex items-center justify-between"
