@@ -1,29 +1,101 @@
-import React from 'react';
-import { GoogleMap, useLoadScript, Marker } from '@react-google-maps/api';
+import React, { useRef, useState, useEffect } from 'react';
 
-const containerStyle = {
-    width: '100%',
-    height: '400px',
+const wrapperStyle: React.CSSProperties = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
 };
 
-const center = {
-    lat: 37.7749,
-    lng: -122.4194,
+const containerStyle: React.CSSProperties = {
+    width: '100vw',
+    height:  '80vh',
 };
+
+const defaultCenter = [116.397428, 39.90923];
 
 const Map: React.FC = () => {
-    const { isLoaded, loadError } = useLoadScript({
-        googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
-    });
+    const mapRef = useRef<HTMLDivElement>(null);
+    const [error, setError] = useState<string | null>(null);
+    const key = process.env.REACT_APP_AMAP_API_KEY || '';
+    const securityJsCode = process.env.REACT_APP_AMAP_CREDENTIAL || '';
 
-    if (loadError) return <div>Error loading maps</div>;
-    if (!isLoaded) return <div>Loading Maps…</div>;
+
+    useEffect(() => {
+        if (!key) {
+            setError('Missing AMap API Key');
+            return;
+        }
+
+        if (!securityJsCode) {
+            setError('Missing AMap Security Code');
+            return;
+        }
+
+        window._AMapSecurityConfig = {
+            securityJsCode: securityJsCode,
+        };
+
+        const script = document.createElement('script');
+        script.src = `https://webapi.amap.com/maps?v=2.0&key=${key}`;
+        script.async = true;
+
+        script.onload = () => {
+            // Initialize map after script is loaded
+            if (mapRef.current && window.AMap) {
+                const map = new window.AMap.Map(mapRef.current, {
+                    zoom: 12,
+                    center: defaultCenter,
+                });
+
+                // Add marker
+                const marker = new window.AMap.Marker({
+                    position: defaultCenter,
+                    map: map
+                });
+            }
+        };
+
+        script.onerror = () => {
+            setError('Failed to load AMap JS SDK');
+        };
+
+        document.head.appendChild(script);
+
+        return () => {
+            // Clean up
+            document.head.removeChild(script);
+        };
+    }, [key, securityJsCode]);
 
     return (
-        <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={12}>
-            <Marker position={center} />
-        </GoogleMap>
+        <div style={wrapperStyle}>
+            <div style={containerStyle}>
+                {error ? (
+                    <div style={{ padding: 12 }}>{error}</div>
+                ) : (
+                    <div ref={mapRef} style={{ width: '100%', height: '100%' }}></div>
+                )}
+            </div>
+        </div>
     );
 };
+
+declare global {
+    interface Window {
+        AMap: any;
+        _AMapSecurityConfig: {
+            securityJsCode: string;
+        };
+    }
+}
+
+declare global {
+    interface Window {
+        AMap: any;
+        _AMapSecurityConfig: {
+            securityJsCode: string;
+        };
+    }
+}
 
 export default Map;

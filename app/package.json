@@ -1,6 +1,6 @@
 {
-  "name": "react-ts-app",
-  "version": "0.1.0",
+  "name": "frontend",
+  "version": "0.0.1",
   "private": true,
   "dependencies": {
     "@react-google-maps/api": "^2.20.7",
@@ -12,6 +12,7 @@
     "@types/node": "^16.18.126",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
+    "@uiw/react-amap": "^7.1.12",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-scripts": "5.0.1",
