@@ -3,6 +3,7 @@ import { Outlet } from "react-router";
 import { JourneyProvider } from '../context/JourneyContext';
 
 
+
 const DefaultLayOut = () => {
 
     return (

@@ -1,7 +1,8 @@
-/* AMapComponent.css */
+/* AMapComponent.css - 使用相对单位的自适应样式 */
 #mapContainer {
     width: 100%;
-    height: 500px;
+    height: 100%;
+    min-height: 50vh; /* 使用视口高度代替固定像素 */
 }
 
 .amap-container {
@@ -9,16 +10,23 @@
     width: 100%;
 }
 
+/* Map wrapper with relative positioning for overlays */
+.map-wrapper {
+    position: relative;
+    width: 100%;
+    height: 60vh; /* 使用视口高度代替固定像素 */
+}
+
 .marker {
-    width: 30px;
-    height: 30px;
+    width: 2rem; /* 使用相对单位代替固定像素 */
+    height: 2rem;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-weight: bold;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0.125rem 0.3125rem rgba(0, 0, 0, 0.3);
 }
 
 /* 每天不同颜色的标记 */
@@ -42,16 +50,16 @@
     background-color: #ff9f43; /* 橙色 - 第5天 */
 }
 
-/* 添加的新样式 */
+/* 添加的新样式 - 自适应 */
 .journey-toggle-btn {
     position: relative;
     display: block;
-    margin: 10px auto;
-    padding: 8px 16px;
+    margin: 0.625rem auto;
+    padding: 0.5rem 1rem;
     background-color: #2e86de;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 0.25rem;
     cursor: pointer;
     font-weight: bold;
     transition: background-color 0.3s;
@@ -62,33 +70,200 @@
 }
 
 .journey-bottom-container {
-    margin-top: 10px;
-    padding: 15px;
+    margin-top: 0.625rem;
+    padding: 0.9375rem;
     background-color: #f5f5f5;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+    width: 100%;
 }
 
 .journey-bottom-container .journey-detail {
     position: relative;
     background-color: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 0.9375rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.1);
 }
 
 .journey-bottom-container h4 {
     margin-top: 0;
-    margin-bottom: 15px;
+    margin-bottom: 0.9375rem;
     color: #333;
+    font-size: 1rem;
 }
 
 .day-options label {
     display: inline-block;
-    margin-right: 15px;
-    margin-bottom: 10px;
-    font-size: 14px;
+    margin-right: 0.9375rem;
+    margin-bottom: 0.625rem;
+    font-size: 0.875rem;
     color: #555;
 }
 
-/* 更多天数可以继续添加不同颜色 */
+/* 禁用状态的样式 */
+.day-options input[disabled] + span {
+    color: #aaa;
+}
+
+.day-options label input[disabled] {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* 地图错误状态样式 - 自适应 */
+.map-error-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.map-error-message {
+    text-align: center;
+    padding: 1.25rem;
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+    max-width: 80%;
+}
+
+.error-icon {
+    color: #e74c3c;
+    margin-bottom: 1rem;
+}
+
+.map-error-message h3 {
+    margin: 0 0 0.5rem;
+    color: #333;
+    font-size: 1.25rem;
+}
+
+.map-error-message p {
+    margin: 0 0 1.25rem;
+    color: #666;
+}
+
+.retry-button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    transition: background-color 0.3s;
+}
+
+.retry-button:hover {
+    background-color: #2980b9;
+}
+
+.retry-button svg {
+    margin-right: 0.5rem;
+}
+
+/* 地图加载中状态样式 - 自适应 */
+.map-loading-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.map-loading-spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 0.25rem solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-left-color: #3498db;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+/* 新增：地图视图更新中状态样式 - 自适应 */
+.map-updating-overlay {
+    position: absolute;
+    bottom: 1.25rem;
+    right: 1.25rem;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.15);
+    z-index: 9;
+    display: flex;
+    align-items: center;
+}
+
+.map-updating-indicator {
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 0.125rem solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-left-color: #2e86de;
+    animation: spin 1s linear infinite;
+    margin-right: 0.5rem;
+}
+
+.map-updating-overlay::after {
+    content: "正在更新地图...";
+    font-size: 0.75rem;
+    color: #555;
+}
+
+/* 响应式调整 */
+@media screen and (max-width: 768px) {
+    .map-wrapper {
+        height: 50vh; /* 在小屏幕上减小地图高度 */
+    }
+
+    .journey-bottom-container {
+        padding: 0.625rem;
+    }
+
+    .day-options label {
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.8125rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .map-wrapper {
+        height: 40vh; /* 在很小的屏幕上进一步减小地图高度 */
+    }
+
+    .marker {
+        width: 1.75rem;
+        height: 1.75rem;
+    }
+
+    .map-error-message {
+        max-width: 90%;
+        padding: 1rem;
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

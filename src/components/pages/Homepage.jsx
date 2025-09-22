@@ -361,3 +361,4 @@ export default function Homepage({ onStartPlanning }) {
     </div>
   );
 }
+
