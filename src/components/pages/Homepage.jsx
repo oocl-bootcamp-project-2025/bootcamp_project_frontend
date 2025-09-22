@@ -1,4 +1,4 @@
-import { Button } from 'antd';
+import { Alert, Button } from 'antd';
 import { Building, Calendar, Camera, ChevronDown, Clock, Coffee, Compass, Heart, MapPin, Mountain, Search, Users, UtensilsCrossed } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -15,14 +15,15 @@ export default function Homepage({ onStartPlanning }) {
   const [filteredCities, setFilteredCities] = useState([]);
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [departureDate, setDepartureDate] = useState('');
-  const [departureTime, setDepartureTime] = useState('');
+  const [departureTime, setDepartureTime] = useState('00:00');
   const [returnDate, setReturnDate] = useState('');
-  const [returnTime, setReturnTime] = useState('');
+  const [returnTime, setReturnTime] = useState('00:00');
   const [showDepartureTime, setShowDepartureTime] = useState(false);
   const [showReturnTime, setShowReturnTime] = useState(false);
   const [preference, setPreference] = useState([]);
   const departureTimeRef = useRef(null);
   const returnTimeRef = useRef(null);
+  const cityDropdownRef = useRef(null);
 
   const preferenceOptions = [
     { id: 'niche', label: '小众探索', icon: Compass, color: 'bg-purple-100 text-purple-700 border-purple-200' },
@@ -51,6 +52,13 @@ export default function Homepage({ onStartPlanning }) {
     setDestination(cityName);
     setShowCityDropdown(false);
     setFilteredCities([]);
+  };
+
+  const handleDestinationBlur = () => {
+    // 只有选择了城市列表中的城市才有效，否则清空
+    if (!CHINESE_CITIES.some(city => city.name === destination)) {
+      setDestination('');
+    }
   };
 
   // 生成今天之后的日期选项
@@ -128,6 +136,10 @@ export default function Homepage({ onStartPlanning }) {
     }
   };
 
+  const duration = departureDate && returnDate
+    ? calculateDuration(departureDate, returnDate)
+    : null;
+
   // 点击外部收起时间选择器
   useEffect(() => {
     function handleClickOutside(event) {
@@ -142,6 +154,21 @@ export default function Homepage({ onStartPlanning }) {
         !returnTimeRef.current.contains(event.target)
       ) {
         setShowReturnTime(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        cityDropdownRef.current &&
+        !cityDropdownRef.current.contains(event.target)
+      ) {
+        setShowCityDropdown(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -168,7 +195,7 @@ export default function Homepage({ onStartPlanning }) {
         <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
 
           {/* 目的地选择 */}
-          <div className="relative">
+          <div className="relative" ref={cityDropdownRef}>
             <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
               <MapPin className="w-4 h-4 mr-2 text-orange-500" />
               目的地
@@ -177,6 +204,7 @@ export default function Homepage({ onStartPlanning }) {
               <Input
                 value={destination}
                 onChange={(e) => handleDestinationChange(e.target.value)}
+                onBlur={handleDestinationBlur}
                 placeholder="搜索城市名称或拼音"
                 className="w-full"
               />
@@ -189,7 +217,7 @@ export default function Homepage({ onStartPlanning }) {
                 {filteredCities.map((city) => (
                   <div
                     key={city.name}
-                    onClick={() => handleCitySelect(city.name)}
+                    onMouseDown={() => handleCitySelect(city.name)}
                     className="px-4 py-2 hover:bg-gray-50 cursor-pointer"
                   >
                     <div className="font-medium">{city.name}</div>
@@ -227,7 +255,7 @@ export default function Homepage({ onStartPlanning }) {
                   onClick={() => setShowDepartureTime(!showDepartureTime)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md text-left focus:ring-2 focus:ring-orange-500 focus:border-transparent flex items-center justify-between"
                 >
-                  {departureTime || '选择时间'}
+                  {departureTime || '0:00'}
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 {showDepartureTime && (
@@ -263,8 +291,8 @@ export default function Homepage({ onStartPlanning }) {
                 onChange={(e) => setReturnDate(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 style={{ colorScheme: 'light' }}
-                min={departureDate}
-                max={getMaxReturnDate()}
+                min={departureDate || undefined}
+                max={departureDate ? getMaxReturnDate() : undefined}
                 disabled={!canSelectReturnDate}
               />
             </div>
@@ -279,7 +307,7 @@ export default function Homepage({ onStartPlanning }) {
                   onClick={() => setShowReturnTime(!showReturnTime)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md text-left focus:ring-2 focus:ring-orange-500 focus:border-transparent flex items-center justify-between"
                 >
-                  {returnTime || '选择时间'}
+                  {returnTime || '0:00'}
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 {showReturnTime && (
@@ -302,6 +330,23 @@ export default function Homepage({ onStartPlanning }) {
             </div>
           </div>
 
+          {departureDate && returnDate && (
+            <Alert
+              message={`行程共 ${duration} 天`}
+              type="info"
+              showIcon={false}
+              style={{
+                margin: 16,
+                background: 'linear-gradient(90deg,#fff7ed 0%,#f0f9ff 100%)',
+                border: 'none',
+                color: '#d97706',
+                fontWeight: 500,
+                fontSize: 18,
+                textAlign: 'center',
+                padding: '18px 0'
+              }}
+            />
+          )}
           {/* 旅行偏好 */}
           <div>
             <label className="flex items-center text-sm font-medium text-gray-700 mb-3">
@@ -343,19 +388,6 @@ export default function Homepage({ onStartPlanning }) {
             开始规划我的旅程
           </Button>
 
-          {/* 预览信息 */}
-          {destination && departureDate && returnDate && preference && (
-            <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-              <h3 className="font-medium text-gray-900">旅行预览</h3>
-              <div className="text-sm text-gray-600 space-y-1">
-                <div>📍 目的地: {destination}</div>
-                <div>📅 时间: {departureDate} 至 {returnDate}</div>
-                <div>⏰ 出发: {departureTime || '09:00'} | 返回: {returnTime || '18:00'}</div>
-                <div>🎯 偏好: {preferenceOptions.filter(p => preference.includes(p.id)).map(p => p.label).join('、')}</div>
-                <div>📊 行程: {calculateDuration(departureDate, returnDate)} 天</div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
