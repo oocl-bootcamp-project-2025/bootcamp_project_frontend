@@ -104,7 +104,7 @@ const AMapComponent = () => {
 
                                 // 根据景点数量设置简单的缩放级别
                                 const zoom = positions.length === 1 ? 16 :
-                                        positions.length <= 3 ? 15 : 14;
+                                    positions.length <= 3 ? 15 : 14;
 
                                 // 直接设置地图中心和缩放级别，避免复杂计算
                                 mapRef.current.setZoomAndCenter(zoom, [centerLng, centerLat]);
@@ -143,7 +143,7 @@ const AMapComponent = () => {
 
                             // 根据点位数量确定合适的缩放级别
                             const zoom = positions.length <= 2 ? 14 :
-                                    positions.length <= 5 ? 13 : 12;
+                                positions.length <= 5 ? 13 : 12;
 
                             // 直接设置地图中心和缩放级别
                             mapRef.current.setZoomAndCenter(zoom, [centerLng, centerLat]);
