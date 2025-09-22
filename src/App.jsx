@@ -1,12 +1,11 @@
 import { lazy, Suspense, useCallback, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import AMapComponent from './components/map/AMapComponent';
 import {
   createBrowserRouter,
-  RouterProvider,
-  useParams
+  RouterProvider
 } from "react-router";
+import AMapComponent from './components/map/AMapComponent';
 
 // Hooks
 import { useAppState, useModalState } from './hooks';
@@ -15,9 +14,9 @@ import { useAppState, useModalState } from './hooks';
 import { PAGES } from './constants';
 
 // Utils
-import { DEFAULT_ADDITIONAL_IMAGES, generateArticleContent } from './utils/mockData';
 import JourneyDetail from "@/components/map/JourneyDetail";
 import DefaultLayOut from "@/layout/DefaultLayOut";
+import { DEFAULT_ADDITIONAL_IMAGES, generateArticleContent } from './utils/mockData';
 
 // Lazy load components to improve initial load time
 const Homepage = lazy(() => import('./components/pages/Homepage'));
@@ -351,84 +350,84 @@ export default function App() {
 
       <RouterProvider router={router}>
 
-      {/*<AMapComponent />*/}
+        {/*<AMapComponent />*/}
 
 
-      {/* Mobile App Container */}
-      <div className="min-h-screen bg-gray-50 relative overflow-x-hidden">
-        {/* Mobile Safe Area */}
-        <div className="min-h-screen max-w-md mx-auto bg-white relative shadow-xl">
-          <Suspense fallback={<LoadingSpinner />}>
-            {/* Page Routing */}
-            {currentPage === PAGES.HOME && (
-              <Homepage
-                onStartPlanning={handleStartPlanning}
-              />
-            )}
+        {/* Mobile App Container */}
+        <div className="min-h-screen bg-gray-50 relative overflow-x-hidden">
+          {/* Mobile Safe Area */}
+          <div className="min-h-screen max-w-md mx-auto bg-white relative shadow-xl">
+            <Suspense fallback={<LoadingSpinner />}>
+              {/* Page Routing */}
+              {currentPage === PAGES.HOME && (
+                <Homepage
+                  onStartPlanning={handleStartPlanning}
+                />
+              )}
 
 
-            {currentPage === PAGES.EXPERT_PROFILE && (
-              <ExpertProfilePage
-                expert={selectedExpert}
-                onBack={handleBackFromExpertProfile}
-                onBookService={handleBookServiceFromProfile}
-                onViewArticle={handleViewArticleFromProfile}
-                bookings={bookings}
-                onCancelBooking={handleCancelBooking}
-                selectedAttraction={selectedAttraction}
-                shouldShowServicesTab={shouldShowServicesTab}
-              />
-            )}
+              {currentPage === PAGES.EXPERT_PROFILE && (
+                <ExpertProfilePage
+                  expert={selectedExpert}
+                  onBack={handleBackFromExpertProfile}
+                  onBookService={handleBookServiceFromProfile}
+                  onViewArticle={handleViewArticleFromProfile}
+                  bookings={bookings}
+                  onCancelBooking={handleCancelBooking}
+                  selectedAttraction={selectedAttraction}
+                  shouldShowServicesTab={shouldShowServicesTab}
+                />
+              )}
 
-            {currentPage === PAGES.POST_DETAIL && (
-              <PostDetailPage
-                onBack={handleBackFromPostDetail}
-                post={selectedPost}
-              />
-            )}
+              {currentPage === PAGES.POST_DETAIL && (
+                <PostDetailPage
+                  onBack={handleBackFromPostDetail}
+                  post={selectedPost}
+                />
+              )}
 
-            {/* Mobile Modals */}
-            {isArticleModalOpen && (
-              <ExpertArticleModal
-                expert={selectedExpert}
-                attractionName={selectedAttractionName}
-                isOpen={isArticleModalOpen}
-                onClose={handleCloseArticleModal}
-                onBookServices={handleBookServicesFromArticle}
-              />
-            )}
+              {/* Mobile Modals */}
+              {isArticleModalOpen && (
+                <ExpertArticleModal
+                  expert={selectedExpert}
+                  attractionName={selectedAttractionName}
+                  isOpen={isArticleModalOpen}
+                  onClose={handleCloseArticleModal}
+                  onBookServices={handleBookServicesFromArticle}
+                />
+              )}
 
-            {isServiceSelectionOpen && (
-              <ServiceSelectionModal
-                expert={selectedExpert}
-                isOpen={isServiceSelectionOpen}
-                onClose={handleCloseServiceSelection}
-                onServiceSelected={handleServiceSelected}
-              />
-            )}
+              {isServiceSelectionOpen && (
+                <ServiceSelectionModal
+                  expert={selectedExpert}
+                  isOpen={isServiceSelectionOpen}
+                  onClose={handleCloseServiceSelection}
+                  onServiceSelected={handleServiceSelected}
+                />
+              )}
 
-            {isBookingModalOpen && (
-              <ExpertBookingModal
-                expert={selectedExpert}
-                selectedServiceId={selectedServiceId}
-                isOpen={isBookingModalOpen}
-                onClose={handleCloseBookingModal}
-                onConfirmBooking={handleConfirmBooking}
-              />
-            )}
+              {isBookingModalOpen && (
+                <ExpertBookingModal
+                  expert={selectedExpert}
+                  selectedServiceId={selectedServiceId}
+                  isOpen={isBookingModalOpen}
+                  onClose={handleCloseBookingModal}
+                  onConfirmBooking={handleConfirmBooking}
+                />
+              )}
 
-            {isExpertListOpen && (
-              <ExpertListModal
-                attraction={selectedAttraction}
-                isOpen={isExpertListOpen}
-                onClose={handleCloseExpertList}
-                onSelectExpert={handleSelectExpertFromList}
-                bookings={bookings}
-              />
-            )}
-          </Suspense>
+              {isExpertListOpen && (
+                <ExpertListModal
+                  attraction={selectedAttraction}
+                  isOpen={isExpertListOpen}
+                  onClose={handleCloseExpertList}
+                  onSelectExpert={handleSelectExpertFromList}
+                  bookings={bookings}
+                />
+              )}
+            </Suspense>
+          </div>
         </div>
-      </div>
       </RouterProvider>
     </DndProvider>
   );
