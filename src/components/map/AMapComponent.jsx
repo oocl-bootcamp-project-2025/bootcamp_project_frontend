@@ -23,54 +23,81 @@ const AMapComponent = () => {
             !selectedDays.every(day => prevSelectedDays.includes(day));
 
         // 如果选中的天数变化且地图已初始化，调整视图
-        if (hasSelectedDaysChanged && mapRef.current && filteredLocations.length > 0) {
+        if (hasSelectedDaysChanged && mapRef.current && filteredLocations && filteredLocations.length > 0) {
             console.log("Selected days changed, adjusting map view:", selectedDays);
 
-            // 如果只选择了一天
-            if (selectedDays.length === 1) {
-                const day = selectedDays[0];
-                const dayLocations = filteredLocations.filter(loc => loc.day === day);
+            // 筛选出有效的位置数据（确保坐标值合法）
+            const validLocations = filteredLocations.filter(location =>
+                location.position &&
+                location.position.length === 2 &&
+                !isNaN(location.position[0]) &&
+                !isNaN(location.position[1])
+            );
 
-                if (dayLocations.length > 0) {
-                    // 创建边界对象
+            if (validLocations.length === 0) {
+                console.warn("No valid locations found for selected days:", selectedDays);
+                return; // 如果没有有效位置，提前返回避免错误
+            }
+
+            try {
+                // 如果只选择了一天
+                if (selectedDays.length === 1) {
+                    const day = selectedDays[0];
+                    const dayLocations = validLocations.filter(loc => loc.day === day);
+
+                    if (dayLocations.length > 0) {
+                        // 创建边界对象
+                        const bounds = new window.AMap.Bounds();
+
+                        // 将该天的所有景点添加到边界中
+                        dayLocations.forEach(location => {
+                            if (location.position && location.position.length === 2 &&
+                                !isNaN(location.position[0]) && !isNaN(location.position[1])) {
+                                bounds.extend(location.position);
+                            }
+                        });
+
+                        // 确保边界有效
+                        if (!bounds.isEmpty()) {
+                            // 计算中心点
+                            const center = bounds.getCenter();
+
+                            // 根据景点数量设置合适的缩放级别
+                            const zoom = dayLocations.length === 1 ? 16 :
+                                      dayLocations.length <= 3 ? 15 : 14;
+
+                            // 设置地图中心和缩放级别
+                            mapRef.current.setZoomAndCenter(zoom, center);
+                        }
+                    }
+                } else {
+                    // 如果选择了多天或全部，则调整视图以适应所有可见标记
                     const bounds = new window.AMap.Bounds();
+                    let hasValidPoints = false;
 
-                    // 将该天的所有景点添加到边界中
-                    dayLocations.forEach(location => {
-                        if (location.position && location.position.length === 2) {
+                    // 将所有选中天数的景点添加到边界中
+                    validLocations.forEach(location => {
+                        if (location.position && location.position.length === 2 &&
+                            !isNaN(location.position[0]) && !isNaN(location.position[1])) {
                             bounds.extend(location.position);
+                            hasValidPoints = true;
                         }
                     });
 
-                    // 计算中心点
-                    const center = bounds.getCenter();
-
-                    // 根据景点数量设置合适的缩放级别
-                    const zoom = dayLocations.length === 1 ? 16 :
-                                dayLocations.length <= 3 ? 15 : 14;
-
-                    // 设置地图中心和缩放级别
-                    mapRef.current.setZoomAndCenter(zoom, center);
-                }
-            } else {
-                // 如果选择了多天或全部，则调整视图以适应所有可见标记
-                const bounds = new window.AMap.Bounds();
-
-                // 将所有选中天数的景点添加到边界中
-                filteredLocations.forEach(location => {
-                    if (location.position && location.position.length === 2) {
-                        bounds.extend(location.position);
+                    // 只有在边界有效时才设置视图
+                    if (hasValidPoints && !bounds.isEmpty()) {
+                        // 使所有标记点都在视图内
+                        mapRef.current.setFitView(bounds, {
+                            padding: [50, 50, 50, 50] // 添加内边距确保所有标记可见
+                        });
                     }
-                });
+                }
 
-                // 使所有标记点都在视图内
-                mapRef.current.setFitView(bounds, {
-                    padding: [50, 50, 50, 50] // 添加内边距确保所有标记可见
-                });
+                // 更新之前选中的天数
+                setPrevSelectedDays([...selectedDays]);
+            } catch (error) {
+                console.error("Error adjusting map view:", error);
             }
-
-            // 更新之前选中的天数
-            setPrevSelectedDays([...selectedDays]);
         }
     }, [selectedDays, filteredLocations]);
 
@@ -80,66 +107,81 @@ const AMapComponent = () => {
 
         console.log("Filtered locations:", filteredLocations); // 调试日志
 
-        // 清除所有现有标记
-        markersRef.current.forEach(marker => {
-            marker.setMap(null);
-        });
-        markersRef.current = [];
+        try {
+            // 清除所有现有标记
+            markersRef.current.forEach(marker => {
+                marker.setMap(null);
+            });
+            markersRef.current = [];
 
-        // 创建信息窗口
-        const infoWindow = new window.AMap.InfoWindow({
-            isCustom: true,
-            autoMove: true,
-            offset: new window.AMap.Pixel(0, -15)
-        });
+            // 创建信息窗口
+            const infoWindow = new window.AMap.InfoWindow({
+                isCustom: true,
+                autoMove: true,
+                offset: new window.AMap.Pixel(0, -15)
+            });
 
-        // 添加新标记
-        const newMarkers = [];
+            // 添加新标记
+            const newMarkers = [];
 
-        if (filteredLocations && filteredLocations.length > 0) {
-            filteredLocations.forEach((location) => {
-                if (location.position && location.position.length === 2) {
-                    // 为不同天数创建不同颜色的标记
-                    const day = location.day || 1;
-                    const marker = new window.AMap.Marker({
-                        position: location.position,
-                        title: location.name,
-                        content: `<div class="marker marker-day-${day}">${location.name.substring(0, 1)}</div>`,
-                        offset: new window.AMap.Pixel(-15, -15) // 使标记居中
-                    });
+            if (filteredLocations && filteredLocations.length > 0) {
+                filteredLocations.forEach((location) => {
+                    // 确保位置坐标有效
+                    if (location.position &&
+                        location.position.length === 2 &&
+                        !isNaN(location.position[0]) &&
+                        !isNaN(location.position[1])) {
 
-                    marker.setMap(mapRef.current);
-                    newMarkers.push(marker);
+                        // 为不同天数创建不同颜色的标记
+                        const day = location.day || 1;
+                        const marker = new window.AMap.Marker({
+                            position: location.position,
+                            title: location.name,
+                            content: `<div class="marker marker-day-${day}">${location.name.substring(0, 1)}</div>`,
+                            offset: new window.AMap.Pixel(-15, -15) // 使标记居中
+                        });
 
-                    // 添加鼠标悬停事件
-                    marker.on('mouseover', () => {
-                        const cardContent = ReactDOMServer.renderToString(
-                            <Card name={location.name} day={location.day} />
-                        );
-                        infoWindow.setContent(cardContent);
-                        infoWindow.open(mapRef.current, location.position);
-                    });
+                        marker.setMap(mapRef.current);
+                        newMarkers.push(marker);
 
-                    // 添加鼠标离开事件以关闭信息窗口
-                    marker.on('mouseout', () => {
-                        infoWindow.close();
+                        // 添加鼠标悬停事件
+                        marker.on('mouseover', () => {
+                            const cardContent = ReactDOMServer.renderToString(
+                                <Card name={location.name} day={location.day} />
+                            );
+                            infoWindow.setContent(cardContent);
+                            infoWindow.open(mapRef.current, location.position);
+                        });
+
+                        // 添加鼠标离开事件以关闭信息窗口
+                        marker.on('mouseout', () => {
+                            infoWindow.close();
+                        });
+                    } else {
+                        console.warn("Invalid location position:", location);
+                    }
+                });
+            }
+
+            markersRef.current = newMarkers;
+
+            // 如果有标记，调整地图视图以包含所有标记点
+            if (newMarkers.length > 0 && (!prevSelectedDays || prevSelectedDays.length === 0)) {
+                const bounds = new window.AMap.Bounds();
+                newMarkers.forEach(marker => bounds.extend(marker.getPosition()));
+
+                // 确保边界有效
+                if (!bounds.isEmpty()) {
+                    mapRef.current.setFitView(bounds, {
+                        padding: [50, 50, 50, 50]
                     });
                 }
-            });
-        }
 
-        markersRef.current = newMarkers;
-
-        // 如果有标记，调整地图视图以包含所有标记点
-        if (newMarkers.length > 0 && (!prevSelectedDays || prevSelectedDays.length === 0)) {
-            const bounds = new window.AMap.Bounds();
-            newMarkers.forEach(marker => bounds.extend(marker.getPosition()));
-            mapRef.current.setFitView(bounds, {
-                padding: [50, 50, 50, 50]
-            });
-
-            // 初始化之前选中的天数
-            setPrevSelectedDays([...selectedDays]);
+                // 初始化之前选中的天数
+                setPrevSelectedDays([...selectedDays]);
+            }
+        } catch (error) {
+            console.error("Error updating markers:", error);
         }
     }, [filteredLocations]); // 当过滤后的位置变化时，重新执行
 
@@ -154,27 +196,57 @@ const AMapComponent = () => {
 
         console.log("Initializing map..."); // 调试日志
 
-        // 创建地图实例
-        const map = new window.AMap.Map('mapContainer', {
-            center: [116.397428, 39.909187], // 天安门中心点经纬度
-            zoom: 12, // 初始缩放级别
-            resizeEnable: true // 是否监控地图容器尺寸变化
-        });
-
-        mapRef.current = map;
-
-        // 清理事件监听
-        return () => {
-            // 清除所有标记
-            markersRef.current.forEach(marker => {
-                marker.setMap(null);
+        try {
+            // 创建地图实例
+            const map = new window.AMap.Map('mapContainer', {
+                center: [116.397428, 39.909187], // 天安门中心点经纬度
+                zoom: 12, // 初始缩放级别
+                resizeEnable: true // 是否监控地图容器尺寸变化
             });
-        };
+
+            mapRef.current = map;
+
+            // 添加错误处理事件监听
+            map.on('error', (e) => {
+                console.error('Map error:', e);
+            });
+
+            // 清理事件监听
+            return () => {
+                // 清除所有标记
+                markersRef.current.forEach(marker => {
+                    marker.setMap(null);
+                });
+
+                // 移除错误事件监听
+                map.off('error');
+            };
+        } catch (error) {
+            console.error("Error initializing map:", error);
+        }
     }, []); // 空依赖数组确保只在组件挂载时执行一次
 
     // 切换Journey显示/隐藏的函数
     const toggleJourney = () => {
         setShowJourney(prev => !prev);
+    };
+
+    // 处理切换特定天数的函数 - 增加错误处理
+    const handleToggleDay = (day) => {
+        try {
+            toggleDay(day);
+        } catch (error) {
+            console.error(`Error toggling day ${day}:`, error);
+        }
+    };
+
+    // 处理全选/取消全选的函数 - 增加错误处理
+    const handleToggleAll = () => {
+        try {
+            toggleAll();
+        } catch (error) {
+            console.error("Error toggling all days:", error);
+        }
     };
 
     return (
@@ -200,7 +272,7 @@ const AMapComponent = () => {
                                 <input
                                     type="checkbox"
                                     checked={selectedDays.length === uniqueDays.length}
-                                    onChange={toggleAll}
+                                    onChange={handleToggleAll}
                                 />
                                 显示全部
                             </label>
@@ -210,7 +282,7 @@ const AMapComponent = () => {
                                         <input
                                             type="checkbox"
                                             checked={selectedDays.includes(day)}
-                                            onChange={() => toggleDay(day)}
+                                            onChange={() => handleToggleDay(day)}
                                         />
                                         第{day}天
                                     </label>
