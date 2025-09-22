@@ -1,0 +1,100 @@
+/* JourneyControls.css */
+
+.journey-controls {
+    width: 100%;
+}
+
+.journey-toggle-btn {
+    position: relative;
+    display: block;
+    margin: 0.625rem auto;
+    padding: 0.5rem 1rem;
+    background-color: #2e86de;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.journey-toggle-btn:hover {
+    background-color: #1c6cbe;
+}
+
+.journey-bottom-container {
+    margin-top: 0.625rem;
+    padding: 0.9375rem;
+    background-color: #f5f5f5;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.journey-bottom-container .journey-detail {
+    position: relative;
+    background-color: white;
+    padding: 0.9375rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.1);
+}
+
+.journey-bottom-container h4 {
+    margin-top: 0;
+    margin-bottom: 0.9375rem;
+    color: #333;
+    font-size: 1rem;
+}
+
+.usage-tip {
+    margin: 0 0 0.75rem 0;
+    padding: 0.5rem;
+    background-color: #f8f9fa;
+    border-left: 3px solid #2e86de;
+    font-size: 0.8125rem;
+    color: #555;
+    border-radius: 0.25rem;
+}
+
+.day-options label {
+    display: inline-block;
+    margin-right: 0.9375rem;
+    margin-bottom: 0.625rem;
+    font-size: 0.875rem;
+    color: #555;
+}
+
+/* 禁用状态的样式 */
+.day-options input[disabled] + span {
+    color: #aaa;
+}
+
+.day-options label input[disabled] {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* 天数标签样式 */
+.day-label {
+    margin-left: 0.25rem;
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.125rem;
+    transition: background-color 0.2s;
+}
+
+.day-label:hover {
+    background-color: rgba(46, 134, 222, 0.1);
+}
+
+/* 响应式调整 */
+@media screen and (max-width: 768px) {
+    .journey-bottom-container {
+        padding: 0.625rem;
+    }
+
+    .day-options label {
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.8125rem;
+    }
+}

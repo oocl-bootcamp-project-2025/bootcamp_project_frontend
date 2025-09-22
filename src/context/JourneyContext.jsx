@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 
 // 创建上下文
 const JourneyContext = createContext();
@@ -50,6 +50,11 @@ export const JourneyProvider = ({ children }) => {
     });
   };
 
+  // 直接设置选中的天数
+  const setSelectedDaysDirectly = (days) => {
+    setSelectedDays(Array.isArray(days) ? days : [days]);
+  };
+
   return (
     <JourneyContext.Provider value={{
       selectedDays,
@@ -57,7 +62,8 @@ export const JourneyProvider = ({ children }) => {
       locations,
       filteredLocations,
       toggleDay,
-      toggleAll
+      toggleAll,
+      setSelectedDays: setSelectedDaysDirectly
     }}>
       {children}
     </JourneyContext.Provider>
