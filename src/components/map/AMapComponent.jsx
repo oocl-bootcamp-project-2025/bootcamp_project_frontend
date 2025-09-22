@@ -1,8 +1,8 @@
 import MapContainer from './MapContainer';
 
-const AMapComponent = () => {
+const AMapComponent = ({ selectedTab, itinerary }) => {
 
-    return <MapContainer />;
+    return <MapContainer selectedTab={selectedTab} itinerary={itinerary} />;
 };
 
 export default AMapComponent;

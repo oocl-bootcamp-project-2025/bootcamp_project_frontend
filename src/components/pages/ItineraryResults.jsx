@@ -183,7 +183,7 @@ export default function ItineraryResults({
 
       {/* 地图底层 */}
       <div className="map-layer">
-        <AMapComponent />
+        <AMapComponent selectedTab={selectedTab} itinerary={currentItinerary} />
 
         {/* 我的位置按钮 */}
         <button className="location-button">

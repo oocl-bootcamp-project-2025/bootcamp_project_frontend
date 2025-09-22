@@ -1,32 +1,67 @@
 import { useEffect, useRef, useState } from 'react';
-import { useJourney } from '../../context/JourneyContext';
 import Card from './Card';
 import './css/MapContainer.css';
-import JourneyControls from './JourneyControls';
 import MapCore from './MapCore';
 import MapLoadingStates from './MapLoadingStates';
 import MapMarkers from './MapMarkers';
 import MapRoutes from './MapRoutes';
 
-const MapContainer = () => {
+const MapContainer = ({ selectedTab, itinerary }) => {
     const [map, setMap] = useState(null);
     const [showJourney, setShowJourney] = useState(false);
-    const [prevSelectedDays, setPrevSelectedDays] = useState([]);
+    const [prevSelectedTab, setPrevSelectedTab] = useState(null);
     const [mapError, setMapError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isUpdatingView, setIsUpdatingView] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState(null);
     const updateTimeoutRef = useRef(null);
 
-    // 从上下文中获取选中的天数和过滤后的位置
-    const { filteredLocations, selectedDays, uniqueDays, toggleDay, toggleAll, setSelectedDays } = useJourney();
+    // 根据选中的标签页和行程数据生成位置信息
+    const getFilteredLocations = () => {
+        if (!itinerary) return [];
+        
+        if (selectedTab === 'overview') {
+            // 总览模式：显示所有景点
+            return Object.values(itinerary).flat().map((attraction, index) => ({
+                name: attraction.name,
+                position: getAttractionPosition(attraction.name),
+                day: Math.floor(index / 2) + 1, // 简单分配天数
+                id: attraction.id
+            }));
+        } else {
+            // 具体天数模式：只显示当天的景点
+            const dayAttractions = itinerary[selectedTab] || [];
+            return dayAttractions.map((attraction, index) => ({
+                name: attraction.name,
+                position: getAttractionPosition(attraction.name),
+                day: parseInt(selectedTab.replace('day', '')),
+                id: attraction.id
+            }));
+        }
+    };
+
+    // 获取景点坐标的辅助函数（这里使用固定坐标，实际项目中应该从数据库获取）
+    const getAttractionPosition = (name) => {
+        const positions = {
+            '天安门广场': [116.397428, 39.909187],
+            '故宫博物院': [116.403963, 39.917219],
+            '长城': [116.015881, 40.356188],
+            '颐和园': [116.275147, 39.999984],
+            '北海公园': [116.390895, 39.926623],
+            '景山公园': [116.397026, 39.927641],
+            '圆明园': [116.303511, 40.006626]
+        };
+        return positions[name] || [116.397428, 39.909187]; // 默认坐标
+    };
+
+    const filteredLocations = getFilteredLocations();
 
     // 监控selectedLocation状态变化
     useEffect(() => {
         console.log("selectedLocation state changed:", selectedLocation);
     }, [selectedLocation]);
 
-    // 监听选中天数的变化，调整地图视图
+    // 监听选中标签页的变化，调整地图视图
     useEffect(() => {
         // 如果地图出错或未加载，不执行此操作
         if (mapError || !map) return;
@@ -34,16 +69,13 @@ const MapContainer = () => {
         // 防止频繁更新
         if (isUpdatingView) return;
 
-        // 检查是否有天数选择变化
-        const hasSelectedDaysChanged =
-            !prevSelectedDays ||
-            prevSelectedDays.length !== selectedDays.length ||
-            !selectedDays.every(day => prevSelectedDays.includes(day));
+        // 检查是否有标签页选择变化
+        const hasSelectedTabChanged = prevSelectedTab !== selectedTab;
 
-        // 如果选中的天数变化且地图已初始化，调整视图
-        if (hasSelectedDaysChanged && map && filteredLocations && filteredLocations.length > 0) {
-            console.log("Selected days changed, adjusting map view:", selectedDays);
-            console.log("filteredLocations for selected days:", filteredLocations);
+        // 如果选中的标签页变化且地图已初始化，调整视图
+        if (hasSelectedTabChanged && map && filteredLocations && filteredLocations.length > 0) {
+            console.log("Selected tab changed, adjusting map view:", selectedTab);
+            console.log("filteredLocations for selected tab:", filteredLocations);
 
             // 设置视图更新标志
             setIsUpdatingView(true);
@@ -56,7 +88,7 @@ const MapContainer = () => {
             updateTimeoutRef.current = setTimeout(() => {
                 console.warn("Map view update timeout - resetting state");
                 setIsUpdatingView(false);
-                setPrevSelectedDays([...selectedDays]);
+                setPrevSelectedTab(selectedTab);
             }, 10000);
 
             try {
@@ -69,7 +101,7 @@ const MapContainer = () => {
                 );
 
                 if (validLocations.length === 0) {
-                    console.warn("No valid locations found for selected days:", selectedDays);
+                    console.warn("No valid locations found for selected tab:", selectedTab);
                     setIsUpdatingView(false);
                     clearTimeout(updateTimeoutRef.current);
                     return;
@@ -92,7 +124,7 @@ const MapContainer = () => {
                 clearTimeout(updateTimeoutRef.current);
             }
         };
-    }, [selectedDays, filteredLocations, mapError, isUpdatingView, prevSelectedDays, map]);
+    }, [selectedTab, filteredLocations, mapError, isUpdatingView, prevSelectedTab, map]);
 
     // 调整地图视图的辅助函数
     const adjustMapView = (validLocations) => {
@@ -154,7 +186,7 @@ const MapContainer = () => {
                 setTimeout(() => {
                     setIsUpdatingView(false);
                     clearTimeout(updateTimeoutRef.current);
-                    setPrevSelectedDays([...selectedDays]);
+                    setPrevSelectedTab(selectedTab);
                     console.log("Map view update completed");
                 }, 500);
 
@@ -188,7 +220,7 @@ const MapContainer = () => {
     // 标记更新回调
     const handleMarkersUpdate = (markers) => {
         // 如果是初始加载，调整视图以包含所有标记点
-        if (markers.length > 0 && (!prevSelectedDays || prevSelectedDays.length === 0)) {
+        if (markers.length > 0 && prevSelectedTab === null) {
             try {
                 const bounds = new window.AMap.Bounds();
                 markers.forEach(marker => bounds.extend(marker.getPosition()));
@@ -211,8 +243,8 @@ const MapContainer = () => {
                     map.setZoomAndCenter(16, [position.lng, position.lat]);
                 }
 
-                // 初始化之前选中的天数
-                setPrevSelectedDays([...selectedDays]);
+                // 初始化之前选中的标签页
+                setPrevSelectedTab(selectedTab);
             } catch (error) {
                 console.error("Error in handleMarkersUpdate:", error);
             }
@@ -235,7 +267,7 @@ const MapContainer = () => {
         setMap(null);
         setMapError(false);
         setIsLoading(true);
-        setPrevSelectedDays([]);
+        setPrevSelectedTab(null);
         
         // 调用地图核心组件的重试函数
         if (window.mapCoreRetry) {
@@ -250,7 +282,6 @@ const MapContainer = () => {
 
     return (
         <div className="amap-container">
-            <h1>高德地图标注示例</h1>
             <div className="map-wrapper">
                 <MapCore 
                     onMapReady={handleMapReady}
@@ -322,16 +353,7 @@ const MapContainer = () => {
                 )}
             </div>
 
-            <JourneyControls 
-                showJourney={showJourney}
-                onToggleJourney={toggleJourney}
-                selectedDays={selectedDays}
-                uniqueDays={uniqueDays}
-                onToggleDay={toggleDay}
-                onToggleAll={toggleAll}
-                onSetSelectedDays={setSelectedDays}
-                isUpdatingView={isUpdatingView}
-            />
+
         </div>
     );
 };
