@@ -21,6 +21,11 @@ const MapContainer = () => {
     // 从上下文中获取选中的天数和过滤后的位置
     const { filteredLocations, selectedDays, uniqueDays, toggleDay, toggleAll, setSelectedDays } = useJourney();
 
+    // 监控selectedLocation状态变化
+    useEffect(() => {
+        console.log("selectedLocation state changed:", selectedLocation);
+    }, [selectedLocation]);
+
     // 监听选中天数的变化，调整地图视图
     useEffect(() => {
         // 如果地图出错或未加载，不执行此操作
@@ -216,7 +221,12 @@ const MapContainer = () => {
 
     // 处理景点点击事件
     const handleLocationClick = (location) => {
+        console.log("=== HANDLE LOCATION CLICK ===");
+        console.log("handleLocationClick called with:", location);
+        console.log("Setting selectedLocation to:", location);
         setSelectedLocation(location);
+        console.log("selectedLocation state should be updated");
+        console.log("=== HANDLE LOCATION CLICK END ===");
     };
 
     // 重试加载地图
@@ -287,7 +297,27 @@ const MapContainer = () => {
                                 name={selectedLocation.name} 
                                 day={selectedLocation.day}
                             />
+                            <div style={{ fontSize: '10px', color: '#999', marginTop: '5px', borderTop: '1px solid #eee', paddingTop: '5px' }}>
+                                调试: 景点={selectedLocation.name}, 天数={selectedLocation.day}
+                            </div>
                         </div>
+                    </div>
+                )}
+                
+                {/* 调试信息显示 */}
+                {selectedLocation && (
+                    <div style={{
+                        position: 'absolute',
+                        top: '10px',
+                        right: '10px',
+                        background: 'rgba(0,0,0,0.8)',
+                        color: 'white',
+                        padding: '5px',
+                        fontSize: '12px',
+                        borderRadius: '3px',
+                        zIndex: 1001
+                    }}>
+                        调试: 已选择 {selectedLocation.name}
                     </div>
                 )}
             </div>
