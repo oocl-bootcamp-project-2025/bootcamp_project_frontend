@@ -1,6 +1,6 @@
 // router/index.js
-import { createBrowserRouter } from "react-router-dom";
 import { lazy } from 'react';
+import { createBrowserRouter } from "react-router-dom";
 import DefaultLayOut from "../layout/DefaultLayOut";
 
 // Lazy load components for better performance
@@ -11,6 +11,7 @@ const ItineraryWrapper = lazy(() => import('../components/wrappers/ItineraryWrap
 const ExpertProfilePage = lazy(() => import('../components/pages/ExpertProfilePage'));
 const PostDetailPage = lazy(() => import('../components/pages/PostDetailPage'));
 const ItineraryResults = lazy(() => import('../components/pages/ItineraryResults'));
+const TestItineraryResults = lazy(() => import('../TestItineraryResults'));
 
 export const router = createBrowserRouter([
   {
@@ -40,6 +41,10 @@ export const router = createBrowserRouter([
       {
         path: 'results',
         element: <ItineraryResults />
+      },
+      {
+        path: 'test-results',
+        element: <TestItineraryResults />
       },
       {
         path: 'expert/:id',

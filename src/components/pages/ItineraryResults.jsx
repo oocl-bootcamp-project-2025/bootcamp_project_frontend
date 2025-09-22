@@ -1,12 +1,10 @@
-import { Calendar, ChevronLeft, Clock, MapPin, Plus, RotateCcw, BarChart3, Users } from 'lucide-react';
-import { useState } from 'react';
-import CollapsibleMap from '../common/CollapsibleMap';
-import DraggableAttractionCard from '../common/DraggableAttractionCard';
+import { Calendar, ChevronDown, ChevronLeft, ChevronUp, Clock, MapPin, Plus } from 'lucide-react';
+import { useRef, useState } from 'react';
+import AMapComponent from '../map/AMapComponent';
 import { Button } from '../ui/button';
-import { Card } from '../ui/card';
+import './css/ItineraryOverviewCard.css';
 import './css/ItineraryResults.css';
 import './css/ItineraryStatistics.css';
-import './css/ItineraryOverviewCard.css';
 
 export default function ItineraryResults({
   searchData,
@@ -14,14 +12,17 @@ export default function ItineraryResults({
   itinerary,
   onBack,
   onViewExpertArticle,
-
   onFindExperts,
   onReplaceAttraction,
   onResetItinerary,
   onUpdateItinerary
 }) {
-  const [selectedTab, setSelectedTab] = useState('overview'); // 默认显示总览
+  const [selectedTab, setSelectedTab] = useState('overview');
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [dragStart, setDragStart] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const panelRef = useRef(null);
 
   // 初始化行程数据
   const [currentItinerary, setCurrentItinerary] = useState(itinerary || {
@@ -69,16 +70,6 @@ export default function ItineraryResults({
         location: '海淀区',
         images: ['https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=500'],
         experts: []
-      },
-      {
-        id: 'attraction3',
-        name: '长城',
-        description: '中国古代的军事防御工程',
-        duration: '4小时',
-        time: '09:00-13:00',
-        location: '延庆区',
-        images: ['https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=500'],
-        experts: []
       }
     ]
   });
@@ -89,11 +80,7 @@ export default function ItineraryResults({
     const { dayKey: targetDayKey, index: targetIndex } = targetItem;
 
     const newItinerary = { ...currentItinerary };
-
-    // 从源位置移除
     const [removed] = newItinerary[sourceDayKey].splice(sourceIndex, 1);
-
-    // 插入到目标位置
     newItinerary[targetDayKey].splice(targetIndex, 0, removed);
 
     setCurrentItinerary(newItinerary);
@@ -120,6 +107,37 @@ export default function ItineraryResults({
     setShowResetConfirm(false);
   };
 
+  // 处理触摸开始
+  const handleTouchStart = (e) => {
+    setDragStart(e.touches[0].clientY);
+    setIsDragging(true);
+  };
+
+  // 处理触摸移动
+  const handleTouchMove = (e) => {
+    if (!isDragging || !dragStart) return;
+
+    const currentY = e.touches[0].clientY;
+    const diff = dragStart - currentY;
+
+    if (diff > 50 && !isExpanded) {
+      setIsExpanded(true);
+    } else if (diff < -50 && isExpanded) {
+      setIsExpanded(false);
+    }
+  };
+
+  // 处理触摸结束
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    setDragStart(null);
+  };
+
+  // 切换展开状态
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   const days = Object.keys(currentItinerary);
 
   // 计算总览数据
@@ -136,232 +154,228 @@ export default function ItineraryResults({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b sticky top-0 z-40">
-        <div className="max-w-md mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onBack}
-                className="mr-2 p-2"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </Button>
-              <div>
-                <h1 className="text-lg font-semibold">
-                  {searchData?.destination || '目的地'} 行程
-                </h1>
-                <p className="text-sm text-gray-600">
-                  {days.length} 天行程规划
-                </p>
-              </div>
-            </div>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowResetConfirm(true)}
-            >
-              <RotateCcw className="w-4 h-4 mr-1" />
-              重置
-            </Button>
+    <div className="itinerary-results-container">
+      {/* 固定头部 */}
+      <div className="itinerary-header">
+        <div className="header-content">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onBack}
+            className="back-button"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </Button>
+          <div className="header-title">
+            <h1>{searchData?.destination || '北京'}</h1>
+            <p>{days.length}天行程 · {getTotalAttractions()}个景点</p>
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowResetConfirm(true)}
+            className="save-button"
+          >
+            保存
+          </Button>
         </div>
       </div>
 
-      {/* 可折叠地图 */}
-      <div className="max-w-md mx-auto px-4 py-4">
-        <CollapsibleMap
-          searchData={searchData}
-          itinerary={currentItinerary}
-        />
+      {/* 地图底层 */}
+      <div className="map-layer">
+        <AMapComponent />
+
+        {/* 我的位置按钮 */}
+        <button className="location-button">
+          <MapPin className="w-5 h-5" />
+          我的位置
+        </button>
+
+        {/* 地图控制按钮 */}
+        <div className="map-controls">
+          <button className="map-control-btn">+</button>
+          <button className="map-control-btn">-</button>
+        </div>
+
+        {/* 定位按钮 */}
+        <button className="navigation-button">
+          <svg viewBox="0 0 24 24" className="w-5 h-5">
+            <path d="M12 2L13.09 7.26L18 6L16.74 11.09L22 12L16.74 12.91L18 18L12.91 16.74L12 22L11.09 16.74L6 18L7.26 12.91L2 12L7.26 11.09L6 6L11.09 7.26L12 2Z" fill="currentColor" />
+          </svg>
+        </button>
       </div>
 
-      {/* 标签页导航 */}
-      <div className="bg-white border-b sticky top-[73px] z-30">
-        <div className="max-w-md mx-auto px-4">
-          <div className="flex overflow-x-auto">
-            {/* 总览标签 */}
+      {/* 详细行程面板 */}
+      <div
+        ref={panelRef}
+        className={`itinerary-panel ${isExpanded ? 'expanded' : 'collapsed'}`}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* 拖拽指示器 */}
+        <div className="panel-handle" onClick={toggleExpanded}>
+          <div className="handle-bar"></div>
+          <span className="handle-text">
+            {isExpanded ? '收起行程' : '查看详细行程'}
+          </span>
+          {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
+        </div>
+
+        {/* 标签页导航 */}
+        <div className="panel-tabs">
+          <button
+            onClick={() => setSelectedTab('overview')}
+            className={`tab-button ${selectedTab === 'overview' ? 'active' : ''}`}
+          >
+            总览
+          </button>
+          {days.map((dayKey, index) => (
             <button
-              onClick={() => setSelectedTab('overview')}
-              className={`flex-shrink-0 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${selectedTab === 'overview'
-                  ? 'border-orange-500 text-orange-600 bg-orange-50'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
-                }`}
+              key={dayKey}
+              onClick={() => setSelectedTab(dayKey)}
+              className={`tab-button ${selectedTab === dayKey ? 'active' : ''}`}
             >
-              总览
+              第{index + 1}天
             </button>
-
-            {/* 天数标签 */}
-            {days.map((dayKey, index) => (
-              <button
-                key={dayKey}
-                onClick={() => setSelectedTab(dayKey)}
-                className={`flex-shrink-0 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${selectedTab === dayKey
-                    ? 'border-orange-500 text-orange-600 bg-orange-50'
-                    : 'border-transparent text-gray-600 hover:text-gray-900'
-                  }`}
-              >
-                第{index + 1}天
-              </button>
-            ))}
-          </div>
+          ))}
         </div>
-      </div>
 
-      {/* 内容区域 */}
-      <div className="max-w-md mx-auto px-4 py-4">
-        {selectedTab === 'overview' ? (
-          // 总览视图
-          <div>
-            {/* 总览卡片 */}
-            <Card className="overview-card">
-              <div className="overview-card-content">
-                <div className="overview-card-header">
-                  <h2 className="overview-card-title">{searchData?.destination || '北京'}</h2>
-                </div>
+        {/* 面板内容 */}
+        <div className="panel-content">
+          {selectedTab === 'overview' ? (
+            // 总览视图
+            <div className="overview-content">
+              {/* 目的地卡片 */}
+              <div className="destination-card">
+                <h2>{searchData?.destination || '北京'}</h2>
+                <p>为您精心规划的{getTotalDays()}天深度游</p>
 
-                <p className="overview-card-description">
-                  为您精心规划的{getTotalDays()}天旅程
-                </p>
-
-                <div className="overview-stats-grid">
-                  <div className="overview-stats-item">
-                    <div className="overview-stats-value">{getTotalAttractions()}</div>
-                    <div className="overview-stats-label">景点</div>
+                <div className="stats-grid">
+                  <div className="stat-item">
+                    <div className="stat-value">{getTotalAttractions()}</div>
+                    <div className="stat-label">景点</div>
                   </div>
-                  <div className="overview-stats-item">
-                    <div className="overview-stats-value">{getVisitorCount()}</div>
-                    <div className="overview-stats-label">出行人数</div>
+                  <div className="stat-item">
+                    <div className="stat-value">{getVisitorCount()}</div>
+                    <div className="stat-label">达人服务</div>
                   </div>
-                  <div className="overview-stats-item">
-                    <div className="overview-stats-value">{getTotalDays()}</div>
-                    <div className="overview-stats-label">天</div>
+                  <div className="stat-item">
+                    <div className="stat-value">{getTotalDays()}</div>
+                    <div className="stat-label">天</div>
                   </div>
                 </div>
               </div>
-            </Card>
 
-            {/* 行程概览列表 */}
-            <div className="flex items-center mb-4">
-              <Calendar className="w-5 h-5 mr-2 text-orange-500" />
-              <h3 className="text-lg font-semibold">行程概览</h3>
-            </div>
+              {/* 行程概览 */}
+              <div className="itinerary-overview">
+                <div className="section-header">
+                  <Calendar className="w-5 h-5" />
+                  <h3>行程概览</h3>
+                </div>
 
-            <div className="space-y-3">
-              {days.map((dayKey, index) => {
-                const dayNumber = index + 1;
-                const attractions = currentItinerary[dayKey] || [];
-                const dayName = `第${dayNumber}天`;
+                <div className="days-list">
+                  {days.map((dayKey, index) => {
+                    const dayNumber = index + 1;
+                    const attractions = currentItinerary[dayKey] || [];
 
-                return (
-                  <Card key={dayKey} className="p-4 bg-white border border-gray-200">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mr-3">
-                          <span className="text-orange-600 font-semibold text-sm">{dayNumber}</span>
+                    return (
+                      <div key={dayKey} className="day-summary">
+                        <div className="day-info">
+                          <div className="day-label">第{dayNumber}天</div>
+                          <div className="attraction-count">{attractions.length}个景点</div>
                         </div>
-                        <div>
-                          <h4 className="font-semibold">{dayName}</h4>
-                          <p className="text-sm text-gray-500 flex items-center">
-                            <MapPin className="w-3 h-3 mr-1" />
-                            {attractions.length} 个景点
-                          </p>
+
+                        <div className="attractions-preview">
+                          {attractions.slice(0, 2).map((attraction, idx) => (
+                            <div key={attraction.id} className="attraction-preview">
+                              {attraction.images && attraction.images[0] && (
+                                <img src={attraction.images[0]} alt={attraction.name} />
+                              )}
+                              <span>{attraction.name}</span>
+                            </div>
+                          ))}
+                          {attractions.length > 2 && (
+                            <div className="more-attractions">+{attractions.length - 2}...</div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          ) : (
+            // 具体天数视图
+            <div className="day-detail">
+              <div className="day-header">
+                <h3>第{days.indexOf(selectedTab) + 1}天</h3>
+                <p>{(currentItinerary[selectedTab] || []).length}个精选景点</p>
+              </div>
+
+              <div className="attractions-timeline">
+                {(currentItinerary[selectedTab] || []).map((attraction, index) => (
+                  <div key={attraction.id} className="attraction-item">
+                    <div className="time-dot">
+                      <Clock className="w-4 h-4" />
+                      <span>{attraction.time?.split('-')[0] || '09:00'}</span>
+                      <small>({attraction.duration || '2小时'})</small>
+                    </div>
+
+                    <div className="attraction-card">
+                      {attraction.images && attraction.images[0] && (
+                        <img src={attraction.images[0]} alt={attraction.name} />
+                      )}
+
+                      <div className="attraction-info">
+                        <h4>{attraction.name}</h4>
+                        <p>{attraction.description}</p>
+
+                        <div className="attraction-actions">
+                          <button
+                            className="action-btn"
+                            onClick={() => onFindExperts && onFindExperts(attraction)}
+                          >
+                            查看详情
+                          </button>
+                          <button
+                            className="action-btn primary"
+                            onClick={() => onFindExperts && onFindExperts(attraction)}
+                          >
+                            找达人
+                          </button>
                         </div>
                       </div>
                     </div>
+                  </div>
+                ))}
 
-                    <div className="space-y-2">
-                      {attractions.slice(0, 2).map((attraction) => (
-                        <div key={attraction.id} className="flex items-center">
-                          <div className="w-12 h-12 rounded-lg overflow-hidden mr-3 flex-shrink-0">
-                            <img
-                              src={attraction.images?.[0] || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=100'}
-                              alt={attraction.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h5 className="font-medium text-sm truncate">{attraction.name}</h5>
-                            <p className="text-xs text-gray-500 flex items-center">
-                              <Clock className="w-3 h-3 mr-1" />
-                              {attraction.time} • {attraction.duration}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                      {attractions.length > 2 && (
-                        <div className="text-center">
-                          <span className="text-sm text-gray-400">还有 {attractions.length - 2} 个景点...</span>
-                        </div>
-                      )}
-                    </div>
-                  </Card>
-                );
-              })}
+                {/* 添加更多景点 */}
+                <div className="add-attraction">
+                  <Plus className="w-5 h-5" />
+                  <span>添加更多景点</span>
+                </div>
+              </div>
             </div>
-          </div>
-        ) : (
-          // 单日详细视图
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">
-                第{days.indexOf(selectedTab) + 1}天详细行程
-              </h3>
-            </div>
-
-            {/* 单日景点列表 */}
-            <div className="space-y-4">
-              {(currentItinerary[selectedTab] || []).map((attraction, index) => (
-                <DraggableAttractionCard
-                  key={attraction.id}
-                  attraction={attraction}
-                  index={index}
-                  dayKey={selectedTab}
-                  onMove={handleAttractionMove}
-                  onFindExperts={() => onFindExperts && onFindExperts(attraction)}
-                  onReplace={() => handleReplaceAttraction(attraction.id)}
-                  bookings={bookings}
-                />
-              ))}
-
-              {/* 添加更多景点按钮 */}
-              <Card className="p-4 border-2 border-dashed border-gray-300 hover:border-orange-300 transition-colors">
-                <button
-                  className="w-full flex items-center justify-center text-gray-500 hover:text-orange-500"
-                  onClick={() => {/* 添加景点逻辑 */ }}
-                >
-                  <Plus className="w-5 h-5 mr-2" />
-                  添加更多景点
-                </button>
-              </Card>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-      {/* Reset Confirmation Modal */}
+      {/* 重置确认对话框 */}
       {showResetConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-sm mx-4">
-            <h3 className="text-lg font-semibold mb-2">重置行程</h3>
-            <p className="text-gray-600 mb-4">
-              确定要重置整个行程吗？这将清空所有预约和自定义修改。
-            </p>
-            <div className="flex space-x-3">
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>重置行程</h3>
+            <p>确定要重置整个行程吗？这将清空所有预约和自定义修改。</p>
+            <div className="modal-actions">
               <Button
                 variant="outline"
-                className="flex-1"
                 onClick={() => setShowResetConfirm(false)}
               >
                 取消
               </Button>
               <Button
                 variant="destructive"
-                className="flex-1"
                 onClick={handleResetItinerary}
               >
                 确认重置
@@ -370,21 +384,6 @@ export default function ItineraryResults({
           </div>
         </div>
       )}
-
-      {/* Summary Footer */}
-      <div className="bg-white border-t mt-8">
-        <div className="max-w-md mx-auto p-4">
-          <div className="text-center">
-            <p className="text-sm text-gray-600 mb-2">
-              行程总览: {days.length} 天，
-              共 {Object.values(currentItinerary).reduce((total, day) => total + day.length, 0)} 个景点
-            </p>
-            <p className="text-xs text-gray-500">
-              专家预约: {bookings.length} 个服务
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
