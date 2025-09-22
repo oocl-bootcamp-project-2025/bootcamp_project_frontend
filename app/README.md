@@ -44,3 +44,23 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## AMap (Alibaba Maps) setup
+
+This project includes a simple AMap (Alibaba / Gaode) integration in `src/components/Map.tsx`.
+
+- Add your AMap key as an environment variable named `REACT_APP_AMAP_KEY`.
+- For local development, create a `.env` file in the `app/` folder with:
+
+```
+REACT_APP_AMAP_KEY=your_amap_key_here
+```
+
+- Start the app from the `app/` folder: 
+
+```bash
+npm install
+npm start
+```
+
+The map component will load the AMap JS SDK at runtime and show a marker at a default location.
