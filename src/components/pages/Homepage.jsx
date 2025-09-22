@@ -1,5 +1,5 @@
 import { Alert, Button } from 'antd';
-import { Building, Calendar, Camera, ChevronDown, Clock, Coffee, Compass, Heart, MapPin, Mountain, Search, Users, UtensilsCrossed } from 'lucide-react';
+import { Building, Calendar, Camera, ChevronDown, Coffee, Compass, MapPin, Mountain, Search, Users, UtensilsCrossed } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '../ui/input';
@@ -10,7 +10,7 @@ import { calculateDuration, filterCities } from '../../utils';
 
 export default function Homepage({ onStartPlanning }) {
   const navigate = useNavigate();
-  
+
   const [destination, setDestination] = useState('');
   const [filteredCities, setFilteredCities] = useState([]);
   const [showCityDropdown, setShowCityDropdown] = useState(false);
@@ -95,7 +95,7 @@ export default function Homepage({ onStartPlanning }) {
       return;
     }
 
-    if (!preference) {
+    if (!preference.length) {
       alert('请选择旅行偏好');
       return;
     }
@@ -103,9 +103,9 @@ export default function Homepage({ onStartPlanning }) {
     const searchData = {
       destination: destination.trim(),
       departureDate,
-      departureTime: departureTime || '09:00',
+      departureTime: departureTime || '00:00',
       returnDate,
-      returnTime: returnTime || '18:00',
+      returnTime: returnTime || '00:00',
       preference,
       duration: calculateDuration(departureDate, returnDate)
     };
@@ -180,24 +180,30 @@ export default function Homepage({ onStartPlanning }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-blue-50">
       {/* Header */}
-      <div className="p-6 text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          <Heart className="inline-block w-8 h-8 mr-2 text-red-500" />
-          AI 旅行规划
+      <div className="p-6 text-center" style={{ marginTop: '20px' }}>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2" style={{
+          color: '#FF6B35',
+          fontFamily: '"NSimSun", "Segoe UI", "PingFang SC", "Helvetica Neue", Arial, sans-serif',
+          letterSpacing: '0.03em'
+        }} >
+          让AI为您规划
         </h1>
-        <p className="text-gray-600">
-          让AI为您规划完美的旅程
-        </p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2" style={{
+          color: '#FF6B35',
+          fontFamily: '"NSimSun", "Segoe UI", "PingFang SC", "Helvetica Neue", Arial, sans-serif',
+          letterSpacing: '0.03em'
+        }}>
+          专属行程
+        </h1>
       </div>
 
       {/* Main Content */}
       <div className="px-6 pb-6">
         <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
 
-          {/* 目的地选择 */}
           <div className="relative" ref={cityDropdownRef}>
-            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-              <MapPin className="w-4 h-4 mr-2 text-orange-500" />
+            <label className="flex items-center text-xl font-medium text-gray-700 mb-2">
+              <MapPin className="w-4 h-4 mr-2" style={{ color: '#db9278ff' }} />
               目的地
             </label>
             <div className="relative">
@@ -208,12 +214,12 @@ export default function Homepage({ onStartPlanning }) {
                 placeholder="搜索城市名称或拼音"
                 className="w-full"
               />
-              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
             </div>
 
             {/* 城市下拉选择 */}
             {showCityDropdown && filteredCities.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-48 overflow-y-auto " style={{ width: '350px' }}>
+              <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-48 overflow-y-auto ">
                 {filteredCities.map((city) => (
                   <div
                     key={city.name}
@@ -229,10 +235,13 @@ export default function Homepage({ onStartPlanning }) {
           </div>
 
           {/* 出发时间 */}
-          <div className="grid grid-cols-2 gap-4">
+          <label className="flex items-center text-xl font-medium text-gray-700 mb-2">
+            <Calendar className="w-4 h-4 mr-2 text-500" style={{ color: '#db9278ff' }} />
+            旅行时间
+          </label>
+          <div className="grid grid-cols-2 gap-4" >
             <div>
               <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                <Calendar className="w-4 h-4 mr-2 text-green-500" />
                 出发日期
               </label>
               <input
@@ -247,7 +256,6 @@ export default function Homepage({ onStartPlanning }) {
 
             <div>
               <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                <Clock className="w-4 h-4 mr-2 text-blue-500" />
                 出发时间
               </label>
               <div className="relative" ref={departureTimeRef}>
@@ -282,7 +290,6 @@ export default function Homepage({ onStartPlanning }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                <Calendar className="w-4 h-4 mr-2 text-purple-500" />
                 返回日期
               </label>
               <input
@@ -299,7 +306,6 @@ export default function Homepage({ onStartPlanning }) {
 
             <div>
               <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                <Clock className="w-4 h-4 mr-2 text-indigo-500" />
                 返回时间
               </label>
               <div className="relative" ref={returnTimeRef}>
@@ -339,18 +345,17 @@ export default function Homepage({ onStartPlanning }) {
                 margin: 16,
                 background: 'linear-gradient(90deg,#fff7ed 0%,#f0f9ff 100%)',
                 border: 'none',
-                color: '#d97706',
+                color: '#FF6B35',
                 fontWeight: 500,
                 fontSize: 18,
-                textAlign: 'center',
-                padding: '18px 0'
+                textAlign: 'center'
               }}
             />
           )}
           {/* 旅行偏好 */}
           <div>
-            <label className="flex items-center text-sm font-medium text-gray-700 mb-3">
-              <Users className="w-4 h-4 mr-2 text-pink-500" />
+            <label className="flex items-center text-xl font-medium text-gray-700 mb-3">
+              <Users className="w-4 h-4 mr-2 text-500" style={{ fontSize: '1.5rem', color: '#db9278ff' }} />
               旅行偏好
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -383,6 +388,13 @@ export default function Homepage({ onStartPlanning }) {
             onClick={handleStartPlanning}
             className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-medium py-3 px-4 rounded-lg transition-all transform hover:scale-105"
             size="lg"
+            disabled={
+              !destination.trim() ||
+              !departureDate ||
+              !returnDate ||
+              !preference.length
+            }
+            style={{ backgroundColor: '#f5c6b6ff' }}
           >
             <Search className="w-5 h-5 mr-2" />
             开始规划我的旅程
