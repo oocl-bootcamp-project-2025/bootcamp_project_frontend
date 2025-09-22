@@ -1,0 +1,62 @@
+// router/index.js
+import { createBrowserRouter } from "react-router-dom";
+import { lazy } from 'react';
+import DefaultLayOut from "../layout/DefaultLayOut";
+
+// Lazy load components for better performance
+const Homepage = lazy(() => import('../components/pages/Homepage'));
+const AMapComponent = lazy(() => import('../components/map/AMapComponent'));
+const JourneyDetail = lazy(() => import('../components/map/JourneyDetail'));
+const ItineraryWrapper = lazy(() => import('../components/wrappers/ItineraryWrapper'));
+const ExpertProfilePage = lazy(() => import('../components/pages/ExpertProfilePage'));
+const PostDetailPage = lazy(() => import('../components/pages/PostDetailPage'));
+const ItineraryResults = lazy(() => import('../components/pages/ItineraryResults'));
+
+export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <DefaultLayOut />,
+    children: [
+      {
+        index: true, // 默认路由 -> 首页
+        element: <Homepage />
+      },
+      {
+        path: 'home',
+        element: <Homepage />
+      },
+      {
+        path: 'map',
+        element: <AMapComponent />
+      },
+      {
+        path: 'journey',
+        element: <JourneyDetail />
+      },
+      {
+        path: 'itinerary',
+        element: <ItineraryWrapper />
+      },
+      {
+        path: 'results',
+        element: <ItineraryResults />
+      },
+      {
+        path: 'expert/:id',
+        element: <ExpertProfilePage />
+      },
+      {
+        path: 'expert',
+        element: <ExpertProfilePage />
+      },
+      {
+        path: 'post/:id',
+        element: <PostDetailPage />
+      },
+      {
+        path: 'post',
+        element: <PostDetailPage />
+      }
+    ]
+  }
+]);

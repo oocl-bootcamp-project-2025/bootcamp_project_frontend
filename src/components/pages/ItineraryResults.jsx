@@ -3,6 +3,7 @@ import { useState } from 'react';
 import DraggableAttractionCard from '../common/DraggableAttractionCard';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
+import './css/ItineraryResults.css';
 
 export default function ItineraryResults({
   searchData,

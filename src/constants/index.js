@@ -1,43 +1,35 @@
-// 中国主要城市数据
+// 页面常量
+export const PAGES = {
+  HOME: 'home',
+  RESULTS: 'results',
+  ATTRACTION_DETAIL: 'attraction_detail',
+  EXPERT_PROFILE: 'expert_profile',
+  POST_DETAIL: 'post_detail',
+  ITINERARY: 'itinerary'
+};
+
+// 中国城市数据
 export const CHINESE_CITIES = [
-  { name: '北京', pinyin: 'beijing', province: '北京市' },
-  { name: '上海', pinyin: 'shanghai', province: '上海市' },
-  { name: '广州', pinyin: 'guangzhou', province: '广东省' },
-  { name: '深圳', pinyin: 'shenzhen', province: '广东省' },
-  { name: '杭州', pinyin: 'hangzhou', province: '浙江省' },
-  { name: '南京', pinyin: 'nanjing', province: '江苏省' },
-  { name: '成都', pinyin: 'chengdu', province: '四川省' },
-  { name: '重庆', pinyin: 'chongqing', province: '重庆市' },
-  { name: '西安', pinyin: 'xian', province: '陕西省' },
-  { name: '武汉', pinyin: 'wuhan', province: '湖北省' },
-  { name: '天津', pinyin: 'tianjin', province: '天津市' },
-  { name: '苏州', pinyin: 'suzhou', province: '江苏省' },
-  { name: '青岛', pinyin: 'qingdao', province: '山东省' },
-  { name: '长沙', pinyin: 'changsha', province: '湖南省' },
-  { name: '大连', pinyin: 'dalian', province: '辽宁省' },
-  { name: '厦门', pinyin: 'xiamen', province: '福建省' },
-  { name: '无锡', pinyin: 'wuxi', province: '江苏省' },
-  { name: '福州', pinyin: 'fuzhou', province: '福建省' },
-  { name: '济南', pinyin: 'jinan', province: '山东省' },
-  { name: '昆明', pinyin: 'kunming', province: '云南省' },
-  { name: '哈尔滨', pinyin: 'haerbin', province: '黑龙江省' },
-  { name: '石家庄', pinyin: 'shijiazhuang', province: '河北省' },
-  { name: '合肥', pinyin: 'hefei', province: '安徽省' },
-  { name: '郑州', pinyin: 'zhengzhou', province: '河南省' },
-  { name: '长春', pinyin: 'changchun', province: '吉林省' },
-  { name: '沈阳', pinyin: 'shenyang', province: '辽宁省' },
-  { name: '南昌', pinyin: 'nanchang', province: '江西省' },
-  { name: '贵阳', pinyin: 'guiyang', province: '贵州省' },
-  { name: '太原', pinyin: 'taiyuan', province: '山西省' },
-  { name: '南宁', pinyin: 'nanning', province: '广西壮族自治区' },
-  { name: '海口', pinyin: 'haikou', province: '海南省' },
-  { name: '三亚', pinyin: 'sanya', province: '海南省' },
-  { name: '拉萨', pinyin: 'lasa', province: '西藏自治区' },
-  { name: '乌鲁木齐', pinyin: 'wulumuqi', province: '新疆维吾尔自治区' },
-  { name: '银川', pinyin: 'yinchuan', province: '宁夏回族自治区' },
-  { name: '呼和浩特', pinyin: 'huhehaote', province: '内蒙古自治区' },
-  { name: '兰州', pinyin: 'lanzhou', province: '甘肃省' },
-  { name: '西宁', pinyin: 'xining', province: '青海省' }
+  { name: '北京', province: '北京市', pinyin: 'beijing' },
+  { name: '上海', province: '上海市', pinyin: 'shanghai' },
+  { name: '广州', province: '广东省', pinyin: 'guangzhou' },
+  { name: '深圳', province: '广东省', pinyin: 'shenzhen' },
+  { name: '杭州', province: '浙江省', pinyin: 'hangzhou' },
+  { name: '南京', province: '江苏省', pinyin: 'nanjing' },
+  { name: '成都', province: '四川省', pinyin: 'chengdu' },
+  { name: '西安', province: '陕西省', pinyin: 'xian' },
+  { name: '武汉', province: '湖北省', pinyin: 'wuhan' },
+  { name: '重庆', province: '重庆市', pinyin: 'chongqing' },
+  { name: '天津', province: '天津市', pinyin: 'tianjin' },
+  { name: '苏州', province: '江苏省', pinyin: 'suzhou' },
+  { name: '青岛', province: '山东省', pinyin: 'qingdao' },
+  { name: '长沙', province: '湖南省', pinyin: 'changsha' },
+  { name: '大连', province: '辽宁省', pinyin: 'dalian' },
+  { name: '厦门', province: '福建省', pinyin: 'xiamen' },
+  { name: '无锡', province: '江苏省', pinyin: 'wuxi' },
+  { name: '福州', province: '福建省', pinyin: 'fuzhou' },
+  { name: '济南', province: '山东省', pinyin: 'jinan' },
+  { name: '宁波', province: '浙江省', pinyin: 'ningbo' }
 ];
 
 // 时间选项
@@ -50,32 +42,18 @@ export const TIME_OPTIONS = [
 
 // 旅行偏好选项
 export const PREFERENCE_OPTIONS = [
-  { id: 'niche', label: '小众探索' },
-  { id: 'cultural', label: '文化深度' },
-  { id: 'food', label: '美食之旅' },
-  { id: 'photography', label: '摄影打卡' }
+  { id: 'niche', label: '小众探索', icon: 'Compass' },
+  { id: 'culture', label: '文化历史', icon: 'Building' },
+  { id: 'nature', label: '自然风光', icon: 'Mountain' },
+  { id: 'food', label: '美食购物', icon: 'UtensilsCrossed' },
+  { id: 'leisure', label: '休闲娱乐', icon: 'Coffee' },
+  { id: 'photo', label: '拍照出片', icon: 'Camera' }
 ];
 
-// 专家服务类型
-export const SERVICE_TYPES = [
-  { id: 'guide', name: '导游服务', price: '¥200/天' },
-  { id: 'consultation', name: '旅游咨询', price: '¥50/小时' },
-  { id: 'planning', name: '行程规划', price: '¥150/次' }
-];
-
-// 页面路由常量
-export const PAGES = {
-  HOME: 'home',
-  RESULTS: 'results',
-  ATTRACTION_DETAIL: 'attraction-detail',
-  EXPERT_PROFILE: 'expert-profile',
-  POST_DETAIL: 'post-detail'
-};
-
-// 预约状态
-export const BOOKING_STATUS = {
-  PENDING: 'pending',
-  CONFIRMED: 'confirmed',
-  CANCELLED: 'cancelled',
-  COMPLETED: 'completed'
+// API 端点
+export const API_ENDPOINTS = {
+  SEARCH: '/api/search',
+  EXPERTS: '/api/experts',
+  BOOKINGS: '/api/bookings',
+  ATTRACTIONS: '/api/attractions'
 };
