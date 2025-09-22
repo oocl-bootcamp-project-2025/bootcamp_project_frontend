@@ -45,6 +45,10 @@ const routes = [
       {
         path: '/journey',
         element: <JourneyDetail />
+      },
+      {
+        path: '/home',
+        element: <Homepage />
       }
 
 

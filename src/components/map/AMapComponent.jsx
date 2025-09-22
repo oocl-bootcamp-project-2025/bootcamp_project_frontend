@@ -9,9 +9,70 @@ const AMapComponent = () => {
     const mapRef = useRef(null); // 用于存储地图实例的引用
     const markersRef = useRef([]); // 用于存储所有标记的引用
     const [showJourney, setShowJourney] = useState(false); // 添加显示/隐藏Journey的状态
+    const [prevSelectedDays, setPrevSelectedDays] = useState([]); // 存储上一次选中的天数，用于比较变化
 
     // 从上下文中获取选中的天数和过滤后的位置
     const { filteredLocations, selectedDays, uniqueDays, toggleDay, toggleAll } = useJourney();
+
+    // 监听选中天数的变化，调整地图视图
+    useEffect(() => {
+        // 检查是否有天数选择变化
+        const hasSelectedDaysChanged =
+            !prevSelectedDays ||
+            prevSelectedDays.length !== selectedDays.length ||
+            !selectedDays.every(day => prevSelectedDays.includes(day));
+
+        // 如果选中的天数变化且地图已初始化，调整视图
+        if (hasSelectedDaysChanged && mapRef.current && filteredLocations.length > 0) {
+            console.log("Selected days changed, adjusting map view:", selectedDays);
+
+            // 如果只选择了一天
+            if (selectedDays.length === 1) {
+                const day = selectedDays[0];
+                const dayLocations = filteredLocations.filter(loc => loc.day === day);
+
+                if (dayLocations.length > 0) {
+                    // 创建边界对象
+                    const bounds = new window.AMap.Bounds();
+
+                    // 将该天的所有景点添加到边界中
+                    dayLocations.forEach(location => {
+                        if (location.position && location.position.length === 2) {
+                            bounds.extend(location.position);
+                        }
+                    });
+
+                    // 计算中心点
+                    const center = bounds.getCenter();
+
+                    // 根据景点数量设置合适的缩放级别
+                    const zoom = dayLocations.length === 1 ? 16 :
+                                dayLocations.length <= 3 ? 15 : 14;
+
+                    // 设置地图中心和缩放级别
+                    mapRef.current.setZoomAndCenter(zoom, center);
+                }
+            } else {
+                // 如果选择了多天或全部，则调整视图以适应所有可见标记
+                const bounds = new window.AMap.Bounds();
+
+                // 将所有选中天数的景点添加到边界中
+                filteredLocations.forEach(location => {
+                    if (location.position && location.position.length === 2) {
+                        bounds.extend(location.position);
+                    }
+                });
+
+                // 使所有标记点都在视图内
+                mapRef.current.setFitView(bounds, {
+                    padding: [50, 50, 50, 50] // 添加内边距确保所有标记可见
+                });
+            }
+
+            // 更新之前选中的天数
+            setPrevSelectedDays([...selectedDays]);
+        }
+    }, [selectedDays, filteredLocations]);
 
     // 更新标记显示
     useEffect(() => {
@@ -70,10 +131,15 @@ const AMapComponent = () => {
         markersRef.current = newMarkers;
 
         // 如果有标记，调整地图视图以包含所有标记点
-        if (newMarkers.length > 0) {
+        if (newMarkers.length > 0 && (!prevSelectedDays || prevSelectedDays.length === 0)) {
             const bounds = new window.AMap.Bounds();
             newMarkers.forEach(marker => bounds.extend(marker.getPosition()));
-            mapRef.current.setFitView(bounds);
+            mapRef.current.setFitView(bounds, {
+                padding: [50, 50, 50, 50]
+            });
+
+            // 初始化之前选中的天数
+            setPrevSelectedDays([...selectedDays]);
         }
     }, [filteredLocations]); // 当过滤后的位置变化时，重新执行
 
