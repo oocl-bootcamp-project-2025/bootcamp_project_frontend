@@ -389,18 +389,21 @@ export default function ItineraryResults({
                           <div className="attraction-count">{attractions.length}个景点</div>
                         </div>
 
-                        <div className="attractions-preview">
-                          {attractions.slice(0, 2).map((attraction, idx) => (
-                            <div key={attraction.id} className="attraction-preview">
+                        <div className="attractions-list">
+                          {attractions.map((attraction, idx) => (
+                            <div key={attraction.id} className="attraction-overview-item">
                               {attraction.images && attraction.images[0] && (
-                                <img src={attraction.images[0]} alt={attraction.name} />
+                                <img src={attraction.images[0]} alt={attraction.name} className="attraction-thumb" />
                               )}
-                              <span>{attraction.name}</span>
+                              <div className="attraction-details">
+                                <div className="attraction-name">{attraction.name}</div>
+                                <div className="attraction-time-info">
+                                  <span className="arrival-time">{attraction.time?.split('-')[0] || '09:00'}</span>
+                                  <span className="duration">· {attraction.duration || '2小时'}</span>
+                                </div>
+                              </div>
                             </div>
                           ))}
-                          {attractions.length > 2 && (
-                            <div className="more-attractions">+{attractions.length - 2}...</div>
-                          )}
                         </div>
                       </div>
                     );
