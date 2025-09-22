@@ -1,6 +1,12 @@
 import { lazy, Suspense, useCallback, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import AMapComponent from './components/map/AMapComponent';
+import {
+  createBrowserRouter,
+  RouterProvider,
+  useParams
+} from "react-router";
 
 // Hooks
 import { useAppState, useModalState } from './hooks';
@@ -10,6 +16,8 @@ import { PAGES } from './constants';
 
 // Utils
 import { DEFAULT_ADDITIONAL_IMAGES, generateArticleContent } from './utils/mockData';
+import JourneyDetail from "@/components/map/JourneyDetail";
+import DefaultLayOut from "@/layout/DefaultLayOut";
 
 // Lazy load components to improve initial load time
 const Homepage = lazy(() => import('./components/pages/Homepage'));
@@ -21,6 +29,33 @@ const ExpertArticleModal = lazy(() => import('./components/modals/ExpertArticleM
 const ServiceSelectionModal = lazy(() => import('./components/modals/ServiceSelectionModal'));
 const ExpertBookingModal = lazy(() => import('./components/modals/ExpertBookingModal'));
 const ExpertListModal = lazy(() => import('./components/modals/ExpertListModal'));
+
+// route
+
+const routes = [
+  {
+    path: '/',
+    element: <DefaultLayOut />,
+    // errorElement: <ErrorPage />,
+    children: [
+      {
+        path: '/map',
+        element: <AMapComponent />
+      },
+      {
+        path: '/journey',
+        element: <JourneyDetail />
+      }
+
+
+    ]
+  }
+];
+
+const router = createBrowserRouter(routes);
+
+
+
 
 export default function App() {
   // 使用自定义hooks管理状态
@@ -302,6 +337,12 @@ export default function App() {
 
   return (
     <DndProvider backend={HTML5Backend}>
+
+      <RouterProvider router={router}>
+
+      {/*<AMapComponent />*/}
+
+
       {/* Mobile App Container */}
       <div className="min-h-screen bg-gray-50 relative overflow-x-hidden">
         {/* Mobile Safe Area */}
@@ -399,6 +440,7 @@ export default function App() {
           </Suspense>
         </div>
       </div>
+      </RouterProvider>
     </DndProvider>
   );
 }

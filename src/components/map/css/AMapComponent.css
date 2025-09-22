@@ -4,32 +4,91 @@
     height: 500px;
 }
 
-.marker {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
+.amap-container {
+    position: relative;
+    width: 100%;
 }
 
+.marker {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* 每天不同颜色的标记 */
 .marker-day-1 {
-    background-color: #FF0000; /* 红色 */
+    background-color: #ff4757; /* 红色 - 第1天 */
 }
 
 .marker-day-2 {
-    background-color: #0000FF; /* 蓝色 */
+    background-color: #2e86de; /* 蓝色 - 第2天 */
 }
 
 .marker-day-3 {
-    background-color: #00FF00; /* 绿色 */
+    background-color: #26de81; /* 绿色 - 第3天 */
 }
 
 .marker-day-4 {
-    background-color: #FFFF00; /* 黄色 */
+    background-color: #f368e0; /* 粉色 - 第4天 */
 }
 
 .marker-day-5 {
-    background-color: #FF00FF; /* 紫色 */
+    background-color: #ff9f43; /* 橙色 - 第5天 */
 }
 
-.marker-day-6 {
-    background-color: #00FFFF; /* 青色 */
+/* 添加的新样式 */
+.journey-toggle-btn {
+    position: relative;
+    display: block;
+    margin: 10px auto;
+    padding: 8px 16px;
+    background-color: #2e86de;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
 }
+
+.journey-toggle-btn:hover {
+    background-color: #1c6cbe;
+}
+
+.journey-bottom-container {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.journey-bottom-container .journey-detail {
+    position: relative;
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.journey-bottom-container h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.day-options label {
+    display: inline-block;
+    margin-right: 15px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #555;
+}
+
+/* 更多天数可以继续添加不同颜色 */

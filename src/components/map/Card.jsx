@@ -1,4 +1,4 @@
-// Card.js
+// Card.jsx
 import React from 'react';
 import './css/Card.css'; // 导入样式文件
 
