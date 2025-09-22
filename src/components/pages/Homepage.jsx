@@ -394,7 +394,7 @@ export default function Homepage({ onStartPlanning }) {
               !returnDate ||
               !preference.length
             }
-            style={{ backgroundColor: '#f5c6b6ff' }}
+            style={{ backgroundColor: '#f5c6b6ff', color: '#161515ff' }}
           >
             <Search className="w-5 h-5 mr-2" />
             开始规划我的旅程
