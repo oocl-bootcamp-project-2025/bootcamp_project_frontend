@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useJourney } from '../../context/JourneyContext';
+import Card from './Card';
 import './css/MapContainer.css';
 import JourneyControls from './JourneyControls';
 import MapCore from './MapCore';
@@ -14,6 +15,7 @@ const MapContainer = () => {
     const [mapError, setMapError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isUpdatingView, setIsUpdatingView] = useState(false);
+    const [selectedLocation, setSelectedLocation] = useState(null);
     const updateTimeoutRef = useRef(null);
 
     // 从上下文中获取选中的天数和过滤后的位置
@@ -212,6 +214,11 @@ const MapContainer = () => {
         }
     };
 
+    // 处理景点点击事件
+    const handleLocationClick = (location) => {
+        setSelectedLocation(location);
+    };
+
     // 重试加载地图
     const handleRetry = () => {
         // 重置状态
@@ -248,6 +255,7 @@ const MapContainer = () => {
                             map={map}
                             locations={filteredLocations}
                             onMarkersUpdate={handleMarkersUpdate}
+                            onLocationClick={handleLocationClick}
                             isUpdatingView={isUpdatingView}
                         />
                         <MapRoutes 
@@ -263,6 +271,25 @@ const MapContainer = () => {
                     isUpdating={isUpdatingView}
                     onRetry={handleRetry}
                 />
+
+                {/* 景点信息卡片浮层 */}
+                {selectedLocation && (
+                    <div className="location-card-overlay" onClick={() => setSelectedLocation(null)}>
+                        <div className="location-card-container" onClick={(e) => e.stopPropagation()}>
+                            <button 
+                                className="close-card-button"
+                                onClick={() => setSelectedLocation(null)}
+                                aria-label="关闭"
+                            >
+                                ×
+                            </button>
+                            <Card 
+                                name={selectedLocation.name} 
+                                day={selectedLocation.day}
+                            />
+                        </div>
+                    </div>
+                )}
             </div>
 
             <JourneyControls 

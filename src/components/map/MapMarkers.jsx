@@ -7,6 +7,7 @@ const MapMarkers = ({
     map, 
     locations, 
     onMarkersUpdate,
+    onLocationClick,
     isUpdatingView 
 }) => {
     const markersRef = useRef([]);
@@ -72,6 +73,13 @@ const MapMarkers = ({
                                 marker.setMap(map);
                                 newMarkers.push(marker);
 
+                                // 添加点击事件
+                                marker.on('click', () => {
+                                    if (onLocationClick) {
+                                        onLocationClick(location);
+                                    }
+                                });
+
                                 // 添加鼠标悬停事件
                                 marker.on('mouseover', () => {
                                     const cardContent = ReactDOMServer.renderToString(
@@ -109,7 +117,7 @@ const MapMarkers = ({
                 console.error("Error updating markers:", error);
             }
         }
-    }, [map, locations, isUpdatingView]);
+    }, [map, locations, onLocationClick, isUpdatingView]);
 
     // 组件卸载时清理标记
     useEffect(() => {

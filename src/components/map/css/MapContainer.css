@@ -12,15 +12,104 @@
     height: 60vh;
 }
 
+/* 景点信息卡片浮层样式 */
+.location-card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.location-card-container {
+    position: relative;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    max-width: 90%;
+    max-height: 80%;
+    overflow: auto;
+    animation: slideUp 0.3s ease-out;
+}
+
+.close-card-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.close-card-button:hover {
+    background-color: #f5f5f5;
+    color: #333;
+    transform: scale(1.1);
+}
+
+.close-card-button:active {
+    transform: scale(0.95);
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
 /* 响应式调整 */
 @media screen and (max-width: 768px) {
     .map-wrapper {
         height: 50vh;
+    }
+    
+    .location-card-container {
+        margin: 20px;
+        max-width: calc(100% - 40px);
     }
 }
 
 @media screen and (max-width: 480px) {
     .map-wrapper {
         height: 40vh;
+    }
+    
+    .location-card-container {
+        margin: 10px;
+        max-width: calc(100% - 20px);
+        padding: 15px;
     }
 }
