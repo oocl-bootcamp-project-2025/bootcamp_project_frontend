@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { PAGES } from '../constants';
 
 // 应用状态管理Hook
-export const useAppState = () => {
+const useAppState = () => {
   const [currentPage, setCurrentPage] = useState(PAGES.HOME);
   const [searchData, setSearchData] = useState(null);
   const [selectedExpert, setSelectedExpert] = useState(null);
@@ -86,3 +86,5 @@ export const useAppState = () => {
     setItinerary
   };
 };
+
+export default useAppState;
