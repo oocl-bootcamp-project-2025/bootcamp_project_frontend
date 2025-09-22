@@ -1,7 +1,7 @@
 import { ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { Card } from '../ui/card';
-import './CollapsibleMap.css';
+import './css/CollapsibleMap.css';
 
 export default function CollapsibleMap({ searchData, itinerary }) {
   const [isExpanded, setIsExpanded] = useState(false);
