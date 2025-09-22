@@ -203,3 +203,319 @@ src/components/map/
 - 当前单独选中的天数会高亮显示（蓝色+下划线+加粗）
 - 添加工具提示和使用说明
 - 鼠标悬停效果更加友好
+
+## 组件调用逻辑详解
+
+### 主要调用流程
+
+```
+App.jsx
+  └─ Homepage.jsx
+      └─ MapContainer.jsx (主入口)
+          ├─ MapCore.jsx (地图初始化)
+          ├─ MapMarkers.jsx (标记管理)
+          ├─ MapRoutes.jsx (路线绘制)
+          ├─ MapLoadingStates.jsx (状态显示)
+          └─ JourneyControls.jsx (控制面板)
+```
+
+### 详细调用关系
+
+#### 1. MapContainer.jsx (主协调器)
+
+**状态管理**:
+
+```javascript
+const [map, setMap] = useState(null); // 地图实例
+const [showJourney, setShowJourney] = useState(false); // 显示控制
+const [mapError, setMapError] = useState(false); // 错误状态
+const [isLoading, setIsLoading] = useState(true); // 加载状态
+const [isUpdatingView, setIsUpdatingView] = useState(false); // 视图更新状态
+```
+
+**Context 调用**:
+
+```javascript
+const {
+  filteredLocations, // 过滤后的位置数据
+  selectedDays, // 选中的天数
+  uniqueDays, // 所有天数
+  toggleDay, // 切换单天选择
+  toggleAll, // 全选/取消全选
+  setSelectedDays, // 直接设置选中天数
+} = useJourney();
+```
+
+**子组件调用**:
+
+```javascript
+// 1. 地图核心初始化
+<MapCore
+  onMapReady={handleMapReady}      // 地图准备完成回调
+  onMapError={handleMapError}      // 地图错误回调
+  onMapLoading={handleMapLoading}  // 加载状态回调
+/>
+
+// 2. 标记管理 (条件渲染：地图就绪后)
+{map && (
+  <MapMarkers
+    map={map}                      // 地图实例
+    locations={filteredLocations}  // 位置数据
+    onMarkersUpdate={handleMarkersUpdate} // 标记更新回调
+    isUpdatingView={isUpdatingView}       // 视图更新状态
+  />
+)}
+
+// 3. 路线绘制 (条件渲染：地图就绪后)
+{map && (
+  <MapRoutes
+    map={map}                      // 地图实例
+    locations={filteredLocations}  // 位置数据
+  />
+)}
+
+// 4. 状态显示
+<MapLoadingStates
+  isLoading={isLoading}   // 加载状态
+  mapError={mapError}     // 错误状态
+  isUpdating={isUpdatingView} // 更新状态
+  onRetry={handleRetry}   // 重试回调
+/>
+
+// 5. 控制面板
+<JourneyControls
+  showJourney={showJourney}          // 显示状态
+  onToggleJourney={toggleJourney}    // 切换显示
+  selectedDays={selectedDays}        // 选中天数
+  uniqueDays={uniqueDays}            // 所有天数
+  onToggleDay={toggleDay}            // 天数切换
+  onToggleAll={toggleAll}            // 全选切换
+  onSetSelectedDays={setSelectedDays} // 直接设置
+  isUpdatingView={isUpdatingView}    // 更新状态
+/>
+```
+
+#### 2. MapCore.jsx (地图核心)
+
+**初始化流程**:
+
+```javascript
+useEffect(() => {
+  // 1. 检查高德地图API是否加载
+  if (typeof window.AMap !== 'undefined') {
+    initializeMap(); // 直接初始化
+  } else {
+    // 2. 动态加载高德地图API
+    loadAMapScript()
+      .then(() => {
+        initializeMap();
+      })
+      .catch(onMapError);
+  }
+}, []);
+
+// 3. 地图初始化完成后调用父组件回调
+const initializeMap = () => {
+  try {
+    const mapInstance = new window.AMap.Map('container', config);
+    onMapReady(mapInstance); // 通知父组件
+    onMapLoading(false); // 设置加载完成
+  } catch (error) {
+    onMapError(error); // 通知错误
+  }
+};
+```
+
+#### 3. MapMarkers.jsx (标记管理)
+
+**更新流程**:
+
+```javascript
+useEffect(() => {
+  if (!map || !locations) return;
+
+  // 1. 清除旧标记
+  clearMarkers();
+
+  // 2. 批量处理新标记 (性能优化)
+  const markers = [];
+  locations.forEach(location => {
+    const marker = createMarker(location);
+    markers.push(marker);
+  });
+
+  // 3. 添加到地图
+  markers.forEach(marker => map.add(marker));
+
+  // 4. 通知父组件标记更新完成
+  onMarkersUpdate(markers);
+}, [map, locations]);
+
+// 标记创建逻辑
+const createMarker = location => {
+  const marker = new window.AMap.Marker({
+    position: location.position,
+    content: createMarkerContent(location), // 自定义内容
+    title: location.name,
+  });
+
+  // 添加悬停事件
+  marker.on('mouseover', () => showInfoWindow(location));
+  marker.on('mouseout', hideInfoWindow);
+
+  return marker;
+};
+```
+
+#### 4. MapRoutes.jsx (路线管理)
+
+**路线绘制流程**:
+
+```javascript
+useEffect(() => {
+  if (!map || !locations) return;
+
+  // 1. 清除旧路线
+  clearRoutes();
+
+  // 2. 按天数分组
+  const locationsByDay = groupLocationsByDay(locations);
+
+  // 3. 为每天绘制路线
+  Object.entries(locationsByDay).forEach(([day, dayLocations]) => {
+    if (dayLocations.length >= 2) {
+      drawDayRoute(day, dayLocations);
+    }
+  });
+}, [map, locations]);
+
+// 单天路线绘制
+const drawDayRoute = async (day, locations) => {
+  try {
+    // 1. 调用高德路径规划API
+    const routes = await planRoute(locations);
+
+    // 2. 创建路线多边形
+    const polyline = new window.AMap.Polyline({
+      path: routes,
+      strokeColor: getDayColor(day), // 根据天数获取颜色
+      strokeWeight: 4,
+      strokeOpacity: 0.8,
+    });
+
+    // 3. 添加到地图
+    map.add(polyline);
+    polylines.current.push(polyline);
+  } catch (error) {
+    console.warn(`Failed to draw route for day ${day}:`, error);
+  }
+};
+```
+
+#### 5. JourneyControls.jsx (控制面板)
+
+**交互处理流程**:
+
+```javascript
+// 天数点击处理 (新功能)
+const handleDayClick = day => {
+  // 1. 设置单独选中该天
+  onSetSelectedDays([day]);
+
+  // 2. 触发地图视图调整 (由MapContainer监听selectedDays变化)
+};
+
+// 复选框切换处理 (原有功能)
+const handleToggleDay = day => {
+  // 1. 切换天数选择状态
+  onToggleDay(day);
+
+  // 2. 触发地图视图调整
+};
+
+// 全选切换处理
+const handleToggleAll = () => {
+  // 1. 全选或取消全选
+  onToggleAll();
+
+  // 2. 触发地图视图调整
+};
+```
+
+#### 6. 地图视图调整逻辑 (MapContainer.jsx)
+
+**自动调整流程**:
+
+```javascript
+useEffect(() => {
+  // 1. 监听选中天数变化
+  if (hasSelectedDaysChanged && map && filteredLocations.length > 0) {
+    // 2. 防抖处理，避免频繁调用
+    setIsUpdatingView(true);
+
+    // 3. 筛选有效位置
+    const validLocations = filteredLocations.filter(isValidLocation);
+
+    // 4. 调整地图视图
+    adjustMapView(validLocations);
+  }
+}, [selectedDays, filteredLocations, map]);
+
+// 视图调整算法
+const adjustMapView = validLocations => {
+  // 1. 计算边界范围
+  const bounds = calculateBounds(validLocations);
+
+  // 2. 添加边距
+  const paddedBounds = addPadding(bounds);
+
+  // 3. 计算最佳缩放级别和中心点
+  const { zoom, center } = calculateOptimalView(paddedBounds);
+
+  // 4. 应用到地图
+  map.setZoomAndCenter(zoom, center);
+
+  // 5. 延迟更新状态，确保地图渲染完成
+  setTimeout(() => {
+    setIsUpdatingView(false);
+    setPrevSelectedDays([...selectedDays]);
+  }, 500);
+};
+```
+
+### 数据流向图
+
+```
+JourneyContext (全局状态)
+    ↓ (提供数据)
+MapContainer (主控制器)
+    ↓ (分发状态和回调)
+┌─────────────┬─────────────┬─────────────┬─────────────┐
+│  MapCore    │ MapMarkers  │ MapRoutes   │JourneyControls│
+│             │             │             │             │
+│ ✓初始化地图  │ ✓管理标记    │ ✓绘制路线    │ ✓用户交互     │
+│ ✓错误处理   │ ✓批量渲染    │ ✓路径规划    │ ✓状态显示     │
+│ ✓加载状态   │ ✓事件绑定    │ ✓颜色管理    │ ✓视图控制     │
+└─────────────┴─────────────┴─────────────┴─────────────┘
+    ↑ (状态回调)
+MapContainer (状态汇总)
+    ↑ (触发更新)
+JourneyContext (状态更新)
+```
+
+### 性能优化策略
+
+1. **条件渲染**: 地图实例准备就绪后才渲染标记和路线组件
+2. **批量处理**: 标记更新使用批量处理，减少 DOM 操作
+3. **防抖处理**: 视图调整使用防抖，避免频繁 API 调用
+4. **状态缓存**: 缓存上一次选中状态，避免重复计算
+5. **错误恢复**: 完善的错误处理和重试机制
+6. **内存管理**: 组件卸载时清理地图资源和定时器
+
+### 扩展性设计
+
+- **插件化**: 每个子组件都可以独立扩展功能
+- **配置化**: 通过 props 传递配置参数
+- **事件驱动**: 使用回调函数实现组件间通信
+- **状态分离**: 业务状态和 UI 状态分离管理
+- **样式模块化**: CSS 模块化避免样式冲突
