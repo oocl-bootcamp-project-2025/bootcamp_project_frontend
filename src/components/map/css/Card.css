@@ -1,0 +1,25 @@
+/* Card.css */
+.card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    min-width: 120px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    color: #333;
+    font-size: 14px;
+}
+
+.card h4 {
+    margin: 0;
+    font-size: 16px;
+    color: #007BFF;
+}
+
+.card p {
+    margin: 5px 0;
+    font-size: 12px;
+    color: #666;
+}
