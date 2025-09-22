@@ -1,0 +1,122 @@
+/* 行程统计模块样式 */
+
+/* 行程统计区域容器 */
+.itinerary-statistics-container {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+/* 行程统计标题区 */
+.itinerary-statistics-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.itinerary-statistics-header-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+  color: #f97316; /* text-orange-500 */
+}
+
+.itinerary-statistics-title {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+}
+
+/* 统计卡片网格布局 */
+.statistics-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+/* 统计卡片基础样式 */
+.statistics-card {
+  padding: 0.75rem;
+  text-align: center;
+}
+
+/* 卡片图标容器 */
+.statistics-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.statistics-card-icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* 卡片数值 */
+.statistics-card-value {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+/* 卡片标签 */
+.statistics-card-label {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+/* 景点统计卡片 */
+.attraction-statistics-card {
+  background-image: linear-gradient(to bottom right, #eff6ff, #dbeafe);
+  border: 1px solid #bfdbfe;
+}
+
+.attraction-statistics-card .statistics-card-icon svg {
+  color: #2563eb;
+}
+
+.attraction-statistics-card .statistics-card-value {
+  color: #1e40af;
+}
+
+.attraction-statistics-card .statistics-card-label {
+  color: #2563eb;
+}
+
+/* 达人统计卡片 */
+.expert-statistics-card {
+  background-image: linear-gradient(to bottom right, #f5f3ff, #ede9fe);
+  border: 1px solid #ddd6fe;
+}
+
+.expert-statistics-card .statistics-card-icon svg {
+  color: #7c3aed;
+}
+
+.expert-statistics-card .statistics-card-value {
+  color: #5b21b6;
+}
+
+.expert-statistics-card .statistics-card-label {
+  color: #7c3aed;
+}
+
+/* 天数统计卡片 */
+.days-statistics-card {
+  background-image: linear-gradient(to bottom right, #ecfdf5, #d1fae5);
+  border: 1px solid #a7f3d0;
+}
+
+.days-statistics-card .statistics-card-icon svg {
+  color: #10b981;
+}
+
+.days-statistics-card .statistics-card-value {
+  color: #065f46;
+}
+
+.days-statistics-card .statistics-card-label {
+  color: #10b981;
+}

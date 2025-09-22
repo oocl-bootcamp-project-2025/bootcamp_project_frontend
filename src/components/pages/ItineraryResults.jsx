@@ -1,10 +1,12 @@
-import { Calendar, ChevronLeft, Clock, MapPin, Plus, RotateCcw } from 'lucide-react';
+import { Calendar, ChevronLeft, Clock, MapPin, Plus, RotateCcw, BarChart3, Users } from 'lucide-react';
 import { useState } from 'react';
 import CollapsibleMap from '../common/CollapsibleMap';
 import DraggableAttractionCard from '../common/DraggableAttractionCard';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
 import './css/ItineraryResults.css';
+import './css/ItineraryStatistics.css';
+import './css/ItineraryOverviewCard.css';
 
 export default function ItineraryResults({
   searchData,
@@ -216,28 +218,28 @@ export default function ItineraryResults({
           // 总览视图
           <div>
             {/* 总览卡片 */}
-            <Card className="bg-gradient-to-r from-orange-400 to-yellow-400 text-white border-0 shadow-lg mb-6">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold">{searchData?.destination || '北京'}</h2>
+            <Card className="overview-card">
+              <div className="overview-card-content">
+                <div className="overview-card-header">
+                  <h2 className="overview-card-title">{searchData?.destination || '北京'}</h2>
                 </div>
 
-                <p className="text-white/90 mb-6 text-sm">
+                <p className="overview-card-description">
                   为您精心规划的{getTotalDays()}天旅程
                 </p>
 
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold mb-1">{getTotalAttractions()}</div>
-                    <div className="text-white/80 text-sm">景点</div>
+                <div className="overview-stats-grid">
+                  <div className="overview-stats-item">
+                    <div className="overview-stats-value">{getTotalAttractions()}</div>
+                    <div className="overview-stats-label">景点</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold mb-1">{getVisitorCount()}</div>
-                    <div className="text-white/80 text-sm">出行人数</div>
+                  <div className="overview-stats-item">
+                    <div className="overview-stats-value">{getVisitorCount()}</div>
+                    <div className="overview-stats-label">出行人数</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold mb-1">{getTotalDays()}</div>
-                    <div className="text-white/80 text-sm">天</div>
+                  <div className="overview-stats-item">
+                    <div className="overview-stats-value">{getTotalDays()}</div>
+                    <div className="overview-stats-label">天</div>
                   </div>
                 </div>
               </div>
