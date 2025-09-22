@@ -5,31 +5,36 @@
 }
 
 .marker {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
+/* 每天不同颜色的标记 */
 .marker-day-1 {
-    background-color: #FF0000; /* 红色 */
+    background-color: #ff4757; /* 红色 - 第1天 */
 }
 
 .marker-day-2 {
-    background-color: #0000FF; /* 蓝色 */
+    background-color: #2e86de; /* 蓝色 - 第2天 */
 }
 
 .marker-day-3 {
-    background-color: #00FF00; /* 绿色 */
+    background-color: #26de81; /* 绿色 - 第3天 */
 }
 
 .marker-day-4 {
-    background-color: #FFFF00; /* 黄色 */
+    background-color: #f368e0; /* 粉色 - 第4天 */
 }
 
 .marker-day-5 {
-    background-color: #FF00FF; /* 紫色 */
+    background-color: #ff9f43; /* 橙色 - 第5天 */
 }
 
-.marker-day-6 {
-    background-color: #00FFFF; /* 青色 */
-}
+/* 更多天数可以继续添加不同颜色 */

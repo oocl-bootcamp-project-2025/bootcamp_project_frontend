@@ -1,70 +1,136 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import ReactDOMServer from 'react-dom/server';
+import { useNavigate } from 'react-router';
 import Card from './Card'; // 导入 Card 组件
 import './css/AMapComponent.css'; // 导入 CSS 文件
+import { useJourney } from '../../context/JourneyContext';
 
 const AMapComponent = () => {
+    const navigate = useNavigate(); // 获取 navigate 函数
+    const longPressTimer = useRef(null); // 用于存储长按定时器
+    const mapRef = useRef(null); // 用于存储地图实例的引用
+    const markersRef = useRef([]); // 用于存储所有标记的引用
+
+    // 从上下文中获取选中的天数和过滤后的位置
+    const { filteredLocations } = useJourney();
+
+    // 更新标记显示
     useEffect(() => {
-        const locations = [
-            { name: '天安门', position: [116.397128, 39.916527], day: 1 },
-            { name: '大观园', position: [116.39476, 39.89509], day: 2 },
-            { name: '故宫', position: [116.397128, 39.914889], day: 1 },
-            // 更多地点
-        ];
+        if (!mapRef.current || !window.AMap) return; // 如果地图尚未初始化，则返回
 
-        // 创建地图实例
-        const map = new window.AMap.Map('mapContainer', {
-            center: [116.365868, 39.911455], // 西城区中心点经纬度
-            zoom: 12, // 初始缩放级别
+        console.log("Filtered locations:", filteredLocations); // 调试日志
+
+        // 清除所有现有标记
+        markersRef.current.forEach(marker => {
+            marker.setMap(null);
         });
-
-        // 用于存储所有标记的坐标
-        const markers = [];
+        markersRef.current = [];
 
         // 创建信息窗口
         const infoWindow = new window.AMap.InfoWindow({
-            isCustom: true, // 使用自定义信息窗口
-            autoMove: true, // 自动移动到标记位置
+            isCustom: true,
+            autoMove: true,
+            offset: new window.AMap.Pixel(0, -15)
         });
 
-        // 添加标注
-        locations.forEach((location) => {
-            const dayClass = `marker-day-${location.day}`;
-            const marker = new window.AMap.Marker({
-                position: location.position,
-                title: location.name,
-                // 使用 CSS 类来设置样式
-                content: `<div class="marker ${dayClass}"></div>`,
-            });
-            marker.setMap(map);
-            markers.push(marker.getPosition()); // 存储标记位置
+        // 添加新标记
+        const newMarkers = [];
 
-            // 添加鼠标悬停事件
-            marker.on('mouseover', () => {
-                const cardContent = ReactDOMServer.renderToString(<Card name={location.name} day={location.day} />);
-                infoWindow.setContent(cardContent);
-                infoWindow.open(map, location.position);
-            });
+        if (filteredLocations && filteredLocations.length > 0) {
+            filteredLocations.forEach((location) => {
+                if (location.position && location.position.length === 2) {
+                    // 为不同天数创建不同颜色的标记
+                    const day = location.day || 1;
+                    const marker = new window.AMap.Marker({
+                        position: location.position,
+                        title: location.name,
+                        content: `<div class="marker marker-day-${day}">${location.name.substring(0, 1)}</div>`,
+                        offset: new window.AMap.Pixel(-15, -15) // 使标记居中
+                    });
 
-            // 添加鼠标离开事件以关闭信息窗口
-            marker.on('mouseout', () => {
-                infoWindow.close();
-            });
-        });
+                    marker.setMap(mapRef.current);
+                    newMarkers.push(marker);
 
-        // 缩放地图以包含所有标记点
-        if (markers.length > 0) {
-            const bounds = new window.AMap.Bounds();
-            markers.forEach(marker => bounds.extend(marker));
-            map.setFitView(bounds);
+                    // 添加鼠标悬停事件
+                    marker.on('mouseover', () => {
+                        const cardContent = ReactDOMServer.renderToString(
+                            <Card name={location.name} day={location.day} />
+                        );
+                        infoWindow.setContent(cardContent);
+                        infoWindow.open(mapRef.current, location.position);
+                    });
+
+                    // 添加鼠标离开事件以关闭信息窗口
+                    marker.on('mouseout', () => {
+                        infoWindow.close();
+                    });
+                }
+            });
         }
 
-    }, []);
+        markersRef.current = newMarkers;
+
+        // 如果有标记，调整地图视图以包含所有标记点
+        if (newMarkers.length > 0) {
+            const bounds = new window.AMap.Bounds();
+            newMarkers.forEach(marker => bounds.extend(marker.getPosition()));
+            mapRef.current.setFitView(bounds);
+        }
+    }, [filteredLocations]); // 当过滤后的位置变化时，重新执行
+
+    // 初始化地图
+    useEffect(() => {
+        // 检查AMap是否已加载
+        if (!window.AMap) {
+            console.error("高德地图 API 未加载！");
+            // 可以在这里添加加载地图API的代码
+            return;
+        }
+
+        console.log("Initializing map..."); // 调试日志
+
+        // 创建地图实例
+        const map = new window.AMap.Map('mapContainer', {
+            center: [116.397428, 39.909187], // 天安门中心点经纬度
+            zoom: 12, // 初始缩放级别
+            resizeEnable: true // 是否监控地图容器尺寸变化
+        });
+
+        mapRef.current = map;
+
+        // 处理长按事件
+        const handleLongPressStart = () => {
+            longPressTimer.current = setTimeout(() => {
+                navigate('/journey'); // 导航到 JourneyDetail 页面
+            }, 800); // 设置长按时间
+        };
+
+        const handleLongPressEnd = () => {
+            clearTimeout(longPressTimer.current); // 清除定时器
+        };
+
+        // 添加事件监听
+        map.on('mousedown', handleLongPressStart);
+        map.on('mouseup', handleLongPressEnd);
+        map.on('mouseleave', handleLongPressEnd); // 鼠标离开时清除定时器
+
+        // 清理事件监听
+        return () => {
+            map.off('mousedown', handleLongPressStart);
+            map.off('mouseup', handleLongPressEnd);
+            map.off('mouseleave', handleLongPressEnd);
+
+            // 清除所有标记
+            markersRef.current.forEach(marker => {
+                marker.setMap(null);
+            });
+        };
+    }, []); // 空依赖数组确保只在组件挂载时执行一次
 
     return (
         <div>
             <h1>高德地图标注示例</h1>
-            <div id="mapContainer"></div>
+            <div id="mapContainer" style={{ width: '100%', height: '500px' }}></div>
         </div>
     );
 };
