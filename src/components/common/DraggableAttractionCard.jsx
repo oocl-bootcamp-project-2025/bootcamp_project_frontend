@@ -10,7 +10,6 @@ export default function DraggableAttractionCard({
   index,
   dayKey,
   onMove,
-  onViewDetails,
   onFindExperts,
   onReplace,
   bookings = []
@@ -112,19 +111,13 @@ export default function DraggableAttractionCard({
 
         <div className="flex items-center justify-between">
           <div className="flex space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onViewDetails(attraction)}
-            >
-              详情
-            </Button>
+
             <Button
               variant="outline"
               size="sm"
               onClick={() => onFindExperts(attraction)}
             >
-              找专家
+              找达人
             </Button>
           </div>
 

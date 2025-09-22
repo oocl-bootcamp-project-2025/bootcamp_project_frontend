@@ -21,8 +21,7 @@ import DefaultLayOut from "@/layout/DefaultLayOut";
 
 // Lazy load components to improve initial load time
 const Homepage = lazy(() => import('./components/pages/Homepage'));
-const ItineraryResults = lazy(() => import('./components/pages/ItineraryResults'));
-const AttractionDetailPage = lazy(() => import('./components/pages/AttractionDetailPage'));
+const ItineraryWrapper = lazy(() => import('./components/wrappers/ItineraryWrapper'));
 const PostDetailPage = lazy(() => import('./components/pages/PostDetailPage'));
 const ExpertProfilePage = lazy(() => import('./components/pages/ExpertProfilePage'));
 const ExpertArticleModal = lazy(() => import('./components/modals/ExpertArticleModal'));
@@ -39,15 +38,25 @@ const routes = [
     // errorElement: <ErrorPage />,
     children: [
       {
+        index: true, // 默认路由
+        element: <Homepage />
+      },
+      {
         path: '/map',
         element: <AMapComponent />
       },
       {
         path: '/journey',
         element: <JourneyDetail />
+      },
+      {
+        path: '/home',
+        element: <Homepage />
+      },
+      {
+        path: '/itinerary',
+        element: <ItineraryWrapper />
       }
-
-
     ]
   }
 ];
@@ -104,8 +113,10 @@ export default function App() {
 
   // 事件处理函数
   const handleStartPlanning = useCallback((data) => {
-    navigateToPage(PAGES.RESULTS, { searchData: data });
-  }, [navigateToPage]);
+    // 这个函数现在主要用于向后兼容，实际导航由Homepage自己处理
+    // 如果需要，可以在这里处理额外的逻辑
+    console.log('开始规划旅行:', data);
+  }, []);
 
   const handleBackToHome = useCallback(() => {
     navigateToPage(PAGES.HOME);
@@ -355,28 +366,6 @@ export default function App() {
               />
             )}
 
-            {currentPage === PAGES.RESULTS && (
-              <ItineraryResults
-                searchData={searchData}
-                bookings={bookings}
-                itinerary={itinerary}
-                onBack={handleBackToHome}
-                onViewExpertArticle={handleViewExpertArticle}
-                onViewAttractionDetails={handleViewAttractionDetails}
-                onFindExperts={handleFindExperts}
-                onReplaceAttraction={handleReplaceAttraction}
-                onResetItinerary={handleResetItinerary}
-                onUpdateItinerary={updateItinerary}
-              />
-            )}
-
-            {currentPage === PAGES.ATTRACTION_DETAIL && (
-              <AttractionDetailPage
-                attraction={selectedAttraction}
-                onBack={handleBackFromAttractionDetail}
-                onViewReview={handleViewReview}
-              />
-            )}
 
             {currentPage === PAGES.EXPERT_PROFILE && (
               <ExpertProfilePage
