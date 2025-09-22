@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { useNavigate } from 'react-router';
 import Card from './Card'; // 导入 Card 组件
@@ -10,6 +10,7 @@ const AMapComponent = () => {
     const longPressTimer = useRef(null); // 用于存储长按定时器
     const mapRef = useRef(null); // 用于存储地图实例的引用
     const markersRef = useRef([]); // 用于存储所有标记的引用
+    const [showJourney, setShowJourney] = useState(false); // 添加显示/隐藏Journey的状态
 
     // 从上下文中获取选中的天数和过滤后的位置
     const { filteredLocations } = useJourney();
@@ -127,10 +128,54 @@ const AMapComponent = () => {
         };
     }, []); // 空依赖数组确保只在组件挂载时执行一次
 
+    // 切换Journey显示/隐藏的函数
+    const toggleJourney = () => {
+        setShowJourney(prev => !prev);
+    };
+
     return (
-        <div>
+        <div className="amap-container">
             <h1>高德地图标注示例</h1>
             <div id="mapContainer" style={{ width: '100%', height: '500px' }}></div>
+
+            {/* 添加按钮控制Journey显示/隐藏 */}
+            <button
+                className="journey-toggle-btn"
+                onClick={toggleJourney}
+            >
+                {showJourney ? '隐藏行程' : '显示行程'}
+            </button>
+
+            {/* 有条件地渲染Journey部分 */}
+            {showJourney && (
+                <div className="journey-bottom-container">
+                    <div className="journey-detail">
+                        <h4>路线切换</h4>
+                        <div className="day-options">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={useJourney().selectedDays.length === useJourney().uniqueDays.length}
+                                    onChange={useJourney().toggleAll}
+                                />
+                                显示全部
+                            </label>
+                            <div>
+                                {useJourney().uniqueDays.map(day => (
+                                    <label key={day}>
+                                        <input
+                                            type="checkbox"
+                                            checked={useJourney().selectedDays.includes(day)}
+                                            onChange={() => useJourney().toggleDay(day)}
+                                        />
+                                        第{day}天
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

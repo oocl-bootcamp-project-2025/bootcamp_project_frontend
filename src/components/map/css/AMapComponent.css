@@ -4,6 +4,11 @@
     height: 500px;
 }
 
+.amap-container {
+    position: relative;
+    width: 100%;
+}
+
 .marker {
     width: 30px;
     height: 30px;
@@ -35,6 +40,55 @@
 
 .marker-day-5 {
     background-color: #ff9f43; /* 橙色 - 第5天 */
+}
+
+/* 添加的新样式 */
+.journey-toggle-btn {
+    position: relative;
+    display: block;
+    margin: 10px auto;
+    padding: 8px 16px;
+    background-color: #2e86de;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.journey-toggle-btn:hover {
+    background-color: #1c6cbe;
+}
+
+.journey-bottom-container {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.journey-bottom-container .journey-detail {
+    position: relative;
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.journey-bottom-container h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.day-options label {
+    display: inline-block;
+    margin-right: 15px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #555;
 }
 
 /* 更多天数可以继续添加不同颜色 */
