@@ -1,6 +1,7 @@
 import { Button } from 'antd';
 import { Building, Calendar, Camera, ChevronDown, Clock, Coffee, Compass, Heart, MapPin, Mountain, Search, Users, UtensilsCrossed } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Input } from '../ui/input';
 
 // 导入常量和工具函数
@@ -8,6 +9,8 @@ import { CHINESE_CITIES, TIME_OPTIONS } from '../../constants';
 import { calculateDuration, filterCities } from '../../utils';
 
 export default function Homepage({ onStartPlanning }) {
+  const navigate = useNavigate();
+  
   const [destination, setDestination] = useState('');
   const [filteredCities, setFilteredCities] = useState([]);
   const [showCityDropdown, setShowCityDropdown] = useState(false);
@@ -99,6 +102,10 @@ export default function Homepage({ onStartPlanning }) {
       duration: calculateDuration(departureDate, returnDate)
     };
 
+    // 使用React Router导航到行程页面，并传递搜索数据
+    navigate('/itinerary', { state: { searchData } });
+
+    // 如果还需要调用原有的回调（向后兼容）
     if (onStartPlanning) {
       onStartPlanning(searchData);
     }
