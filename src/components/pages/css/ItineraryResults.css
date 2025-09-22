@@ -205,31 +205,55 @@
   background: #666;
 }
 
-/* 标签页 */
-.panel-tabs {
+/* 自定义标签样式 */
+.custom-tab-nav {
   display: flex;
-  border-bottom: 1px solid #f0f0f0;
-  padding: 0 20px;
+  gap: 8px;
+  padding: 0 16px 16px 16px;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-.tab-button {
-  padding: 12px 16px;
+.custom-tab-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.custom-tab-button {
+  background: #f5f5f5;
   border: none;
-  background: none;
+  border-radius: 25px;
+  padding: 10px 20px;
   font-size: 14px;
+  font-weight: 500;
   color: #666;
-  border-bottom: 2px solid transparent;
   cursor: pointer;
+  transition: all 0.3s ease;
   white-space: nowrap;
-  transition: all 0.2s;
+  min-width: fit-content;
+  flex-shrink: 0;
 }
 
-.tab-button.active {
-  color: #ff7518;
-  border-bottom-color: #ff7518;
-  background: rgba(255, 117, 24, 0.05);
-  border-radius: 8px 8px 0 0;
+.custom-tab-button:hover {
+  background: #eeeeee;
+  color: #333;
+}
+
+.custom-tab-button.active {
+  background: linear-gradient(135deg, #ff7518 0%, #ffb347 100%);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 3px 12px rgba(255, 117, 24, 0.4);
+}
+
+.custom-tab-button.active:hover {
+  background: linear-gradient(135deg, #ff7518 0%, #ffb347 100%);
+  color: white;
+}
+
+.custom-tab-content {
+  padding: 0;
 }
 
 /* 面板内容 */

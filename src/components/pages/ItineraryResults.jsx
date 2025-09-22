@@ -237,7 +237,7 @@ export default function ItineraryResults({
 
   const days = Object.keys(currentItinerary);
 
-  // 计算总览数据
+  // 计算总览数据的辅助函数
   const getTotalAttractions = () => {
     return Object.values(currentItinerary).flat().length;
   };
@@ -249,6 +249,135 @@ export default function ItineraryResults({
   const getVisitorCount = () => {
     return searchData?.travelers || 0;
   };
+
+  // 构建Tabs的items数据
+  const tabItems = [
+    {
+      key: 'overview',
+      label: '总览',
+      children: (
+        <div className="overview-content">
+          {/* 目的地卡片 */}
+          <div className="destination-card">
+            <h2>{searchData?.destination || '北京'}</h2>
+            <p>为您精心规划的{getTotalDays()}天深度游</p>
+
+            <div className="stats-grid">
+              <div className="stat-item">
+                <div className="stat-value">{getTotalAttractions()}</div>
+                <div className="stat-label">景点</div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-value">{getVisitorCount()}</div>
+                <div className="stat-label">达人服务</div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-value">{getTotalDays()}</div>
+                <div className="stat-label">天</div>
+              </div>
+            </div>
+          </div>
+
+          {/* 行程概览 */}
+          <div className="itinerary-overview">
+            <div className="section-header">
+              <Calendar className="w-5 h-5" />
+              <h3>行程概览</h3>
+            </div>
+
+            <div className="days-list">
+              {days.map((dayKey, index) => {
+                const dayNumber = index + 1;
+                const attractions = currentItinerary[dayKey] || [];
+
+                return (
+                  <div key={dayKey} className="day-summary">
+                    <div className="day-info">
+                      <div className="day-label">第{dayNumber}天</div>
+                      <div className="attraction-count">{attractions.length}个景点</div>
+                    </div>
+
+                    <div className="attractions-list">
+                      {attractions.map((attraction, idx) => (
+                        <div key={attraction.id} className="attraction-overview-item">
+                          {attraction.images && attraction.images[0] && (
+                            <img src={attraction.images[0]} alt={attraction.name} className="attraction-thumb" />
+                          )}
+                          <div className="attraction-details">
+                            <div className="attraction-name">{attraction.name}</div>
+                            <div className="attraction-time-info">
+                              <span className="arrival-time">{attraction.time?.split('-')[0] || '09:00'}</span>
+                              <span className="duration">· {attraction.duration || '2小时'}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )
+    },
+    ...days.map((dayKey, index) => ({
+      key: dayKey,
+      label: `第${index + 1}天`,
+      children: (
+        <div className="day-detail">
+          <div className="day-header">
+            <h3>第{index + 1}天</h3>
+            <p>{(currentItinerary[dayKey] || []).length}个精选景点</p>
+          </div>
+
+          <div className="attractions-timeline">
+            {(currentItinerary[dayKey] || []).map((attraction, attractionIndex) => (
+              <div key={attraction.id} className="attraction-item">
+                <div className="time-dot">
+                  <Clock className="w-4 h-4" />
+                  <span>{attraction.time?.split('-')[0] || '09:00'}</span>
+                  <small>({attraction.duration || '2小时'})</small>
+                </div>
+
+                <div className="attraction-card">
+                  {attraction.images && attraction.images[0] && (
+                    <img src={attraction.images[0]} alt={attraction.name} />
+                  )}
+
+                  <div className="attraction-info">
+                    <h4>{attraction.name}</h4>
+                    <p>{attraction.description}</p>
+
+                    <div className="attraction-actions">
+                      <button
+                        className="action-btn"
+                        onClick={() => onFindExperts && onFindExperts(attraction)}
+                      >
+                        查看详情
+                      </button>
+                      <button
+                        className="action-btn primary"
+                        onClick={() => onFindExperts && onFindExperts(attraction)}
+                      >
+                        找达人
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* 添加更多景点 */}
+            <div className="add-attraction">
+              <Plus className="w-5 h-5" />
+              <span>添加更多景点</span>
+            </div>
+          </div>
+        </div>
+      )
+    }))
+  ];
 
   return (
     <div className="itinerary-results-container">
@@ -325,145 +454,25 @@ export default function ItineraryResults({
           <div className="handle-bar"></div>
         </div>
 
-        {/* 标签页导航 */}
-        <div className="panel-tabs">
-          <button
-            onClick={() => setSelectedTab('overview')}
-            className={`tab-button ${selectedTab === 'overview' ? 'active' : ''}`}
-          >
-            总览
-          </button>
-          {days.map((dayKey, index) => (
-            <button
-              key={dayKey}
-              onClick={() => setSelectedTab(dayKey)}
-              className={`tab-button ${selectedTab === dayKey ? 'active' : ''}`}
-            >
-              第{index + 1}天
-            </button>
-          ))}
-        </div>
-
-        {/* 面板内容 */}
+        {/* 自定义标签页 */}
         <div className="panel-content">
-          {selectedTab === 'overview' ? (
-            // 总览视图
-            <div className="overview-content">
-              {/* 目的地卡片 */}
-              <div className="destination-card">
-                <h2>{searchData?.destination || '北京'}</h2>
-                <p>为您精心规划的{getTotalDays()}天深度游</p>
+          {/* 标签导航 */}
+          <div className="custom-tab-nav">
+            {tabItems.map((item) => (
+              <button
+                key={item.key}
+                className={`custom-tab-button ${selectedTab === item.key ? 'active' : ''}`}
+                onClick={() => setSelectedTab(item.key)}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
 
-                <div className="stats-grid">
-                  <div className="stat-item">
-                    <div className="stat-value">{getTotalAttractions()}</div>
-                    <div className="stat-label">景点</div>
-                  </div>
-                  <div className="stat-item">
-                    <div className="stat-value">{getVisitorCount()}</div>
-                    <div className="stat-label">达人服务</div>
-                  </div>
-                  <div className="stat-item">
-                    <div className="stat-value">{getTotalDays()}</div>
-                    <div className="stat-label">天</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 行程概览 */}
-              <div className="itinerary-overview">
-                <div className="section-header">
-                  <Calendar className="w-5 h-5" />
-                  <h3>行程概览</h3>
-                </div>
-
-                <div className="days-list">
-                  {days.map((dayKey, index) => {
-                    const dayNumber = index + 1;
-                    const attractions = currentItinerary[dayKey] || [];
-
-                    return (
-                      <div key={dayKey} className="day-summary">
-                        <div className="day-info">
-                          <div className="day-label">第{dayNumber}天</div>
-                          <div className="attraction-count">{attractions.length}个景点</div>
-                        </div>
-
-                        <div className="attractions-list">
-                          {attractions.map((attraction, idx) => (
-                            <div key={attraction.id} className="attraction-overview-item">
-                              {attraction.images && attraction.images[0] && (
-                                <img src={attraction.images[0]} alt={attraction.name} className="attraction-thumb" />
-                              )}
-                              <div className="attraction-details">
-                                <div className="attraction-name">{attraction.name}</div>
-                                <div className="attraction-time-info">
-                                  <span className="arrival-time">{attraction.time?.split('-')[0] || '09:00'}</span>
-                                  <span className="duration">· {attraction.duration || '2小时'}</span>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          ) : (
-            // 具体天数视图
-            <div className="day-detail">
-              <div className="day-header">
-                <h3>第{days.indexOf(selectedTab) + 1}天</h3>
-                <p>{(currentItinerary[selectedTab] || []).length}个精选景点</p>
-              </div>
-
-              <div className="attractions-timeline">
-                {(currentItinerary[selectedTab] || []).map((attraction, index) => (
-                  <div key={attraction.id} className="attraction-item">
-                    <div className="time-dot">
-                      <Clock className="w-4 h-4" />
-                      <span>{attraction.time?.split('-')[0] || '09:00'}</span>
-                      <small>({attraction.duration || '2小时'})</small>
-                    </div>
-
-                    <div className="attraction-card">
-                      {attraction.images && attraction.images[0] && (
-                        <img src={attraction.images[0]} alt={attraction.name} />
-                      )}
-
-                      <div className="attraction-info">
-                        <h4>{attraction.name}</h4>
-                        <p>{attraction.description}</p>
-
-                        <div className="attraction-actions">
-                          <button
-                            className="action-btn"
-                            onClick={() => onFindExperts && onFindExperts(attraction)}
-                          >
-                            查看详情
-                          </button>
-                          <button
-                            className="action-btn primary"
-                            onClick={() => onFindExperts && onFindExperts(attraction)}
-                          >
-                            找达人
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-
-                {/* 添加更多景点 */}
-                <div className="add-attraction">
-                  <Plus className="w-5 h-5" />
-                  <span>添加更多景点</span>
-                </div>
-              </div>
-            </div>
-          )}
+          {/* 标签内容 */}
+          <div className="custom-tab-content">
+            {tabItems.find(item => item.key === selectedTab)?.children}
+          </div>
         </div>
       </div>
 
