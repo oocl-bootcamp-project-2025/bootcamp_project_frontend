@@ -102,6 +102,15 @@ export default function Homepage({ onStartPlanning }) {
     }
   };
 
+  const getMaxReturnDate = () => {
+    if (!departureDate) return '';
+    const dep = new Date(departureDate);
+    dep.setDate(dep.getDate() + 7);
+    return dep.toISOString().split('T')[0];
+  };
+
+  const canSelectReturnDate = !!departureDate;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-blue-50">
       {/* Header */}
@@ -137,7 +146,7 @@ export default function Homepage({ onStartPlanning }) {
 
             {/* 城市下拉选择 */}
             {showCityDropdown && filteredCities.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-48 overflow-y-auto">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-48 overflow-y-auto " style={{ width: '350px' }}>
                 {filteredCities.map((city) => (
                   <div
                     key={city.name}
@@ -159,18 +168,14 @@ export default function Homepage({ onStartPlanning }) {
                 <Calendar className="w-4 h-4 mr-2 text-green-500" />
                 出发日期
               </label>
-              <select
+              <input
+                type="date"
                 value={departureDate}
                 onChange={(e) => setDepartureDate(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-              >
-                <option value="">选择日期</option>
-                {dateOptions.map((date) => (
-                  <option key={date.value} value={date.value}>
-                    {date.label}
-                  </option>
-                ))}
-              </select>
+                style={{ colorScheme: 'light' }}
+              />
+
             </div>
 
             <div>
@@ -187,7 +192,7 @@ export default function Homepage({ onStartPlanning }) {
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 {showDepartureTime && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-32 overflow-y-auto">
+                  <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-32 overflow-y-auto">
                     {TIME_OPTIONS.map((time) => (
                       <div
                         key={time}
@@ -213,18 +218,16 @@ export default function Homepage({ onStartPlanning }) {
                 <Calendar className="w-4 h-4 mr-2 text-purple-500" />
                 返回日期
               </label>
-              <select
+              <input
+                type="date"
                 value={returnDate}
                 onChange={(e) => setReturnDate(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-              >
-                <option value="">选择日期</option>
-                {dateOptions.slice(1).map((date) => (
-                  <option key={date.value} value={date.value}>
-                    {date.label}
-                  </option>
-                ))}
-              </select>
+                style={{ colorScheme: 'light' }}
+                min={departureDate}
+                max={getMaxReturnDate()}
+                disabled={!canSelectReturnDate}
+              />
             </div>
 
             <div>
@@ -241,7 +244,7 @@ export default function Homepage({ onStartPlanning }) {
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 {showReturnTime && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-32 overflow-y-auto">
+                  <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-32 overflow-y-auto"  >
                     {TIME_OPTIONS.map((time) => (
                       <div
                         key={time}
@@ -274,8 +277,8 @@ export default function Homepage({ onStartPlanning }) {
                     key={option.id}
                     onClick={() => setPreference(option.id)}
                     className={`p-3 rounded-lg border transition-all ${preference === option.id
-                        ? `${option.color} border-current`
-                        : 'border-gray-200 hover:border-gray-300 bg-white'
+                      ? `${option.color} border-current`
+                      : 'border-gray-200 hover:border-gray-300 bg-white'
                       }`}
                   >
                     <div className="flex items-center justify-center mb-1">
