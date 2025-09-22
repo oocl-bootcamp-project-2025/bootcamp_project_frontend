@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import ReactDOMServer from 'react-dom/server';
 import Card from './Card'; // 导入 Card 组件
-import './AMapComponent.css'; // 导入 CSS 文件
+import './css/AMapComponent.css'; // 导入 CSS 文件
 
 const AMapComponent = () => {
     useEffect(() => {
