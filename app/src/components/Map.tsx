@@ -47,8 +47,7 @@ const Map: React.FC = () => {
                     center: defaultCenter,
                 });
 
-                // Add marker
-                const marker = new window.AMap.Marker({
+                new window.AMap.Marker({
                     position: defaultCenter,
                     map: map
                 });
