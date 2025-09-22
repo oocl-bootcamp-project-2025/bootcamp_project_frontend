@@ -10,7 +10,6 @@ export default function ItineraryResults({
   itinerary,
   onBack,
   onViewExpertArticle,
-  onViewAttractionDetails,
   onFindExperts,
   onReplaceAttraction,
   onResetItinerary,
@@ -320,7 +319,6 @@ export default function ItineraryResults({
                           index={index}
                           dayKey={selectedTab}
                           onMove={handleAttractionMove}
-                          onViewDetails={() => onViewAttractionDetails && onViewAttractionDetails(attraction)}
                           onFindExperts={() => onFindExperts && onFindExperts(attraction)}
                           onReplace={() => handleReplaceAttraction(attraction.id)}
                           bookings={bookings}
