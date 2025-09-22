@@ -1,19 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ReactDOMServer from 'react-dom/server';
-import { useNavigate } from 'react-router';
 import Card from './Card'; // 导入 Card 组件
 import './css/AMapComponent.css'; // 导入 CSS 文件
 import { useJourney } from '../../context/JourneyContext';
 
 const AMapComponent = () => {
-    const navigate = useNavigate(); // 获取 navigate 函数
     const longPressTimer = useRef(null); // 用于存储长按定时器
     const mapRef = useRef(null); // 用于存储地图实例的引用
     const markersRef = useRef([]); // 用于存储所有标记的引用
     const [showJourney, setShowJourney] = useState(false); // 添加显示/隐藏Journey的状态
 
     // 从上下文中获取选中的天数和过滤后的位置
-    const { filteredLocations } = useJourney();
+    const { filteredLocations, selectedDays, uniqueDays, toggleDay, toggleAll } = useJourney();
 
     // 更新标记显示
     useEffect(() => {
@@ -99,28 +97,8 @@ const AMapComponent = () => {
 
         mapRef.current = map;
 
-        // 处理长按事件
-        const handleLongPressStart = () => {
-            longPressTimer.current = setTimeout(() => {
-                navigate('/journey'); // 导航到 JourneyDetail 页面
-            }, 800); // 设置长按时间
-        };
-
-        const handleLongPressEnd = () => {
-            clearTimeout(longPressTimer.current); // 清除定时器
-        };
-
-        // 添加事件监听
-        map.on('mousedown', handleLongPressStart);
-        map.on('mouseup', handleLongPressEnd);
-        map.on('mouseleave', handleLongPressEnd); // 鼠标离开时清除定时器
-
         // 清理事件监听
         return () => {
-            map.off('mousedown', handleLongPressStart);
-            map.off('mouseup', handleLongPressEnd);
-            map.off('mouseleave', handleLongPressEnd);
-
             // 清除所有标记
             markersRef.current.forEach(marker => {
                 marker.setMap(null);
@@ -155,18 +133,18 @@ const AMapComponent = () => {
                             <label>
                                 <input
                                     type="checkbox"
-                                    checked={useJourney().selectedDays.length === useJourney().uniqueDays.length}
-                                    onChange={useJourney().toggleAll}
+                                    checked={selectedDays.length === uniqueDays.length}
+                                    onChange={toggleAll}
                                 />
                                 显示全部
                             </label>
                             <div>
-                                {useJourney().uniqueDays.map(day => (
+                                {uniqueDays.map(day => (
                                     <label key={day}>
                                         <input
                                             type="checkbox"
-                                            checked={useJourney().selectedDays.includes(day)}
-                                            onChange={() => useJourney().toggleDay(day)}
+                                            checked={selectedDays.includes(day)}
+                                            onChange={() => toggleDay(day)}
                                         />
                                         第{day}天
                                     </label>

@@ -2,8 +2,8 @@
 import React from 'react';
 import './css/JourneyDetail.css'; // 导入样式文件
 import { useJourney } from '../../context/JourneyContext';
-import AMapComponent from './AMapComponent';
 
+// 我们将AMapComponent作为主组件，不再在JourneyDetail中包含地图
 const JourneyDetail = () => {
     const { selectedDays, uniqueDays, toggleDay, toggleAll } = useJourney();
 
@@ -32,11 +32,7 @@ const JourneyDetail = () => {
                     ))}
                 </div>
             </div>
-
-            {/* 在同一页面显示地图组件 */}
-            <div className="map-container">
-                <AMapComponent />
-            </div>
+            {/* 移除了这里对AMapComponent的引用 */}
         </div>
     );
 };
