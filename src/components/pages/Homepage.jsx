@@ -12,9 +12,9 @@ export default function Homepage({ onStartPlanning }) {
   const [filteredCities, setFilteredCities] = useState([]);
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [departureDate, setDepartureDate] = useState('');
-  const [departureTime, setDepartureTime] = useState('');
+  const [departureTime, setDepartureTime] = useState('00:00');
   const [returnDate, setReturnDate] = useState('');
-  const [returnTime, setReturnTime] = useState('');
+  const [returnTime, setReturnTime] = useState('00:00');
   const [showDepartureTime, setShowDepartureTime] = useState(false);
   const [showReturnTime, setShowReturnTime] = useState(false);
   const [preference, setPreference] = useState([]);
@@ -248,7 +248,7 @@ export default function Homepage({ onStartPlanning }) {
                   onClick={() => setShowDepartureTime(!showDepartureTime)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md text-left focus:ring-2 focus:ring-orange-500 focus:border-transparent flex items-center justify-between"
                 >
-                  {departureTime || '选择时间'}
+                  {departureTime || '0:00'}
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 {showDepartureTime && (
@@ -300,7 +300,7 @@ export default function Homepage({ onStartPlanning }) {
                   onClick={() => setShowReturnTime(!showReturnTime)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md text-left focus:ring-2 focus:ring-orange-500 focus:border-transparent flex items-center justify-between"
                 >
-                  {returnTime || '选择时间'}
+                  {returnTime || '0:00'}
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 {showReturnTime && (
@@ -329,7 +329,7 @@ export default function Homepage({ onStartPlanning }) {
               type="info"
               showIcon={false}
               style={{
-                marginTop: 16,
+                margin: 16,
                 background: 'linear-gradient(90deg,#fff7ed 0%,#f0f9ff 100%)',
                 border: 'none',
                 color: '#d97706',
