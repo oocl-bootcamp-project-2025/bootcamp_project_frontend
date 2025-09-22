@@ -8,7 +8,6 @@ const MapMarkers = ({
     locations,
     selectedTab,
     onMarkersUpdate,
-    onLocationClick,
     isUpdatingView
 }) => {
     const markersRef = useRef([]);
@@ -95,21 +94,15 @@ const MapMarkers = ({
                             marker.setMap(map);
                             allMarkers.push(marker);
 
-                            // 添加点击事件
+                            // 添加点击事件 - 显示信息窗口
                             const handleClick = () => {
-                                console.log("=== MARKER CLICKED ===");
                                 console.log("Marker clicked:", location.name);
-                                console.log("Location data:", location);
-                                console.log("onLocationClick function:", onLocationClick);
-
-                                if (onLocationClick && typeof onLocationClick === 'function') {
-                                    console.log("Calling onLocationClick...");
-                                    onLocationClick(location);
-                                    console.log("onLocationClick called successfully");
-                                } else {
-                                    console.warn("onLocationClick is not available or not a function:", onLocationClick);
-                                }
-                                console.log("=== CLICK HANDLER END ===");
+                                // 点击时显示信息窗口，类似悬停效果
+                                const cardContent = ReactDOMServer.renderToString(
+                                    <Card name={location.name} day={location.day} />
+                                );
+                                infoWindow.setContent(cardContent);
+                                infoWindow.open(map, location.position);
                             };
 
                             // 确保事件绑定成功

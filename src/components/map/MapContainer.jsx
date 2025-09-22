@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import Card from './Card';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import './css/MapContainer.css';
 import MapCore from './MapCore';
 import MapLoadingStates from './MapLoadingStates';
@@ -13,7 +12,7 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
     const [mapError, setMapError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isUpdatingView, setIsUpdatingView] = useState(false);
-    const [selectedLocation, setSelectedLocation] = useState(null);
+
     const updateTimeoutRef = useRef(null);
 
     // 获取所有景点位置信息
@@ -81,10 +80,7 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
         return getCurrentTabLocations();
     }, [selectedTab, itinerary]);
 
-    // 监控selectedLocation状态变化
-    useEffect(() => {
-        console.log("selectedLocation state changed:", selectedLocation);
-    }, [selectedLocation]);
+
 
     // 监听选中标签页的变化，调整地图视图
     useEffect(() => {
@@ -276,10 +272,7 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
         }
     };
 
-    // 处理景点点击事件 - 使用useCallback避免不必要的重新渲染
-    const handleLocationClick = useCallback((location) => {
-        setSelectedLocation(location);
-    }, []);
+
 
     // 重试加载地图
     const handleRetry = () => {
@@ -317,7 +310,6 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
                             locations={allLocations}
                             selectedTab={selectedTab}
                             onMarkersUpdate={handleMarkersUpdate}
-                            onLocationClick={handleLocationClick}
                             isUpdatingView={isUpdatingView}
                         />
                         <MapRoutes
@@ -335,44 +327,7 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
                     onRetry={handleRetry}
                 />
 
-                {/* 景点信息卡片浮层 */}
-                {selectedLocation && (
-                    <div className="location-card-overlay" onClick={() => setSelectedLocation(null)}>
-                        <div className="location-card-container" onClick={(e) => e.stopPropagation()}>
-                            <button
-                                className="close-card-button"
-                                onClick={() => setSelectedLocation(null)}
-                                aria-label="关闭"
-                            >
-                                ×
-                            </button>
-                            <Card
-                                name={selectedLocation.name}
-                                day={selectedLocation.day}
-                            />
-                            <div style={{ fontSize: '10px', color: '#999', marginTop: '5px', borderTop: '1px solid #eee', paddingTop: '5px' }}>
-                                调试: 景点={selectedLocation.name}, 天数={selectedLocation.day}
-                            </div>
-                        </div>
-                    </div>
-                )}
 
-                {/* 调试信息显示 */}
-                {selectedLocation && (
-                    <div style={{
-                        position: 'absolute',
-                        top: '10px',
-                        right: '10px',
-                        background: 'rgba(0,0,0,0.8)',
-                        color: 'white',
-                        padding: '5px',
-                        fontSize: '12px',
-                        borderRadius: '3px',
-                        zIndex: 1001
-                    }}>
-                        调试: 已选择 {selectedLocation.name}
-                    </div>
-                )}
             </div>
 
 
