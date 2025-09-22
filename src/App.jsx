@@ -1,6 +1,7 @@
 import { lazy, Suspense, useCallback, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import AMapComponent from './components/map/AMapComponent';
 
 // Hooks
 import { useAppState, useModalState } from './hooks';
@@ -302,6 +303,10 @@ export default function App() {
 
   return (
     <DndProvider backend={HTML5Backend}>
+
+      <AMapComponent />
+
+
       {/* Mobile App Container */}
       <div className="min-h-screen bg-gray-50 relative overflow-x-hidden">
         {/* Mobile Safe Area */}
