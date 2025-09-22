@@ -17,7 +17,8 @@ export default function Homepage({ onStartPlanning }) {
   const [returnTime, setReturnTime] = useState('');
   const [showDepartureTime, setShowDepartureTime] = useState(false);
   const [showReturnTime, setShowReturnTime] = useState(false);
-  const [preference, setPreference] = useState('');
+  const [preference, setPreference] = useState([]);
+
 
   const preferenceOptions = [
     { id: 'niche', label: '小众探索', icon: Compass, color: 'bg-purple-100 text-purple-700 border-purple-200' },
@@ -110,6 +111,15 @@ export default function Homepage({ onStartPlanning }) {
   };
 
   const canSelectReturnDate = !!departureDate;
+
+  const handlePreferenceClick = (id) => {
+    if (preference.includes(id)) {
+      setPreference(preference.filter((p) => p !== id));
+    } else if (preference.length < 3) {
+      setPreference([...preference, id]);
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-blue-50">
@@ -267,19 +277,22 @@ export default function Homepage({ onStartPlanning }) {
           <div>
             <label className="flex items-center text-sm font-medium text-gray-700 mb-3">
               <Users className="w-4 h-4 mr-2 text-pink-500" />
-              旅行偏好 (选择一项)
+              旅行偏好
             </label>
             <div className="grid grid-cols-2 gap-3">
               {preferenceOptions.map((option) => {
                 const IconComponent = option.icon;
+                const selected = preference.includes(option.id);
+                const disabled = !selected && preference.length >= 3;
                 return (
                   <button
                     key={option.id}
-                    onClick={() => setPreference(option.id)}
-                    className={`p-3 rounded-lg border transition-all ${preference === option.id
+                    onClick={() => handlePreferenceClick(option.id)}
+                    className={`p-3 rounded-lg border transition-all ${selected
                       ? `${option.color} border-current`
                       : 'border-gray-200 hover:border-gray-300 bg-white'
-                      }`}
+                      } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    disabled={disabled}
                   >
                     <div className="flex items-center justify-center mb-1">
                       <IconComponent className="w-5 h-5" />
@@ -309,7 +322,7 @@ export default function Homepage({ onStartPlanning }) {
                 <div>📍 目的地: {destination}</div>
                 <div>📅 时间: {departureDate} 至 {returnDate}</div>
                 <div>⏰ 出发: {departureTime || '09:00'} | 返回: {returnTime || '18:00'}</div>
-                <div>🎯 偏好: {preferenceOptions.find(p => p.id === preference)?.label}</div>
+                <div>🎯 偏好: {preferenceOptions.filter(p => preference.includes(p.id)).map(p => p.label).join('、')}</div>
                 <div>📊 行程: {calculateDuration(departureDate, returnDate)} 天</div>
               </div>
             </div>
