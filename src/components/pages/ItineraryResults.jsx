@@ -1,16 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft, MapPin, Clock, Star, Heart, MoreVertical, Edit2, Trash2, Plus, RotateCcw } from 'lucide-react';
-import { useDrop } from 'react-dnd';
-import { Button } from './ui/button';
-import { Card } from './ui/card';
-import { Badge } from './ui/badge';
-import DraggableAttractionCard from './DraggableAttractionCard';
+import { ChevronLeft, MapPin, Plus, RotateCcw } from 'lucide-react';
+import { useState } from 'react';
+import DraggableAttractionCard from '../common/DraggableAttractionCard';
+import { Button } from '../ui/button';
 
-export default function ItineraryResults({ 
-  searchData, 
+export default function ItineraryResults({
+  searchData,
   bookings = [],
   itinerary,
-  onBack, 
+  onBack,
   onViewExpertArticle,
   onViewAttractionDetails,
   onFindExperts,
@@ -35,7 +32,7 @@ export default function ItineraryResults({
         experts: []
       },
       {
-        id: 'attraction2', 
+        id: 'attraction2',
         name: '故宫博物院',
         description: '明清两朝的皇家宫殿，现为综合性博物馆',
         duration: '3小时',
@@ -77,13 +74,13 @@ export default function ItineraryResults({
     const { dayKey: targetDayKey, index: targetIndex } = targetItem;
 
     const newItinerary = { ...currentItinerary };
-    
+
     // 从源位置移除
     const [removed] = newItinerary[sourceDayKey].splice(sourceIndex, 1);
-    
+
     // 插入到目标位置
     newItinerary[targetDayKey].splice(targetIndex, 0, removed);
-    
+
     setCurrentItinerary(newItinerary);
     onUpdateItinerary && onUpdateItinerary(newItinerary);
   };
@@ -134,7 +131,7 @@ export default function ItineraryResults({
                 </p>
               </div>
             </div>
-            
+
             <Button
               variant="outline"
               size="sm"
@@ -155,11 +152,10 @@ export default function ItineraryResults({
               <button
                 key={dayKey}
                 onClick={() => setSelectedDay(dayKey)}
-                className={`flex-shrink-0 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                  selectedDay === dayKey
+                className={`flex-shrink-0 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${selectedDay === dayKey
                     ? 'border-orange-500 text-orange-600 bg-orange-50'
                     : 'border-transparent text-gray-600 hover:text-gray-900'
-                }`}
+                  }`}
               >
                 第 {index + 1} 天
                 <span className="ml-1 text-xs text-gray-500">

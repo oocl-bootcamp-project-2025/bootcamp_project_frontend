@@ -1,58 +1,11 @@
+import { Building, Calendar, Camera, ChevronDown, Clock, Coffee, Compass, Heart, MapPin, Mountain, Search, Users, UtensilsCrossed } from 'lucide-react';
 import { useState } from 'react';
-import { MapPin, Search, Compass, Building, Mountain, UtensilsCrossed, Coffee, Camera, Heart, Calendar, Clock, ChevronDown, Users } from 'lucide-react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Badge } from './ui/badge';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 
-// 中国主要城市数据
-const chineseCities = [
-  { name: '北京', pinyin: 'beijing', province: '北京市' },
-  { name: '上海', pinyin: 'shanghai', province: '上海市' },
-  { name: '广州', pinyin: 'guangzhou', province: '广东省' },
-  { name: '深圳', pinyin: 'shenzhen', province: '广东省' },
-  { name: '杭州', pinyin: 'hangzhou', province: '浙江省' },
-  { name: '南京', pinyin: 'nanjing', province: '江苏省' },
-  { name: '成都', pinyin: 'chengdu', province: '四川省' },
-  { name: '重庆', pinyin: 'chongqing', province: '重庆市' },
-  { name: '西安', pinyin: 'xian', province: '陕西省' },
-  { name: '武汉', pinyin: 'wuhan', province: '湖北省' },
-  { name: '天津', pinyin: 'tianjin', province: '天津市' },
-  { name: '苏州', pinyin: 'suzhou', province: '江苏省' },
-  { name: '青岛', pinyin: 'qingdao', province: '山东省' },
-  { name: '长沙', pinyin: 'changsha', province: '湖南省' },
-  { name: '大连', pinyin: 'dalian', province: '辽宁省' },
-  { name: '厦门', pinyin: 'xiamen', province: '福建省' },
-  { name: '无锡', pinyin: 'wuxi', province: '江苏省' },
-  { name: '福州', pinyin: 'fuzhou', province: '福建省' },
-  { name: '济南', pinyin: 'jinan', province: '山东省' },
-  { name: '昆明', pinyin: 'kunming', province: '云南省' },
-  { name: '哈尔滨', pinyin: 'haerbin', province: '黑龙江省' },
-  { name: '石家庄', pinyin: 'shijiazhuang', province: '河北省' },
-  { name: '合肥', pinyin: 'hefei', province: '安徽省' },
-  { name: '郑州', pinyin: 'zhengzhou', province: '河南省' },
-  { name: '长春', pinyin: 'changchun', province: '吉林省' },
-  { name: '沈阳', pinyin: 'shenyang', province: '辽宁省' },
-  { name: '南昌', pinyin: 'nanchang', province: '江西省' },
-  { name: '贵阳', pinyin: 'guiyang', province: '贵州省' },
-  { name: '太原', pinyin: 'taiyuan', province: '山西省' },
-  { name: '南宁', pinyin: 'nanning', province: '广西壮族自治区' },
-  { name: '海口', pinyin: 'haikou', province: '海南省' },
-  { name: '三亚', pinyin: 'sanya', province: '海南省' },
-  { name: '拉萨', pinyin: 'lasa', province: '西藏自治区' },
-  { name: '乌鲁木齐', pinyin: 'wulumuqi', province: '新疆维吾尔自治区' },
-  { name: '银川', pinyin: 'yinchuan', province: '宁夏回族自治区' },
-  { name: '呼和浩特', pinyin: 'huhehaote', province: '内蒙古自治区' },
-  { name: '兰州', pinyin: 'lanzhou', province: '甘肃省' },
-  { name: '西宁', pinyin: 'xining', province: '青海省' }
-];
-
-// 时间选项
-const timeOptions = [
-  '00:00', '01:00', '02:00', '03:00', '04:00', '05:00',
-  '06:00', '07:00', '08:00', '09:00', '10:00', '11:00',
-  '12:00', '13:00', '14:00', '15:00', '16:00', '17:00',
-  '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'
-];
+// 导入常量和工具函数
+import { CHINESE_CITIES, TIME_OPTIONS } from '../../constants';
+import { calculateDuration, filterCities } from '../../utils';
 
 export default function Homepage({ onStartPlanning }) {
   const [destination, setDestination] = useState('');
@@ -79,11 +32,7 @@ export default function Homepage({ onStartPlanning }) {
   const handleDestinationChange = (value) => {
     setDestination(value);
     if (value.length > 0) {
-      const filtered = chineseCities.filter(city => 
-        city.name.includes(value) || 
-        city.pinyin.toLowerCase().includes(value.toLowerCase()) ||
-        city.province.includes(value)
-      ).slice(0, 8); // 限制显示8个结果
+      const filtered = filterCities(CHINESE_CITIES, value);
       setFilteredCities(filtered);
       setShowCityDropdown(true);
     } else {
@@ -108,8 +57,8 @@ export default function Homepage({ onStartPlanning }) {
       date.setDate(today.getDate() + i);
       dates.push({
         value: date.toISOString().split('T')[0],
-        label: i === 0 ? '今天' : i === 1 ? '明天' : 
-               `${date.getMonth() + 1}月${date.getDate()}日`
+        label: i === 0 ? '今天' : i === 1 ? '明天' :
+          `${date.getMonth() + 1}月${date.getDate()}日`
       });
     }
     return dates;
@@ -122,7 +71,7 @@ export default function Homepage({ onStartPlanning }) {
       alert('请选择目的地');
       return;
     }
-    
+
     if (!departureDate) {
       alert('请选择出发日期');
       return;
@@ -153,14 +102,6 @@ export default function Homepage({ onStartPlanning }) {
     }
   };
 
-  const calculateDuration = (start, end) => {
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-    const diffTime = Math.abs(endDate - startDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-    return diffDays;
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-blue-50">
       {/* Header */}
@@ -177,7 +118,7 @@ export default function Homepage({ onStartPlanning }) {
       {/* Main Content */}
       <div className="px-6 pb-6">
         <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
-          
+
           {/* 目的地选择 */}
           <div className="relative">
             <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
@@ -193,7 +134,7 @@ export default function Homepage({ onStartPlanning }) {
               />
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             </div>
-            
+
             {/* 城市下拉选择 */}
             {showCityDropdown && filteredCities.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-48 overflow-y-auto">
@@ -231,7 +172,7 @@ export default function Homepage({ onStartPlanning }) {
                 ))}
               </select>
             </div>
-            
+
             <div>
               <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                 <Clock className="w-4 h-4 mr-2 text-blue-500" />
@@ -247,7 +188,7 @@ export default function Homepage({ onStartPlanning }) {
                 </button>
                 {showDepartureTime && (
                   <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-32 overflow-y-auto">
-                    {timeOptions.map((time) => (
+                    {TIME_OPTIONS.map((time) => (
                       <div
                         key={time}
                         onClick={() => {
@@ -285,7 +226,7 @@ export default function Homepage({ onStartPlanning }) {
                 ))}
               </select>
             </div>
-            
+
             <div>
               <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                 <Clock className="w-4 h-4 mr-2 text-indigo-500" />
@@ -301,7 +242,7 @@ export default function Homepage({ onStartPlanning }) {
                 </button>
                 {showReturnTime && (
                   <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-32 overflow-y-auto">
-                    {timeOptions.map((time) => (
+                    {TIME_OPTIONS.map((time) => (
                       <div
                         key={time}
                         onClick={() => {
@@ -332,11 +273,10 @@ export default function Homepage({ onStartPlanning }) {
                   <button
                     key={option.id}
                     onClick={() => setPreference(option.id)}
-                    className={`p-3 rounded-lg border transition-all ${
-                      preference === option.id
+                    className={`p-3 rounded-lg border transition-all ${preference === option.id
                         ? `${option.color} border-current`
                         : 'border-gray-200 hover:border-gray-300 bg-white'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-center mb-1">
                       <IconComponent className="w-5 h-5" />

@@ -1,14 +1,13 @@
+import { Clock, MapPin, MoreVertical } from 'lucide-react';
 import { useDrag, useDrop } from 'react-dnd';
-import { MapPin, Clock, Star, Users, MoreVertical } from 'lucide-react';
-import { Card } from './ui/card';
-import { Badge } from './ui/badge';
-import { Button } from './ui/button';
+import { Button } from '../ui/button';
+import { Card } from '../ui/card';
 
 const ITEM_TYPE = 'attraction';
 
-export default function DraggableAttractionCard({ 
-  attraction, 
-  index, 
+export default function DraggableAttractionCard({
+  attraction,
+  index,
   dayKey,
   onMove,
   onViewDetails,
@@ -39,13 +38,13 @@ export default function DraggableAttractionCard({
   });
 
   // 检查是否有专家预约
-  const hasBooking = bookings.some(booking => 
-    booking.attraction?.id === attraction.id || 
+  const hasBooking = bookings.some(booking =>
+    booking.attraction?.id === attraction.id ||
     booking.attraction?.name === attraction.name
   );
 
-  const booking = bookings.find(booking => 
-    booking.attraction?.id === attraction.id || 
+  const booking = bookings.find(booking =>
+    booking.attraction?.id === attraction.id ||
     booking.attraction?.name === attraction.name
   );
 
@@ -65,7 +64,7 @@ export default function DraggableAttractionCard({
             <p className="text-gray-600 text-sm line-clamp-2 mb-2">
               {attraction.description}
             </p>
-            
+
             <div className="flex items-center space-x-4 text-sm text-gray-500 mb-2">
               <div className="flex items-center">
                 <Clock className="w-4 h-4 mr-1" />
