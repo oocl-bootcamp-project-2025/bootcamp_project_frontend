@@ -1,16 +1,17 @@
+import { ClockCircleOutlined, EnvironmentOutlined, MessageOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Button, Card, Modal, Space, Tag, Typography } from 'antd';
 import React from 'react';
-import { Modal, Card, Avatar, Tag, Button, Space, Typography } from 'antd';
-import { UserOutlined, EnvironmentOutlined, MessageOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import LoginTipsModal from './LoginTipsModal';
 
 const { Title, Text, Paragraph } = Typography;
 
-export default function ExpertListModal({ 
-  attraction, 
-  isOpen, 
-  onClose, 
+export default function ExpertListModal({
+  attraction,
+  isOpen,
+  onClose,
   onSelectExpert
 }) {
-  
+
   // 模拟达人数据 - 简化版本
   const experts = [
     {
@@ -61,172 +62,235 @@ export default function ExpertListModal({
   ];
 
   // 处理预约
+  const [loginModalVisible, setLoginModalVisible] = React.useState(false);
+  const [confirmModalVisible, setConfirmModalVisible] = React.useState(false);
+  const [selectedExpert, setSelectedExpert] = React.useState(null);
+
   const handleBooking = (expert) => {
-    console.log('预约达人:', expert.name);
-    // 这里可以添加预约逻辑
-    if (onSelectExpert) {
-      onSelectExpert(expert);
+    const isLoggedIn = !!localStorage.getItem('token'); // 假设用 token 判断登录
+    if (!isLoggedIn) {
+      setLoginModalVisible(true);
+      return;
     }
+    setSelectedExpert(expert);
+    setConfirmModalVisible(true);
+  };
+
+  // 登录弹窗
+  const handleGoLogin = () => {
+    setLoginModalVisible(false);
+    // 跳转到登录页面
+    window.location.href = '/login';
+  };
+
+  const handleCancelLoginModal = () => {
+    setLoginModalVisible(false);
+  };
+
+  // 处理确认预约
+  const handleConfirmBooking = () => {
+    if (onSelectExpert && selectedExpert) {
+      onSelectExpert(selectedExpert);
+    }
+    setConfirmModalVisible(false);
+  };
+
+  // 取消预约确认
+  const handleCancelBooking = () => {
+    setConfirmModalVisible(false);
+    setSelectedExpert(null);
   };
 
   return (
-    <Modal
-      title={
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <EnvironmentOutlined style={{ color: '#ff6b35' }} />
-          <span>{attraction?.name || '景点'} 当地达人</span>
+    <div>
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <EnvironmentOutlined style={{ color: '#ff6b35' }} />
+            <span>{attraction?.name || '景点'} 当地达人</span>
+          </div>
+        }
+        open={isOpen}
+        onCancel={onClose}
+        footer={null}
+        width={600}
+        centered
+        styles={{
+          body: { maxHeight: '70vh', overflowY: 'auto' }
+        }}
+      >
+        <div style={{ marginBottom: '16px' }}>
+          <Text type="secondary">发现专业的当地向导，获得独特的旅行体验</Text>
+          <br />
+          <Text type="secondary" style={{ fontSize: '12px' }}>
+            共找到 {experts.length} 位可用达人
+          </Text>
         </div>
-      }
-      open={isOpen}
-      onCancel={onClose}
-      footer={null}
-      width={600}
-      centered
-      styles={{
-        body: { maxHeight: '70vh', overflowY: 'auto' }
-      }}
-    >
-      <div style={{ marginBottom: '16px' }}>
-        <Text type="secondary">发现专业的当地向导，获得独特的旅行体验</Text>
-        <br />
-        <Text type="secondary" style={{ fontSize: '12px' }}>
-          共找到 {experts.length} 位可用达人
-        </Text>
-      </div>
 
-      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-        {experts.map((expert) => (
-          <Card
-            key={expert.id}
-            hoverable
-            style={{ borderRadius: '12px' }}
-            bodyStyle={{ padding: '20px' }}
-          >
-            <div style={{ display: 'flex', gap: '16px' }}>
-              {/* 达人头像 */}
-              <div style={{ flexShrink: 0 }}>
-                <Avatar
-                  size={64}
-                  src={expert.avatar}
-                  icon={<UserOutlined />}
-                  style={{ border: expert.verified ? '2px solid #1677ff' : 'none' }}
-                />
-                {expert.verified && (
+        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          {experts.map((expert) => (
+            <Card
+              key={expert.id}
+              hoverable
+              style={{ borderRadius: '12px' }}
+              bodyStyle={{ padding: '20px' }}
+            >
+              <div style={{ display: 'flex', gap: '16px' }}>
+                {/* 达人头像 */}
+                <div style={{ flexShrink: 0 }}>
+                  <Avatar
+                    size={64}
+                    src={expert.avatar}
+                    icon={<UserOutlined />}
+                    style={{ border: expert.verified ? '2px solid #1677ff' : 'none' }}
+                  />
+                  {expert.verified && (
+                    <div style={{
+                      position: 'absolute',
+                      bottom: '-2px',
+                      right: '-2px',
+                      width: '20px',
+                      height: '20px',
+                      backgroundColor: '#1677ff',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: '2px solid white'
+                    }}>
+                      <span style={{ color: 'white', fontSize: '10px' }}>✓</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* 达人信息 */}
+                <div style={{ flex: 1 }}>
+                  {/* 基本信息 */}
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                      <Title level={5} style={{ margin: 0 }}>{expert.name}</Title>
+                      {expert.verified && (
+                        <Tag color="blue" style={{ fontSize: '10px' }}>认证达人</Tag>
+                      )}
+                    </div>
+
+                    <Space size="middle" style={{ fontSize: '12px', color: '#666' }}>
+                      <span>
+                        <MessageOutlined style={{ marginRight: '4px' }} />
+                        {expert.articlesCount}篇
+                      </span>
+                      <span>
+                        <EnvironmentOutlined style={{ marginRight: '4px' }} />
+                        {expert.location}
+                      </span>
+                    </Space>
+                  </div>
+
+                  {/* 专长标签 */}
+                  <div style={{ marginBottom: '12px' }}>
+                    <Space wrap>
+                      {expert.specialties.map((specialty, index) => (
+                        <Tag key={index} color="orange" style={{ fontSize: '11px' }}>
+                          {specialty}
+                        </Tag>
+                      ))}
+                    </Space>
+                  </div>
+
+                  {/* 服务信息 */}
                   <div style={{
-                    position: 'absolute',
-                    bottom: '-2px',
-                    right: '-2px',
-                    width: '20px',
-                    height: '20px',
-                    backgroundColor: '#1677ff',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    border: '2px solid white'
+                    backgroundColor: '#f5f5f5',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    marginBottom: '12px'
                   }}>
-                    <span style={{ color: 'white', fontSize: '10px' }}>✓</span>
-                  </div>
-                )}
-              </div>
-
-              {/* 达人信息 */}
-              <div style={{ flex: 1 }}>
-                {/* 基本信息 */}
-                <div style={{ marginBottom: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                    <Title level={5} style={{ margin: 0 }}>{expert.name}</Title>
-                    {expert.verified && (
-                      <Tag color="blue" style={{ fontSize: '10px' }}>认证达人</Tag>
-                    )}
-                  </div>
-                  
-                  <Space size="middle" style={{ fontSize: '12px', color: '#666' }}>
-                    <span>
-                      <MessageOutlined style={{ marginRight: '4px' }} />
-                      {expert.articlesCount}篇
-                    </span>
-                    <span>
-                      <EnvironmentOutlined style={{ marginRight: '4px' }} />
-                      {expert.location}
-                    </span>
-                  </Space>
-                </div>
-
-                {/* 专长标签 */}
-                <div style={{ marginBottom: '12px' }}>
-                  <Space wrap>
-                    {expert.specialties.map((specialty, index) => (
-                      <Tag key={index} color="orange" style={{ fontSize: '11px' }}>
-                        {specialty}
-                      </Tag>
-                    ))}
-                  </Space>
-                </div>
-
-                {/* 服务信息 */}
-                <div style={{
-                  backgroundColor: '#f5f5f5',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  marginBottom: '12px'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                    <Text strong>{expert.service.name}</Text>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ color: '#ff6b35', fontWeight: 'bold' }}>
-                        {expert.service.price}
-                      </div>
-                      <div style={{ fontSize: '11px', color: '#666', display: 'flex', alignItems: 'center' }}>
-                        <ClockCircleOutlined style={{ marginRight: '2px' }} />
-                        {expert.service.duration}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                      <Text strong>{expert.service.name}</Text>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ color: '#ff6b35', fontWeight: 'bold' }}>
+                          {expert.service.price}
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#666', display: 'flex', alignItems: 'center' }}>
+                          <ClockCircleOutlined style={{ marginRight: '2px' }} />
+                          {expert.service.duration}
+                        </div>
                       </div>
                     </div>
+                    <Paragraph
+                      style={{
+                        margin: 0,
+                        fontSize: '12px',
+                        color: '#666'
+                      }}
+                      ellipsis={{ rows: 2 }}
+                    >
+                      {expert.service.description}
+                    </Paragraph>
                   </div>
-                  <Paragraph 
-                    style={{ 
-                      margin: 0, 
-                      fontSize: '12px', 
-                      color: '#666' 
+
+                  {/* 预约按钮 */}
+                  <Button
+                    type="primary"
+                    style={{
+                      background: 'linear-gradient(to right, #ff6b35, #f7931e)',
+                      border: 'none',
+                      borderRadius: '8px',
+                      width: '100%',
+                      height: '40px',
+                      fontWeight: 'bold'
                     }}
-                    ellipsis={{ rows: 2 }}
+                    onClick={() => handleBooking(expert)}
                   >
-                    {expert.service.description}
-                  </Paragraph>
+                    预约达人
+                  </Button>
                 </div>
-
-                {/* 预约按钮 */}
-                <Button
-                  type="primary"
-                  style={{
-                    background: 'linear-gradient(to right, #ff6b35, #f7931e)',
-                    border: 'none',
-                    borderRadius: '8px',
-                    width: '100%',
-                    height: '40px',
-                    fontWeight: 'bold'
-                  }}
-                  onClick={() => handleBooking(expert)}
-                >
-                  预约达人
-                </Button>
               </div>
-            </div>
-          </Card>
-        ))}
-      </Space>
+            </Card>
+          ))}
+        </Space>
 
-      <div style={{ 
-        textAlign: 'center', 
-        marginTop: '20px', 
-        padding: '16px', 
-        backgroundColor: '#fafafa',
-        borderRadius: '8px' 
-      }}>
-        <Text type="secondary" style={{ fontSize: '12px' }}>
-          点击预约达人按钮即可直接预约专业服务
-        </Text>
-      </div>
-    </Modal>
+        <div style={{
+          textAlign: 'center',
+          marginTop: '20px',
+          padding: '16px',
+          backgroundColor: '#fafafa',
+          borderRadius: '8px'
+        }}>
+          <Text type="secondary" style={{ fontSize: '12px' }}>
+            点击预约达人按钮即可直接预约专业服务
+          </Text>
+        </div>
+      </Modal>
+
+      {/* 登录提示弹窗 */}
+      <LoginTipsModal
+        open={loginModalVisible}
+        onCancel={handleCancelLoginModal}
+        onLogin={handleGoLogin}
+      />
+
+      {/* 预约确认弹窗 */}
+      <Modal
+        title="确认预约"
+        open={confirmModalVisible}
+        onCancel={handleCancelBooking}
+        footer={[
+          <Button key="cancel" onClick={handleCancelBooking}>
+            取消
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            onClick={handleConfirmBooking}
+          >
+            确认预约
+          </Button>,
+        ]}
+      >
+        <p>您确定要预约 {selectedExpert?.name} 的 {selectedExpert?.service.name} 服务吗？</p>
+        <p>服务时长：{selectedExpert?.service.duration}</p>
+        <p>服务费用：{selectedExpert?.service.price}</p>
+      </Modal>
+    </div>
   );
 }
