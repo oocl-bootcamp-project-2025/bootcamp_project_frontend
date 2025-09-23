@@ -140,35 +140,28 @@ export default function Homepage({ onStartPlanning }) {
     ? calculateDuration(departureDate, returnDate)
     : null;
 
-  // 点击外部收起时间选择器
   useEffect(() => {
     function handleClickOutside(event) {
+      // 城市下拉
+      if (
+        cityDropdownRef.current &&
+        !cityDropdownRef.current.contains(event.target)
+      ) {
+        setShowCityDropdown(false);
+      }
+      // 出发时间
       if (
         departureTimeRef.current &&
         !departureTimeRef.current.contains(event.target)
       ) {
         setShowDepartureTime(false);
       }
+      // 返回时间
       if (
         returnTimeRef.current &&
         !returnTimeRef.current.contains(event.target)
       ) {
         setShowReturnTime(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (
-        cityDropdownRef.current &&
-        !cityDropdownRef.current.contains(event.target)
-      ) {
-        setShowCityDropdown(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
