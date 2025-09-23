@@ -2,6 +2,7 @@ import { ClockCircleOutlined, EnvironmentOutlined, MessageOutlined, UserOutlined
 import { Avatar, Button, Card, Modal, Space, Tag, Typography } from 'antd';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import BookingSuccessModal from './BookingSuccessModal';
 import ExpertBookingModal from './ExpertBookingModal';
 import LoginTipsModal from './LoginTipsModal';
 
@@ -67,10 +68,13 @@ export default function ExpertListModal({
   const [loginModalVisible, setLoginModalVisible] = React.useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = React.useState(false);
   const [selectedExpert, setSelectedExpert] = React.useState(null);
+  const [showSuccessModal, setShowSuccessModal] = React.useState(false);
+  const [bookedExperts, setBookedExperts] = React.useState([]);
+
   const navigate = useNavigate();
   const handleBooking = (expert) => {
-    localStorage.removeItem('token');
-    //localStorage.setItem('token', 'test-token');
+    //localStorage.removeItem('token');
+    localStorage.setItem('token', 'test-token');
     const isLoggedIn = !!localStorage.getItem('token'); // 假设用 token 判断登录
     console.log('登录状态:', isLoggedIn);
     if (!isLoggedIn) {
@@ -93,10 +97,19 @@ export default function ExpertListModal({
 
   // 处理确认预约
   const handleConfirmBooking = () => {
-    if (onSelectExpert && selectedExpert) {
-      onSelectExpert(selectedExpert);
+    if (selectedExpert) {
+      setBookedExperts([...bookedExperts, selectedExpert.id]);
+      if (onSelectExpert) {
+        onSelectExpert(selectedExpert);
+      }
+      setConfirmModalVisible(false);
+      setShowSuccessModal(true);
     }
-    setConfirmModalVisible(false);
+  };
+
+  const handleContinuePlanning = () => {
+    setShowSuccessModal(false);
+    onClose();
   };
 
   // 取消预约确认
@@ -235,17 +248,20 @@ export default function ExpertListModal({
                   {/* 预约按钮 */}
                   <Button
                     type="primary"
+                    disabled={bookedExperts.includes(expert.id)}
                     style={{
-                      background: 'linear-gradient(to right, #ff6b35, #f7931e)',
+                      background: bookedExperts.includes(expert.id)
+                        ? '#ccc'
+                        : 'linear-gradient(to right, #ff6b35, #f7931e)',
                       border: 'none',
                       borderRadius: '8px',
                       width: '100%',
                       height: '40px',
                       fontWeight: 'bold'
                     }}
-                    onClick={() => handleBooking(expert)}
+                    onClick={() => !bookedExperts.includes(expert.id) && handleBooking(expert)}
                   >
-                    预约达人
+                    {bookedExperts.includes(expert.id) ? '已预约' : '预约达人'}
                   </Button>
                 </div>
               </div>
@@ -283,6 +299,16 @@ export default function ExpertListModal({
         endTime="15:00"
         serviceName={selectedExpert?.service.name}
         price={selectedExpert?.service.price}
+      />
+
+      {/* 预约成功弹窗 */}
+      <BookingSuccessModal
+        open={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        expertName={selectedExpert?.name}
+        serviceName={selectedExpert?.service.name}
+        bookingDateTime={`2025年9月22日星期一 13:30-15:00`}
+        onContinuePlanning={handleContinuePlanning}
       />
     </div>
   );
