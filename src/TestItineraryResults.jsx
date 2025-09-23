@@ -1,4 +1,4 @@
-import ItineraryResults from '../components/pages/ItineraryResults';
+import ItineraryResults from './components/pages/ItineraryResults';
 
 // 测试数据
 const mockSearchData = {
