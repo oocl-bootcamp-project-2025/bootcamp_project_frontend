@@ -53,6 +53,7 @@ const ResultModal = ({
           <button
             className="result-modal-button"
             onClick={onClose}
+            autoFocus
           >
             {buttonText}
           </button>
