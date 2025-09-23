@@ -1,4 +1,5 @@
 import { Check, AlertCircle } from 'lucide-react';
+import { useEffect } from 'react';
 import './css/ResultModal.css';
 
 const ResultModal = ({
@@ -12,6 +13,15 @@ const ResultModal = ({
   if (!isOpen) return null;
 
   const isSuccess = type === 'success';
+
+  // 新增：5秒自动关闭弹窗
+  useEffect(() => {
+    if (!isOpen) return;
+    const timer = setTimeout(() => {
+      onClose && onClose();
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [isOpen, onClose]);
 
   return (
     <div className="result-modal-overlay" onClick={onClose}>
