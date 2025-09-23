@@ -1,9 +1,6 @@
 import { ClockCircleOutlined, EnvironmentOutlined, ExclamationCircleOutlined, MessageOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, Card, Empty, Modal, Result, Skeleton, Space, Tag, Typography } from 'antd';
-import React, { useEffect, useState } from 'react';
-import { ClockCircleOutlined, EnvironmentOutlined, MessageOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Button, Card, Modal, Space, Tag, Typography } from 'antd';
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ExpertBookingModal from './ExpertBookingModal';
 import LoginTipsModal from './LoginTipsModal';
@@ -113,9 +110,9 @@ export default function ExpertListModal({
   }, [isOpen, attraction]);
 
   // 处理预约
-  const [loginModalVisible, setLoginModalVisible] = React.useState(false);
-  const [confirmModalVisible, setConfirmModalVisible] = React.useState(false);
-  const [selectedExpert, setSelectedExpert] = React.useState(null);
+  const [loginModalVisible, setLoginModalVisible] = useState(false);
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
+  const [selectedExpert, setSelectedExpert] = useState(null);
   const navigate = useNavigate();
   const handleBooking = (expert) => {
     localStorage.removeItem('token');
@@ -505,6 +502,6 @@ export default function ExpertListModal({
         serviceName={selectedExpert?.service.name}
         price={selectedExpert?.service.price}
       />
-    </div>
+    </Modal>
   );
 }
