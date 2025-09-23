@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Phone, Calendar } from 'lucide-react';
+import { Phone, Calendar } from 'lucide-react';
 import { Button } from '../ui/button';
 import './css/SaveItineraryModal.css';
 
@@ -84,9 +84,6 @@ const SaveItineraryModal = ({ isOpen, onClose, onSave }) => {
               <p>我们将发送行程详情到您的手机</p>
             </div>
           </div>
-          <button className="save-modal-close" onClick={handleCancel}>
-            <X className="w-5 h-5" />
-          </button>
         </div>
 
         <div className="save-modal-content">

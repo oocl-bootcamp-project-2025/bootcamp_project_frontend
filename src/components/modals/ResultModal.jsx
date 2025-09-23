@@ -1,4 +1,4 @@
-import { Check, AlertCircle, X } from 'lucide-react';
+import { Check, AlertCircle } from 'lucide-react';
 import './css/ResultModal.css';
 
 const ResultModal = ({
@@ -16,11 +16,6 @@ const ResultModal = ({
   return (
     <div className="result-modal-overlay" onClick={onClose}>
       <div className="result-modal-container" onClick={(e) => e.stopPropagation()}>
-        {/* 关闭按钮 */}
-        <button className="result-modal-close" onClick={onClose}>
-          <X className="w-5 h-5" />
-        </button>
-
         {/* 图标区域 */}
         <div className="result-modal-icon-section">
           <div className={`result-modal-icon ${isSuccess ? 'success' : 'error'}`}>
