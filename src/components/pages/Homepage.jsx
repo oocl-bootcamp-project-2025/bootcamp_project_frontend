@@ -56,10 +56,13 @@ export default function Homepage() {
   };
 
   const handleDestinationBlur = () => {
-    // 只有选择了城市列表中的城市才有效，否则清空
-    if (!CHINESE_CITIES.some(city => city.name === destination)) {
-      setDestination('');
-    }
+    setTimeout(() => {
+      setShowCityDropdown(false);
+      // 只有选择了城市列表中的城市才有效，否则清空
+      if (!CHINESE_CITIES.some(city => city.name === destination)) {
+        setDestination('');
+      }
+    }, 200);
   };
 
   // 生成今天之后的日期选项
@@ -118,7 +121,7 @@ export default function Homepage() {
   const getMaxReturnDate = () => {
     if (!departureDate) return '';
     const dep = new Date(departureDate);
-    dep.setDate(dep.getDate() + 7);
+    dep.setDate(dep.getDate() + 6);
     return dep.toISOString().split('T')[0];
   };
 
@@ -136,35 +139,28 @@ export default function Homepage() {
     ? calculateDuration(departureDate, returnDate)
     : null;
 
-  // 点击外部收起时间选择器
   useEffect(() => {
     function handleClickOutside(event) {
+      // 城市下拉
+      if (
+        cityDropdownRef.current &&
+        !cityDropdownRef.current.contains(event.target)
+      ) {
+        setShowCityDropdown(false);
+      }
+      // 出发时间
       if (
         departureTimeRef.current &&
         !departureTimeRef.current.contains(event.target)
       ) {
         setShowDepartureTime(false);
       }
+      // 返回时间
       if (
         returnTimeRef.current &&
         !returnTimeRef.current.contains(event.target)
       ) {
         setShowReturnTime(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (
-        cityDropdownRef.current &&
-        !cityDropdownRef.current.contains(event.target)
-      ) {
-        setShowCityDropdown(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
