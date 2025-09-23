@@ -116,6 +116,7 @@ export default function Homepage() {
 
     // 使用useNavigate进行路由跳转，传递搜索数据
     navigate('/itinerary', { state: { searchData } });
+
   };
 
   const getMaxReturnDate = () => {
@@ -415,8 +416,8 @@ export default function Homepage() {
           <Button
             onClick={handleStartPlanning}
             className={`w-full font-medium py-3 px-4 rounded-lg transition-all transform ${!destination.trim() || !departureDate || !returnDate || !preference.length
-                ? 'bg-gray-300 cursor-not-allowed opacity-50'
-                : 'hover:scale-105'
+              ? 'bg-gray-300 cursor-not-allowed opacity-50'
+              : 'hover:scale-105'
               }`}
             size="lg"
             disabled={!destination.trim() || !departureDate || !returnDate || !preference.length}
