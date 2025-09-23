@@ -1,0 +1,7 @@
+/* AMapComponent.css - 保留向后兼容的样式导入 */
+@import './MapContainer.css';
+@import './MapCore.css';
+@import './MapMarkers.css';
+@import './MapRoutes.css';
+@import './MapLoadingStates.css';
+@import './JourneyControls.css';
