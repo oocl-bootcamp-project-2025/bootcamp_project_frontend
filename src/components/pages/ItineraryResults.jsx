@@ -7,6 +7,7 @@ import './css/ItineraryResults.css';
 import './css/ItineraryStatistics.css';
 import SaveItineraryModal from '../modals/SaveItineraryModal';
 import ResultModal from '../modals/ResultModal';
+import { saveItinerary } from '@/components/apis/api';
 
 export default function ItineraryResults({
   searchData,
@@ -106,50 +107,32 @@ export default function ItineraryResults({
 
   // 新增：处理保存行程
   const handleSaveItinerary = async (phoneNumber) => {
-    try {
-      // 构建要保存的数据
+    // 参数校验
+    if (!phoneNumber) {
+      setResultType('error');
+      setResultMessage('请输入有效的手机号');
+      setShowResultModal(true);
+      return;
+    }
       const itineraryData = {
         phoneNumber,
-        destination: searchData?.destination || '北京',
-        days: getTotalDays(),
-        attractions: getTotalAttractions(),
-        travelers: getVisitorCount(),
-        itinerary: currentItinerary,
-        searchData,
-        createdAt: new Date().toISOString()
+        startDate: searchData?.departureDate || '',
+        allNumber: getTotalAttractions(),
+        itineraryData: currentItinerary
       };
-
-      // TODO: 等后端接口完成后，取消注释下面的代码
-      /*
-      const response = await fetch('/api/save-itinerary', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(itineraryData),
-      });
-
-      if (!response.ok) {
-        throw new Error('保存失败');
-      }
-
-      const result = await response.json();
-      console.log('行程保存成功:', result);
-      */
-
-      // 关闭模态框
-      setShowSaveModal(false);
-      // 保存成功，显示成功结果弹窗
-      setResultType('success');
-      setResultMessage('行程已成功保存！我们已将行程链接发送到您的手机，请注意查收短信。');
-      setShowResultModal(true);
-
-    }catch (error) {
-      // 保存失败，显示失败结果弹窗
-      setResultType('error');
-      setResultMessage('保存失败，请检查网络连接后重试。如问题持续存在，请联系客服。');
-      setShowResultModal(true);
-    }
+      await saveItinerary(itineraryData).then(response => {
+        if (response.code !== 201) {
+          throw new Error('保存失败');
+        }
+        setShowSaveModal(false);
+        setResultType('success');
+        setResultMessage('行程已成功保存！我们已将行程链接发送到您的手机，请注意查收短信。');
+        setShowResultModal(true);
+      }).catch(error => {
+        setResultType('error');
+        setResultMessage('保存失败，请检查网络连接后重试。如问题持续存在，请联系客服。');
+        setShowResultModal(true);
+      })
   };
   // 处理触摸开始
   const handleTouchStart = (e) => {
