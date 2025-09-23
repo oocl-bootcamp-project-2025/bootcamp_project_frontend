@@ -1,0 +1,51 @@
+/* Card.css - 使用相对单位的自适应样式 */
+.card {
+    background-color: #fff;
+    border: 0.0625rem solid #ddd; /* 1px */
+    border-radius: 0.5rem; /* 8px */
+    padding: 0.9375rem; /* 15px */
+    box-shadow: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.1); /* 0 4px 10px */
+    min-width: 7.5rem; /* 120px */
+    width: 100%;
+    max-width: 100%;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    color: #333;
+    font-size: 0.875rem; /* 14px */
+    box-sizing: border-box;
+}
+
+.card h4 {
+    margin: 0;
+    font-size: 1rem; /* 16px */
+    color: #007BFF;
+}
+
+.card p {
+    margin: 0.3125rem 0; /* 5px 0 */
+    font-size: 0.75rem; /* 12px */
+    color: #666;
+}
+
+/* 响应式调整 */
+@media screen and (max-width: 768px) {
+    .card {
+        padding: 0.75rem;
+        min-width: 6.25rem; /* 100px */
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .card {
+        padding: 0.625rem;
+        font-size: 0.8125rem; /* 13px */
+    }
+
+    .card h4 {
+        font-size: 0.9375rem; /* 15px */
+    }
+
+    .card p {
+        font-size: 0.6875rem; /* 11px */
+    }
+}

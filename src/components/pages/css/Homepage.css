@@ -1,0 +1,28 @@
+/* Homepage.css */
+.homepage-container {
+  /* Homepage specific styles */
+}
+
+.homepage-hero {
+  /* Hero section styles */
+}
+
+.homepage-search {
+  /* Search section styles */
+}
+
+.homepage-features {
+  /* Features section styles */
+}
+.duration-card {
+    background: white;
+    border: 1px solid #f0f0f0;
+    border-radius: 12px;
+    padding: 12px;
+}
+.prefer-card {
+    background: white;
+    border: 1px solid #f0f0f0;
+    border-radius: 12px;
+    padding: 12px;
+}
