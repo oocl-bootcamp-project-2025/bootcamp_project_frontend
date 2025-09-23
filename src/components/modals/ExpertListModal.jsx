@@ -1,6 +1,11 @@
 import { ClockCircleOutlined, EnvironmentOutlined, ExclamationCircleOutlined, MessageOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, Card, Empty, Modal, Result, Skeleton, Space, Tag, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
+import { ClockCircleOutlined, EnvironmentOutlined, MessageOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Button, Card, Modal, Space, Tag, Typography } from 'antd';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import ExpertBookingModal from './ExpertBookingModal';
 import LoginTipsModal from './LoginTipsModal';
 
 const { Title, Text, Paragraph } = Typography;
@@ -111,9 +116,12 @@ export default function ExpertListModal({
   const [loginModalVisible, setLoginModalVisible] = React.useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = React.useState(false);
   const [selectedExpert, setSelectedExpert] = React.useState(null);
-
+  const navigate = useNavigate();
   const handleBooking = (expert) => {
+    localStorage.removeItem('token');
+    //localStorage.setItem('token', 'test-token');
     const isLoggedIn = !!localStorage.getItem('token'); // 假设用 token 判断登录
+    console.log('登录状态:', isLoggedIn);
     if (!isLoggedIn) {
       setLoginModalVisible(true);
       return;
@@ -125,8 +133,7 @@ export default function ExpertListModal({
   // 登录弹窗
   const handleGoLogin = () => {
     setLoginModalVisible(false);
-    // 跳转到登录页面
-    window.location.href = '/login';
+    navigate('/login');
   };
 
   const handleCancelLoginModal = () => {
@@ -488,27 +495,16 @@ export default function ExpertListModal({
       />
 
       {/* 预约确认弹窗 */}
-      <Modal
-        title="确认预约"
+      <ExpertBookingModal
         open={confirmModalVisible}
         onCancel={handleCancelBooking}
-        footer={[
-          <Button key="cancel" onClick={handleCancelBooking}>
-            取消
-          </Button>,
-          <Button
-            key="submit"
-            type="primary"
-            onClick={handleConfirmBooking}
-          >
-            确认预约
-          </Button>,
-        ]}
-      >
-        <p>您确定要预约 {selectedExpert?.name} 的 {selectedExpert?.service.name} 服务吗？</p>
-        <p>服务时长：{selectedExpert?.service.duration}</p>
-        <p>服务费用：{selectedExpert?.service.price}</p>
-      </Modal>
-    </Modal>
+        onConfirm={handleConfirmBooking}
+        date="2025年9月22日星期一"
+        startTime="13:30"
+        endTime="15:00"
+        serviceName={selectedExpert?.service.name}
+        price={selectedExpert?.service.price}
+      />
+    </div>
   );
 }
