@@ -6,6 +6,7 @@ import './css/ItineraryOverviewCard.css';
 import './css/ItineraryResults.css';
 import './css/ItineraryStatistics.css';
 import SaveItineraryModal from '../modals/SaveItineraryModal';
+import ResultModal from '../modals/ResultModal';
 
 export default function ItineraryResults({
   searchData,
@@ -25,6 +26,9 @@ export default function ItineraryResults({
   const [isDragging, setIsDragging] = useState(false);
   const [currentTranslateY, setCurrentTranslateY] = useState(0);
   const panelRef = useRef(null);
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [resultType, setResultType] = useState('success');
+  const [resultMessage, setResultMessage] = useState('');
 
   // 初始化行程数据
   const [currentItinerary, setCurrentItinerary] = useState(itinerary || {
@@ -135,13 +139,18 @@ export default function ItineraryResults({
 
       // 关闭模态框
       setShowSaveModal(false);
-      alert("成功保存行程")
-    } catch (error) {
-      console.error('保存行程失败:', error);
-      alert("保存行程失败，请稍后重试")
+      // 保存成功，显示成功结果弹窗
+      setResultType('success');
+      setResultMessage('行程已成功保存！我们已将行程链接发送到您的手机，请注意查收短信。');
+      setShowResultModal(true);
+
+    }catch (error) {
+      // 保存失败，显示失败结果弹窗
+      setResultType('error');
+      setResultMessage('保存失败，请检查网络连接后重试。如问题持续存在，请联系客服。');
+      setShowResultModal(true);
     }
   };
-
   // 处理触摸开始
   const handleTouchStart = (e) => {
     // 只在拖拽手柄上才开始拖拽，避免影响面板内容滚动
@@ -225,7 +234,6 @@ export default function ItineraryResults({
 
     // 限制拖拽范围：向上最多拖拽30%，向下最多拖拽30%
     const limitedOffset = Math.max(-30, Math.min(30, dragOffsetPercent));
-
     setCurrentTranslateY(limitedOffset);
   };
 
@@ -514,6 +522,14 @@ export default function ItineraryResults({
         isOpen={showSaveModal}
         onClose={() => setShowSaveModal(false)}
         onSave={handleSaveItinerary}
+      />
+
+      {/* 新增：结果模态框 */}
+      <ResultModal
+        isOpen={showResultModal}
+        onClose={() => setShowResultModal(false)}
+        type={resultType}
+        message={resultMessage}
       />
     </div>
   );
