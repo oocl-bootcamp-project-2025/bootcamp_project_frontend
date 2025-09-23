@@ -5,6 +5,7 @@ import { Button } from '../ui/button';
 import './css/ItineraryOverviewCard.css';
 import './css/ItineraryResults.css';
 import './css/ItineraryStatistics.css';
+import SaveItineraryModal from '../modals/SaveItineraryModal';
 
 export default function ItineraryResults({
   searchData,
@@ -18,8 +19,8 @@ export default function ItineraryResults({
   onUpdateItinerary
 }) {
   const [selectedTab, setSelectedTab] = useState('overview');
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
   const [dragStart, setDragStart] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [currentTranslateY, setCurrentTranslateY] = useState(0);
@@ -99,13 +100,46 @@ export default function ItineraryResults({
     });
   };
 
-  // 处理行程重置
-  const handleResetItinerary = () => {
-    if (onResetItinerary) {
-      onResetItinerary();
-      setCurrentItinerary({});
+  // 新增：处理保存行程
+  const handleSaveItinerary = async (phoneNumber) => {
+    try {
+      // 构建要保存的数据
+      const itineraryData = {
+        phoneNumber,
+        destination: searchData?.destination || '北京',
+        days: getTotalDays(),
+        attractions: getTotalAttractions(),
+        travelers: getVisitorCount(),
+        itinerary: currentItinerary,
+        searchData,
+        createdAt: new Date().toISOString()
+      };
+
+      // TODO: 等后端接口完成后，取消注释下面的代码
+      /*
+      const response = await fetch('/api/save-itinerary', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(itineraryData),
+      });
+
+      if (!response.ok) {
+        throw new Error('保存失败');
+      }
+
+      const result = await response.json();
+      console.log('行程保存成功:', result);
+      */
+
+      // 关闭模态框
+      setShowSaveModal(false);
+      alert("成功保存行程")
+    } catch (error) {
+      console.error('保存行程失败:', error);
+      alert("保存行程失败，请稍后重试")
     }
-    setShowResetConfirm(false);
   };
 
   // 处理触摸开始
@@ -398,7 +432,7 @@ export default function ItineraryResults({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setShowResetConfirm(true)}
+            onClick={() => setShowSaveModal(true)}
             className="save-button"
           >
             保存
@@ -475,29 +509,12 @@ export default function ItineraryResults({
         </div>
       </div>
 
-      {/* 重置确认对话框 */}
-      {showResetConfirm && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>重置行程</h3>
-            <p>确定要重置整个行程吗？这将清空所有预约和自定义修改。</p>
-            <div className="modal-actions">
-              <Button
-                variant="outline"
-                onClick={() => setShowResetConfirm(false)}
-              >
-                取消
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleResetItinerary}
-              >
-                确认重置
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* 新增：保存行程模态框 */}
+      <SaveItineraryModal
+        isOpen={showSaveModal}
+        onClose={() => setShowSaveModal(false)}
+        onSave={handleSaveItinerary}
+      />
     </div>
   );
 }

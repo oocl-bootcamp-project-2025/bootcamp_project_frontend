@@ -1,0 +1,364 @@
+/* SaveItineraryModal.css */
+.save-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.save-modal-container {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 模态框头部 */
+.save-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24px 24px 0 24px;
+  margin-bottom: 8px;
+}
+
+.save-modal-title-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.save-modal-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #ff7518 0%, #ffb347 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.save-modal-title-text h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 4px 0;
+}
+
+.save-modal-title-text p {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.save-modal-close {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #999;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.save-modal-close:hover {
+  background: #f5f5f5;
+  color: #666;
+}
+
+/* 内容区域 */
+.save-modal-content {
+  padding: 16px 24px 0 24px;
+}
+
+.phone-input-section {
+  margin-bottom: 20px;
+}
+
+.phone-input-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.phone-input-container {
+  margin-bottom: 8px;
+}
+
+.phone-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.phone-input-icon {
+  position: absolute;
+  left: 16px;
+  width: 18px;
+  height: 18px;
+  color: #ff7518;
+  z-index: 1;
+}
+
+.phone-input {
+  width: 100%;
+  padding: 16px 16px 16px 48px;
+  border: 2px solid #ff7518;
+  border-radius: 12px;
+  font-size: 16px;
+  color: #333;
+  background: white;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.phone-input::placeholder {
+  color: #999;
+}
+
+.phone-input:focus {
+  border-color: #ff7518;
+  box-shadow: 0 0 0 3px rgba(255, 117, 24, 0.1);
+}
+
+.phone-input-description {
+  font-size: 12px;
+  color: #999;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* 隐私保护说明 */
+.privacy-notice {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 24px;
+}
+
+.privacy-notice p {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.privacy-notice strong {
+  color: #333;
+  font-weight: 600;
+}
+
+/* 按钮区域 */
+.save-modal-actions {
+  display: flex;
+  gap: 12px;
+  padding: 0 24px 24px 24px;
+}
+
+.cancel-button {
+  flex: 1;
+  padding: 12px 24px;
+  background: white;
+  color: #666;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-button:hover {
+  background: #f5f5f5;
+  border-color: #d0d0d0;
+}
+
+.cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.confirm-save-button {
+  flex: 1;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #ff7518 0%, #ffb347 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.confirm-save-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 117, 24, 0.3);
+}
+
+.confirm-save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.phone-error {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 响应式设计 */
+@media (max-width: 480px) {
+  .save-modal-overlay {
+    padding: 16px;
+  }
+
+  .save-modal-container {
+    border-radius: 12px;
+  }
+
+  .save-modal-header {
+    padding: 20px 20px 0 20px;
+  }
+
+  .save-modal-content {
+    padding: 16px 20px 0 20px;
+  }
+
+  .save-modal-actions {
+    padding: 0 20px 20px 20px;
+    /* 移除 flex-direction: column; 保持并排显示 */
+  }
+
+  /* 移除 width: 100% 让按钮保持原有大小 */
+
+  .phone-input.error {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
+
+}
+
+/* 保存结果弹窗样式 */
+.save-result-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  padding: 20px;
+}
+
+.save-result-modal-container {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 320px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  animation: resultModalSlideIn 0.3s ease-out;
+  text-align: center;
+  padding: 32px 24px 24px 24px;
+}
+
+@keyframes resultModalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.save-result-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px auto;
+  color: white;
+  font-size: 24px;
+}
+
+.save-result-icon.success {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+}
+
+.save-result-icon.error {
+  background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+}
+
+.save-result-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+.save-result-message {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 24px 0;
+  line-height: 1.4;
+}
+
+.save-result-button {
+  width: 100%;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #ff7518 0%, #ffb347 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.save-result-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 117, 24, 0.3);
+}
