@@ -110,12 +110,13 @@ export default function ItineraryResults({
 
   // 处理触摸开始
   const handleTouchStart = (e) => {
-    // 只在拖拽手柄上才开始拖拽，避免影响地图交互
+    // 只在拖拽手柄上才开始拖拽，避免影响面板内容滚动
     if (!e.target.closest('.panel-handle')) return;
 
     setDragStart(e.touches[0].clientY);
     setIsDragging(true);
     setCurrentTranslateY(0); // 重置拖拽偏移
+    // 只有在手柄上才阻止默认行为
     e.preventDefault();
   };
 
@@ -123,11 +124,9 @@ export default function ItineraryResults({
   const handleTouchMove = (e) => {
     if (!isDragging || !dragStart) return;
 
-    // 只在面板区域内阻止默认行为，不影响地图交互
-    if (e.target.closest('.itinerary-panel') || e.target.closest('.panel-handle')) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+    // 只有当拖拽确实开始（从手柄开始）时才阻止默认滚动行为
+    e.preventDefault();
+    e.stopPropagation();
 
     const currentY = e.touches[0].clientY;
     const diff = currentY - dragStart; // 注意：这里是 currentY - dragStart，向下为正

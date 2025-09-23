@@ -6,7 +6,7 @@ import DefaultLayOut from "../layout/DefaultLayOut";
 // Lazy load components for better performance
 const Homepage = lazy(() => import('../components/pages/Homepage'));
 const AMapComponent = lazy(() => import('../components/map/AMapComponent'));
-const JourneyDetail = lazy(() => import('../components/map/JourneyDetail'));
+const MapContainer = lazy(() => import('../components/map/MapContainer'));
 const ItineraryWrapper = lazy(() => import('../components/wrappers/ItineraryWrapper'));
 const ExpertProfilePage = lazy(() => import('../components/pages/ExpertProfilePage'));
 const PostDetailPage = lazy(() => import('../components/pages/PostDetailPage'));
@@ -32,7 +32,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'journey',
-        element: <JourneyDetail />
+        element: <MapContainer />
       },
       {
         path: 'itinerary',
