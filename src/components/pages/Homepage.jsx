@@ -414,15 +414,21 @@ export default function Homepage() {
           {/* 开始规划按钮 */}
           <Button
             onClick={handleStartPlanning}
-            className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-medium py-3 px-4 rounded-lg transition-all transform hover:scale-105"
+            className={`w-full font-medium py-3 px-4 rounded-lg transition-all transform ${!destination.trim() || !departureDate || !returnDate || !preference.length
+                ? 'bg-gray-300 cursor-not-allowed opacity-50'
+                : 'hover:scale-105'
+              }`}
             size="lg"
-            disabled={
-              !destination.trim() ||
-              !departureDate ||
-              !returnDate ||
-              !preference.length
-            }
-            style={{ background: 'linear-gradient(135deg, #ff7518 0%, #ffb347 100%)', color: 'white', borderRadius: '12px' }}
+            disabled={!destination.trim() || !departureDate || !returnDate || !preference.length}
+            style={{
+              background: !destination.trim() || !departureDate || !returnDate || !preference.length
+                ? '#E5E7EB'
+                : 'linear-gradient(135deg, #ff7518 0%, #ffb347 100%)',
+              color: !destination.trim() || !departureDate || !returnDate || !preference.length
+                ? '#9CA3AF'
+                : 'white',
+              borderRadius: '12px'
+            }}
           >
             <Search className="w-5 h-5 mr-2" />
             开始规划我的旅程
