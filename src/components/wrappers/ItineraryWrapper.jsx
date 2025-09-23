@@ -1,8 +1,7 @@
 import { useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ItineraryResults from '../pages/ItineraryResults';
-import { useAppState, useModalState } from '../../hooks';
-import { PAGES } from '../../constants';
+import { useAppContext } from '../../context/AppProvider';
 
 export default function ItineraryWrapper() {
   const navigate = useNavigate();
@@ -16,10 +15,7 @@ export default function ItineraryWrapper() {
     preference: 'culture'
   };
 
-  // 使用应用状态
-  const appState = useAppState();
-  const modalState = useModalState();
-
+  // 使用应用上下文
   const {
     selectedExpert,
     selectedAttractionName,
@@ -35,13 +31,11 @@ export default function ItineraryWrapper() {
     setSelectedAttractionName,
     setSelectedServiceId,
     setSelectedAttraction,
-    setShouldShowServicesTab
-  } = appState;
-
-  const {
+    setShouldShowServicesTab,
+    setBookings,
     openArticleModal,
     openExpertList
-  } = modalState;
+  } = useAppContext();
 
   // 事件处理函数
   const handleBackToHome = useCallback(() => {
@@ -86,16 +80,16 @@ export default function ItineraryWrapper() {
 
     updateItinerary(updatedItinerary);
     // 更新预约列表
-    appState.setBookings(filteredBookings);
+    setBookings(filteredBookings);
     
     console.log(`景点 ${oldAttractionId} 已替换为 ${newAttraction.name}，相关预约已清空`);
-  }, [bookings, itinerary, updateItinerary, appState]);
+  }, [bookings, itinerary, updateItinerary, setBookings]);
 
   const handleResetItinerary = useCallback(() => {
     resetItinerary();
     // 也可以清空所有预约
-    appState.setBookings([]);
-  }, [resetItinerary, appState]);
+    setBookings([]);
+  }, [resetItinerary, setBookings]);
 
   return (
     <ItineraryResults
