@@ -35,7 +35,6 @@ export default function ItineraryResults({
   const [currentItinerary, setCurrentItinerary] = useState(itinerary || {
     day1: [
       {
-        id: 'attraction1',
         name: '天安门广场',
         description: '中华人民共和国首都北京市的城市广场，位于北京市中心',
         duration: '2小时',
@@ -45,7 +44,6 @@ export default function ItineraryResults({
         experts: []
       },
       {
-        id: 'attraction2',
         name: '故宫博物院',
         description: '明清两朝的皇家宫殿，现为综合性博物馆',
         duration: '3小时',
@@ -57,7 +55,6 @@ export default function ItineraryResults({
     ],
     day2: [
       {
-        id: 'attraction3',
         name: '长城',
         description: '中国古代的军事防御工程',
         duration: '4小时',
@@ -69,7 +66,6 @@ export default function ItineraryResults({
     ],
     day3: [
       {
-        id: 'attraction4',
         name: '颐和园',
         description: '中国清朝时期皇家园林',
         duration: '3小时',
@@ -115,13 +111,14 @@ export default function ItineraryResults({
       return;
     }
       const itineraryData = {
-        phoneNumber,
+        phoneNumber: phoneNumber,
         startDate: searchData?.departureDate || '',
         allNumber: getTotalAttractions(),
         itineraryData: currentItinerary
       };
       await saveItinerary(itineraryData).then(response => {
-        if (response.code !== 201) {
+        console.log("保存行程响应:", response);
+        if (response.status !== 201) {
           throw new Error('保存失败');
         }
         setShowSaveModal(false);
