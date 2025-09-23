@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
 import { User } from 'lucide-react';
+import { useState } from 'react';
 
 export default function ImageWithFallback({ src, alt, className, fallbackIcon = User }) {
   const [imageError, setImageError] = useState(false);
-  
+
   const FallbackIcon = fallbackIcon;
-  
+
   if (!src || imageError) {
     return (
       <div className={`${className} bg-gray-200 flex items-center justify-center`}>
@@ -13,7 +13,7 @@ export default function ImageWithFallback({ src, alt, className, fallbackIcon = 
       </div>
     );
   }
-  
+
   return (
     <img
       src={src}
