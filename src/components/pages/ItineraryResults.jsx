@@ -392,13 +392,7 @@ export default function ItineraryResults({
 
                     <div className="attraction-actions">
                       <button
-                        className="action-btn"
-                        onClick={() => onFindExperts && onFindExperts(attraction)}
-                      >
-                        查看详情
-                      </button>
-                      <button
-                        className="action-btn primary"
+                        className="action-btn primary width-auto"
                         onClick={() => onFindExperts && onFindExperts(attraction)}
                       >
                         找达人
