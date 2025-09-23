@@ -146,7 +146,6 @@ src/components/map/
 ├── MapLoadingStates.jsx        # 状态显示组件
 ├── JourneyControls.jsx         # 行程控制组件
 ├── Card.jsx                    # 信息卡片组件(原有)
-├── JourneyDetail.jsx           # 行程详情组件(原有)
 ├── index.js                    # 统一导出
 └── css/
     ├── AMapComponent.css       # 兼容性样式(导入其他样式)
@@ -156,8 +155,7 @@ src/components/map/
     ├── MapRoutes.css           # 路线样式
     ├── MapLoadingStates.css    # 状态显示样式
     ├── JourneyControls.css     # 行程控制样式
-    ├── Card.css                # 信息卡片样式(原有)
-    └── JourneyDetail.css       # 行程详情样式(原有)
+    └── Card.css                # 信息卡片样式(原有)
 ```
 
 ## 迁移指南
