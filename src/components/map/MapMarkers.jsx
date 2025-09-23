@@ -3,36 +3,57 @@ import ReactDOMServer from 'react-dom/server';
 import Card from './Card';
 import './css/MapMarkers.css';
 
-const MapMarkers = ({ 
-    map, 
-    locations, 
+const MapMarkers = ({
+    map,
+    locations,
+    selectedTab,
     onMarkersUpdate,
-    isUpdatingView 
+    isUpdatingView
 }) => {
     const markersRef = useRef([]);
 
     // 更新标记显示
     useEffect(() => {
-        if (!map || !window.AMap) return;
-
-        console.log("Filtered locations:", locations);
-
-        // 如果正在更新视图，延迟标记更新
-        if (isUpdatingView) {
-            setTimeout(() => {
-                updateMarkers();
-            }, 300);
+        if (!map || !window.AMap) {
             return;
         }
 
-        updateMarkers();
+        // 简化逻辑：只在真正需要时更新标记
+        if (!locations || locations.length === 0) {
+            // 如果没有位置数据，清除现有标记
+            markersRef.current.forEach(marker => {
+                if (marker && typeof marker.setMap === 'function') {
+                    marker.setMap(null);
+                }
+            });
+            markersRef.current = [];
+            return;
+        }
+
+        // 只有当标记数量或位置发生实际变化时才更新
+        const shouldUpdate = markersRef.current.length !== locations.length ||
+            !markersRef.current.every((marker, index) => {
+                const location = locations[index];
+                return location && marker.getPosition() &&
+                    marker.getPosition().lng === location.position[0] &&
+                    marker.getPosition().lat === location.position[1];
+            });
+
+        if (shouldUpdate) {
+            updateMarkers();
+        }
 
         // 封装标记更新逻辑，方便复用
         function updateMarkers() {
             try {
-                // 清除所有现有标记
+                // 清除所有现有标记和事件监听器
                 markersRef.current.forEach(marker => {
-                    marker.setMap(null);
+                    if (marker && typeof marker.clearEvents === 'function') {
+                        marker.clearEvents(); // 清除所有事件监听器
+                    }
+                    if (marker && typeof marker.setMap === 'function') {
+                        marker.setMap(null); // 从地图移除
+                    }
                 });
                 markersRef.current = [];
 
@@ -43,36 +64,57 @@ const MapMarkers = ({
                     offset: new window.AMap.Pixel(0, -15)
                 });
 
-                // 添加新标记
-                const newMarkers = [];
+                // 用于收集所有标记
+                let allMarkers = [];
 
                 if (locations && locations.length > 0) {
-                    // 限制一次性处理的标记数量，避免性能问题
-                    const batchSize = 10;
-                    const processMarkersBatch = (startIndex) => {
-                        const endIndex = Math.min(startIndex + batchSize, locations.length);
-                        const batch = locations.slice(startIndex, endIndex);
+                    console.log(`Creating ${locations.length} markers`);
 
-                        batch.forEach((location) => {
-                            // 确保位置坐标有效
-                            if (location.position &&
-                                location.position.length === 2 &&
-                                !isNaN(location.position[0]) &&
-                                !isNaN(location.position[1])) {
+                    // 使用同步方式创建标记，确保事件绑定可靠
+                    locations.forEach((location, index) => {
+                        if (location.position &&
+                            location.position.length === 2 &&
+                            !isNaN(location.position[0]) &&
+                            !isNaN(location.position[1])) {
 
-                                // 为不同天数创建不同颜色的标记
-                                const day = location.day || 1;
-                                const marker = new window.AMap.Marker({
-                                    position: location.position,
-                                    title: location.name,
-                                    content: `<div class="marker marker-day-${day}">${location.name.substring(0, 1)}</div>`,
-                                    offset: new window.AMap.Pixel(-15, -15)
-                                });
+                            const day = location.day || 1;
+                            const isCurrentDay = selectedTab === 'overview' || selectedTab === `day${day}`;
+                            const markerClass = isCurrentDay ? `marker marker-day-${day} marker-active` : `marker marker-day-${day} marker-inactive`;
 
-                                marker.setMap(map);
-                                newMarkers.push(marker);
+                            const marker = new window.AMap.Marker({
+                                position: location.position,
+                                title: location.name,
+                                content: `<div class="${markerClass}">${location.name.substring(0, 1)}</div>`,
+                                offset: new window.AMap.Pixel(-15, -15)
+                            });
 
-                                // 添加鼠标悬停事件
+                            // 保存location数据到marker，以便后续更新样式
+                            marker._locationData = location;
+
+                            marker.setMap(map);
+                            allMarkers.push(marker);
+
+                            // 添加点击事件 - 显示信息窗口
+                            const handleClick = () => {
+                                console.log("Marker clicked:", location.name);
+                                // 点击时显示信息窗口，类似悬停效果
+                                const cardContent = ReactDOMServer.renderToString(
+                                    <Card name={location.name} day={location.day} />
+                                );
+                                infoWindow.setContent(cardContent);
+                                infoWindow.open(map, location.position);
+                            };
+
+                            // 确保事件绑定成功
+                            try {
+                                marker.on('click', handleClick);
+                                console.log(`Click event bound for ${location.name}`);
+                            } catch (eventError) {
+                                console.error(`Failed to bind click event for ${location.name}:`, eventError);
+                            }
+
+                            // 添加悬停事件
+                            try {
                                 marker.on('mouseover', () => {
                                     const cardContent = ReactDOMServer.renderToString(
                                         <Card name={location.name} day={location.day} />
@@ -81,41 +123,59 @@ const MapMarkers = ({
                                     infoWindow.open(map, location.position);
                                 });
 
-                                // 添加鼠标离开事件以关闭信息窗口
                                 marker.on('mouseout', () => {
                                     infoWindow.close();
                                 });
-                            } else {
-                                console.warn("Invalid location position:", location);
+                            } catch (eventError) {
+                                console.error(`Failed to bind hover events for ${location.name}:`, eventError);
                             }
-                        });
 
-                        // 如果还有未处理的标记，安排下一批处理
-                        if (endIndex < locations.length) {
-                            setTimeout(() => {
-                                processMarkersBatch(endIndex);
-                            }, 0);
+                            console.log(`Marker ${index + 1}/${locations.length} created for ${location.name}`);
                         } else {
-                            // 所有批次处理完成，保存标记并通知父组件
-                            markersRef.current = newMarkers;
-                            onMarkersUpdate(newMarkers);
+                            console.warn("Invalid location position:", location);
                         }
-                    };
+                    });
 
-                    // 开始第一批标记处理
-                    processMarkersBatch(0);
+                    // 同步完成后立即更新
+                    console.log(`All ${allMarkers.length} markers created successfully`);
+                    markersRef.current = allMarkers;
+                    if (onMarkersUpdate) {
+                        onMarkersUpdate(allMarkers);
+                    }
                 }
             } catch (error) {
                 console.error("Error updating markers:", error);
             }
         }
-    }, [map, locations, isUpdatingView]);
+    }, [map, locations]); // 移除 onLocationClick 和 isUpdatingView 依赖
+
+    // 当selectedTab变化时，更新现有标记的样式而不重新创建
+    useEffect(() => {
+        if (markersRef.current.length > 0) {
+            markersRef.current.forEach(marker => {
+                if (marker._locationData) {
+                    const location = marker._locationData;
+                    const day = location.day || 1;
+                    const isCurrentDay = selectedTab === 'overview' || selectedTab === `day${day}`;
+                    const markerClass = isCurrentDay ? `marker marker-day-${day} marker-active` : `marker marker-day-${day} marker-inactive`;
+
+                    // 更新标记的内容（样式）
+                    marker.setContent(`<div class="${markerClass}">${location.name.substring(0, 1)}</div>`);
+                }
+            });
+        }
+    }, [selectedTab]);
 
     // 组件卸载时清理标记
     useEffect(() => {
         return () => {
             markersRef.current.forEach(marker => {
-                marker.setMap(null);
+                if (marker && typeof marker.clearEvents === 'function') {
+                    marker.clearEvents(); // 清除所有事件监听器
+                }
+                if (marker && typeof marker.setMap === 'function') {
+                    marker.setMap(null); // 从地图移除
+                }
             });
             markersRef.current = [];
         };

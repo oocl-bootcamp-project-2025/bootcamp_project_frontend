@@ -1,10 +1,19 @@
-export default function ExpertProfilePage({ expert, onBack }) {
+import { useNavigate } from 'react-router-dom';
+import './css/ExpertProfilePage.css';
+
+export default function ExpertProfilePage({ expert }) {
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    navigate(-1); // 返回上一页
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <div className="p-4">
         <div className="flex items-center mb-4">
           <button
-            onClick={onBack}
+            onClick={handleBack}
             className="mr-3 p-2 hover:bg-gray-100 rounded-lg"
           >
             ← 返回

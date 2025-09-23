@@ -1,3 +1,3 @@
 // 导出所有hooks
-export { useAppState } from './useAppState';
-export { useModalState } from './useModalState';
+export { default as useAppState } from './useAppState';
+export { default as useModalState } from './useModalState';

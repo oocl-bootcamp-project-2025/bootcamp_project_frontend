@@ -3,12 +3,13 @@ import { Building, Calendar, Camera, ChevronDown, Coffee, Compass, MapPin, Mount
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '../ui/input';
+import './css/Homepage.css';
 
 // 导入常量和工具函数
 import { CHINESE_CITIES, TIME_OPTIONS } from '../../constants';
 import { calculateDuration, filterCities } from '../../utils';
 
-export default function Homepage({ onStartPlanning }) {
+export default function Homepage() {
   const navigate = useNavigate();
 
   const [destination, setDestination] = useState('');
@@ -110,13 +111,8 @@ export default function Homepage({ onStartPlanning }) {
       duration: calculateDuration(departureDate, returnDate)
     };
 
-    // 使用React Router导航到行程页面，并传递搜索数据
+    // 使用useNavigate进行路由跳转，传递搜索数据
     navigate('/itinerary', { state: { searchData } });
-
-    // 如果还需要调用原有的回调（向后兼容）
-    if (onStartPlanning) {
-      onStartPlanning(searchData);
-    }
   };
 
   const getMaxReturnDate = () => {
@@ -398,4 +394,3 @@ export default function Homepage({ onStartPlanning }) {
     </div>
   );
 }
-
