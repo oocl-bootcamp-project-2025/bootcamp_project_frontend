@@ -1,6 +1,5 @@
-import { Outlet } from "react-router";
 import React from 'react';
-import { JourneyProvider } from '../context/JourneyContext';
+import { Outlet } from "react-router";
 import { AppProvider } from '../context/AppProvider';
 import ModalManager from '../components/common/ModalManager';
 
@@ -9,12 +8,9 @@ const DefaultLayOut = () => {
         <div>
             {/* Your layout header, nav, etc. */}
             <AppProvider>
-                <JourneyProvider>
-                    <Outlet/> {/* This renders the child route, e.g., AMapComponent for /map */}
-                    <ModalManager />
-                </JourneyProvider>
+                <Outlet/> {/* This renders the child route, e.g., AMapComponent for /map */}
+                <ModalManager />
             </AppProvider>
-            <Outlet/> {/* This renders the child route, e.g., AMapComponent for /map */}
         </div>
     );
 }
