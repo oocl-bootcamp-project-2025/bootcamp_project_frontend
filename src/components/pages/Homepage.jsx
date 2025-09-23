@@ -113,7 +113,6 @@ export default function Homepage() {
       preference,
       duration: calculateDuration(departureDate, returnDate)
     };
-
     // 使用useNavigate进行路由跳转，传递搜索数据
     navigate('/itinerary', { state: { searchData } });
 
