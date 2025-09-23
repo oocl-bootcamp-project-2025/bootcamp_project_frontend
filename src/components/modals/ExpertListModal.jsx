@@ -1,6 +1,7 @@
 import { ClockCircleOutlined, EnvironmentOutlined, MessageOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, Card, Modal, Space, Tag, Typography } from 'antd';
 import React from 'react';
+import LoginTipsModal from './LoginTipsModal';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -262,21 +263,11 @@ export default function ExpertListModal({
       </Modal>
 
       {/* 登录提示弹窗 */}
-      <Modal
-        title="需要登录"
+      <LoginTipsModal
         open={loginModalVisible}
         onCancel={handleCancelLoginModal}
-        footer={[
-          <Button key="cancel" onClick={handleCancelLoginModal}>
-            取消
-          </Button>,
-          <Button key="login" type="primary" onClick={handleGoLogin}>
-            去登录
-          </Button>,
-        ]}
-      >
-        <p>请先登录后再进行预约</p>
-      </Modal>
+        onLogin={handleGoLogin}
+      />
 
       {/* 预约确认弹窗 */}
       <Modal
