@@ -2,7 +2,7 @@
 .idea
 
 # ignores node_modules
-node_modules/
+.node_modules
 # dependencies
 /.pnp
 .pnp.js

@@ -5,6 +5,8 @@ import { Button } from '../ui/button';
 import './css/ItineraryOverviewCard.css';
 import './css/ItineraryResults.css';
 import './css/ItineraryStatistics.css';
+import SaveItineraryModal from '../modals/SaveItineraryModal';
+import ResultModal from '../modals/ResultModal';
 
 export default function ItineraryResults({
   searchData,
@@ -18,12 +20,15 @@ export default function ItineraryResults({
   onUpdateItinerary
 }) {
   const [selectedTab, setSelectedTab] = useState('overview');
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
   const [dragStart, setDragStart] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [currentTranslateY, setCurrentTranslateY] = useState(0);
   const panelRef = useRef(null);
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [resultType, setResultType] = useState('success');
+  const [resultMessage, setResultMessage] = useState('');
 
   // 初始化行程数据
   const [currentItinerary, setCurrentItinerary] = useState(itinerary || {
@@ -99,15 +104,53 @@ export default function ItineraryResults({
     });
   };
 
-  // 处理行程重置
-  const handleResetItinerary = () => {
-    if (onResetItinerary) {
-      onResetItinerary();
-      setCurrentItinerary({});
-    }
-    setShowResetConfirm(false);
-  };
+  // 新增：处理保存行程
+  const handleSaveItinerary = async (phoneNumber) => {
+    try {
+      // 构建要保存的数据
+      const itineraryData = {
+        phoneNumber,
+        destination: searchData?.destination || '北京',
+        days: getTotalDays(),
+        attractions: getTotalAttractions(),
+        travelers: getVisitorCount(),
+        itinerary: currentItinerary,
+        searchData,
+        createdAt: new Date().toISOString()
+      };
 
+      // TODO: 等后端接口完成后，取消注释下面的代码
+      /*
+      const response = await fetch('/api/save-itinerary', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(itineraryData),
+      });
+
+      if (!response.ok) {
+        throw new Error('保存失败');
+      }
+
+      const result = await response.json();
+      console.log('行程保存成功:', result);
+      */
+
+      // 关闭模态框
+      setShowSaveModal(false);
+      // 保存成功，显示成功结果弹窗
+      setResultType('success');
+      setResultMessage('行程已成功保存！我们已将行程链接发送到您的手机，请注意查收短信。');
+      setShowResultModal(true);
+
+    }catch (error) {
+      // 保存失败，显示失败结果弹窗
+      setResultType('error');
+      setResultMessage('保存失败，请检查网络连接后重试。如问题持续存在，请联系客服。');
+      setShowResultModal(true);
+    }
+  };
   // 处理触摸开始
   const handleTouchStart = (e) => {
     // 只在拖拽手柄上才开始拖拽，避免影响面板内容滚动
@@ -191,7 +234,6 @@ export default function ItineraryResults({
 
     // 限制拖拽范围：向上最多拖拽30%，向下最多拖拽30%
     const limitedOffset = Math.max(-30, Math.min(30, dragOffsetPercent));
-
     setCurrentTranslateY(limitedOffset);
   };
 
@@ -398,7 +440,7 @@ export default function ItineraryResults({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setShowResetConfirm(true)}
+            onClick={() => setShowSaveModal(true)}
             className="save-button"
           >
             保存
@@ -475,29 +517,20 @@ export default function ItineraryResults({
         </div>
       </div>
 
-      {/* 重置确认对话框 */}
-      {showResetConfirm && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>重置行程</h3>
-            <p>确定要重置整个行程吗？这将清空所有预约和自定义修改。</p>
-            <div className="modal-actions">
-              <Button
-                variant="outline"
-                onClick={() => setShowResetConfirm(false)}
-              >
-                取消
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleResetItinerary}
-              >
-                确认重置
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* 新增：保存行程模态框 */}
+      <SaveItineraryModal
+        isOpen={showSaveModal}
+        onClose={() => setShowSaveModal(false)}
+        onSave={handleSaveItinerary}
+      />
+
+      {/* 新增：结果模态框 */}
+      <ResultModal
+        isOpen={showResultModal}
+        onClose={() => setShowResultModal(false)}
+        type={resultType}
+        message={resultMessage}
+      />
     </div>
   );
 }

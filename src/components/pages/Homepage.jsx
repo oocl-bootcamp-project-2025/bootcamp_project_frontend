@@ -1,8 +1,8 @@
-import { Alert, Button } from 'antd';
+import { Alert, Button, Input } from 'antd';
 import { Building, Calendar, Camera, ChevronDown, Coffee, Compass, MapPin, Mountain, Search, Users, UtensilsCrossed } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Input } from '../ui/input';
+
 import './css/Homepage.css';
 
 // 导入常量和工具函数
@@ -170,41 +170,73 @@ export default function Homepage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-blue-50">
-      {/* Header */}
-      <div className="p-6 text-center" style={{ marginTop: '20px' }}>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2" style={{
-          color: '#FF6B35',
-          fontFamily: '"NSimSun", "Segoe UI", "PingFang SC", "Helvetica Neue", Arial, sans-serif',
-          letterSpacing: '0.03em'
-        }} >
-          让AI为您规划
-        </h1>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2" style={{
-          color: '#FF6B35',
-          fontFamily: '"NSimSun", "Segoe UI", "PingFang SC", "Helvetica Neue", Arial, sans-serif',
-          letterSpacing: '0.03em'
-        }}>
-          专属行程
-        </h1>
+    <div >
+      <div className="p-8 text-center" style={{ marginTop: '20px' }}>
+        <div className="space-y-2">
+          <h1
+            className="text-4xl font-bold mb-1"
+            style={{
+              background: 'linear-gradient(to bottom, #ff7518 0%, #ff9248 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              color: 'transparent',
+              fontFamily: '"Ma Shan Zheng", "STKaiti", "KaiTi", cursive',
+              letterSpacing: '0.05em',
+              textShadow: 'none'
+            }}
+          >
+            让AI为您规划
+          </h1>
+          <h1
+            className="text-4xl font-bold"
+            style={{
+              background: 'linear-gradient(to bottom, #ff9248 0%, #ffb347 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              color: 'transparent',
+              fontFamily: '"Ma Shan Zheng", "STKaiti", "KaiTi", cursive',
+              letterSpacing: '0.05em',
+              textShadow: 'none'
+            }}
+          >
+            专属行程
+          </h1>
+        </div>
       </div>
 
       {/* Main Content */}
-      <div className="px-6 pb-6">
+      <div >
         <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
 
           <div className="relative" ref={cityDropdownRef}>
             <label className="flex items-center text-xl font-medium text-gray-700 mb-2">
-              <MapPin className="w-4 h-4 mr-2" style={{ color: '#db9278ff' }} />
+              <MapPin className="w-4 h-4 mr-2" style={{ color: '#ff7518' }} />
               目的地
             </label>
             <div className="relative">
               <Input
                 value={destination}
                 onChange={(e) => handleDestinationChange(e.target.value)}
-                onBlur={handleDestinationBlur}
+
                 placeholder="搜索城市名称或拼音"
                 className="w-full"
+                style={{
+                  height: '40px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  boxShadow: 'none'
+                }}
+                onFocus={(e) => {
+                  e.target.style.border = '3px solid #ff7518';
+                  e.target.style.boxShadow = '0 0 0 2px rgba(255, 117, 24, 0.2)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.border = 'none';
+                  e.target.style.boxShadow = 'none';
+                  handleDestinationBlur();
+                }}
               />
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
             </div>
@@ -227,103 +259,106 @@ export default function Homepage() {
           </div>
 
           {/* 出发时间 */}
-          <label className="flex items-center text-xl font-medium text-gray-700 mb-2">
-            <Calendar className="w-4 h-4 mr-2 text-500" style={{ color: '#db9278ff' }} />
-            旅行时间
-          </label>
-          <div className="grid grid-cols-2 gap-4" >
-            <div>
-              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                出发日期
-              </label>
-              <input
-                type="date"
-                value={departureDate}
-                onChange={(e) => setDepartureDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                style={{ colorScheme: 'light' }}
-              />
+          <div className={'duration-card'}>
+            <label className="flex items-center text-xl font-medium text-gray-700 mb-2">
+              <Calendar className="w-4 h-4 mr-2 text-500" style={{ color: '#ff7518' }} />
+              旅行时间
+            </label>
+            <div className="grid grid-cols-2 gap-4" >
+              <div>
+                <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                  出发日期
+                </label>
+                <Input
+                  type="date"
+                  value={departureDate}
+                  onChange={(e) => setDepartureDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  style={{ colorScheme: 'light', height: '40px' }}
+                />
 
-            </div>
+              </div>
 
-            <div>
-              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                出发时间
-              </label>
-              <div className="relative" ref={departureTimeRef}>
-                <button
-                  onClick={() => setShowDepartureTime(!showDepartureTime)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-left focus:ring-2 focus:ring-orange-500 focus:border-transparent flex items-center justify-between"
-                >
-                  {departureTime || '0:00'}
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-                {showDepartureTime && (
-                  <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-32 overflow-y-auto">
-                    {TIME_OPTIONS.map((time) => (
-                      <div
-                        key={time}
-                        onClick={() => {
-                          setDepartureTime(time);
-                          setShowDepartureTime(false);
-                        }}
-                        className="px-3 py-2 hover:bg-gray-50 cursor-pointer"
-                      >
-                        {time}
-                      </div>
-                    ))}
-                  </div>
-                )}
+              <div>
+                <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                  出发时间
+                </label>
+                <div className="relative" ref={departureTimeRef}>
+                  <button
+                    onClick={() => setShowDepartureTime(!showDepartureTime)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-left focus:ring-2 focus:ring-orange-500 focus:border-transparent flex items-center justify-between"
+                  >
+                    {departureTime || '0:00'}
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+                  {showDepartureTime && (
+                    <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-32 overflow-y-auto">
+                      {TIME_OPTIONS.map((time) => (
+                        <div
+                          key={time}
+                          onClick={() => {
+                            setDepartureTime(time);
+                            setShowDepartureTime(false);
+                          }}
+                          className="px-3 py-2 hover:bg-gray-50 cursor-pointer"
+                        >
+                          {time}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* 返回时间 */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                返回日期
-              </label>
-              <input
-                type="date"
-                value={returnDate}
-                onChange={(e) => setReturnDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                style={{ colorScheme: 'light' }}
-                min={departureDate || undefined}
-                max={departureDate ? getMaxReturnDate() : undefined}
-                disabled={!canSelectReturnDate}
-              />
-            </div>
+            {/* 返回时间 */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                  返回日期
+                </label>
+                <Input
+                  type="date"
+                  value={returnDate}
+                  onChange={(e) => setReturnDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  style={{ colorScheme: 'light', height: '40px' }}
+                  min={departureDate || undefined}
+                  max={departureDate ? getMaxReturnDate() : undefined}
+                  disabled={!canSelectReturnDate}
+                />
+              </div>
 
-            <div>
-              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                返回时间
-              </label>
-              <div className="relative" ref={returnTimeRef}>
-                <button
-                  onClick={() => setShowReturnTime(!showReturnTime)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-left focus:ring-2 focus:ring-orange-500 focus:border-transparent flex items-center justify-between"
-                >
-                  {returnTime || '0:00'}
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-                {showReturnTime && (
-                  <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-32 overflow-y-auto"  >
-                    {TIME_OPTIONS.map((time) => (
-                      <div
-                        key={time}
-                        onClick={() => {
-                          setReturnTime(time);
-                          setShowReturnTime(false);
-                        }}
-                        className="px-3 py-2 hover:bg-gray-50 cursor-pointer"
-                      >
-                        {time}
-                      </div>
-                    ))}
-                  </div>
-                )}
+              <div>
+                <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                  返回时间
+                </label>
+                <div className="relative" ref={returnTimeRef}>
+                  <button
+                    onClick={() => setShowReturnTime(!showReturnTime)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-left focus:ring-2 focus:ring-orange-500 focus:border-transparent flex items-center justify-between"
+                  >
+                    {returnTime || '0:00'}
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+
+                  {showReturnTime && (
+                    <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-32 overflow-y-auto"  >
+                      {TIME_OPTIONS.map((time) => (
+                        <div
+                          key={time}
+                          onClick={() => {
+                            setReturnTime(time);
+                            setShowReturnTime(false);
+                          }}
+                          className="px-3 py-2 hover:bg-gray-50 cursor-pointer"
+                        >
+                          {time}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -337,7 +372,7 @@ export default function Homepage() {
                 margin: 16,
                 background: 'linear-gradient(90deg,#fff7ed 0%,#f0f9ff 100%)',
                 border: 'none',
-                color: '#FF6B35',
+                color: '#ff7518',
                 fontWeight: 500,
                 fontSize: 18,
                 textAlign: 'center'
@@ -345,9 +380,10 @@ export default function Homepage() {
             />
           )}
           {/* 旅行偏好 */}
-          <div>
+
+          <div className={'prefer-card'}>
             <label className="flex items-center text-xl font-medium text-gray-700 mb-3">
-              <Users className="w-4 h-4 mr-2 text-500" style={{ fontSize: '1.5rem', color: '#db9278ff' }} />
+              <Users className="w-4 h-4 mr-2 text-500" style={{ fontSize: '1.5rem', color: '#ff7518' }} />
               旅行偏好
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -378,15 +414,21 @@ export default function Homepage() {
           {/* 开始规划按钮 */}
           <Button
             onClick={handleStartPlanning}
-            className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-medium py-3 px-4 rounded-lg transition-all transform hover:scale-105"
+            className={`w-full font-medium py-3 px-4 rounded-lg transition-all transform ${!destination.trim() || !departureDate || !returnDate || !preference.length
+                ? 'bg-gray-300 cursor-not-allowed opacity-50'
+                : 'hover:scale-105'
+              }`}
             size="lg"
-            disabled={
-              !destination.trim() ||
-              !departureDate ||
-              !returnDate ||
-              !preference.length
-            }
-            style={{ backgroundColor: '#f5c6b6ff', color: '#161515ff' }}
+            disabled={!destination.trim() || !departureDate || !returnDate || !preference.length}
+            style={{
+              background: !destination.trim() || !departureDate || !returnDate || !preference.length
+                ? '#E5E7EB'
+                : 'linear-gradient(135deg, #ff7518 0%, #ffb347 100%)',
+              color: !destination.trim() || !departureDate || !returnDate || !preference.length
+                ? '#9CA3AF'
+                : 'white',
+              borderRadius: '12px'
+            }}
           >
             <Search className="w-5 h-5 mr-2" />
             开始规划我的旅程

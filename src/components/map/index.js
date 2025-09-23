@@ -2,7 +2,6 @@
 export { default as AMapComponent } from './AMapComponent';
 export { default as Card } from './Card';
 export { default as JourneyControls } from './JourneyControls';
-export { default as JourneyDetail } from './JourneyDetail';
 export { default as MapContainer } from './MapContainer';
 export { default as MapCore } from './MapCore';
 export { default as MapLoadingStates } from './MapLoadingStates';
