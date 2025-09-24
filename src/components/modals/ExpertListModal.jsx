@@ -1,6 +1,6 @@
-import { ClockCircleOutlined, EnvironmentOutlined, MessageOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Button, Card, Modal, Space, Tag, Typography } from 'antd';
-import React from 'react';
+import { ClockCircleOutlined, EnvironmentOutlined, ExclamationCircleOutlined, MessageOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Button, Card, Empty, Modal, Result, Skeleton, Space, Tag, Typography } from 'antd';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BookingSuccessModal from './BookingSuccessModal';
 import ExpertBookingModal from './ExpertBookingModal';
@@ -14,9 +14,12 @@ export default function ExpertListModal({
   onClose,
   onSelectExpert
 }) {
+  const [loading, setLoading] = useState(false);
+  const [experts, setExperts] = useState([]);
+  const [error, setError] = useState(null);
 
-  // 模拟达人数据 - 简化版本
-  const experts = [
+  // 模拟达人数据
+  const mockExperts = [
     {
       id: '1',
       name: '张导游',
@@ -64,13 +67,55 @@ export default function ExpertListModal({
     }
   ];
 
-  // 处理预约
-  const [loginModalVisible, setLoginModalVisible] = React.useState(false);
-  const [confirmModalVisible, setConfirmModalVisible] = React.useState(false);
-  const [selectedExpert, setSelectedExpert] = React.useState(null);
-  const [showSuccessModal, setShowSuccessModal] = React.useState(false);
-  const [bookedExperts, setBookedExperts] = React.useState([]);
+  // 获取达人数据
+  const fetchExperts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      setExperts([]);
 
+      // 模拟网络延迟
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // 模拟网络错误（景点名称包含"错误"或"网络"时）
+      if (attraction?.name && (attraction.name.includes('错误') || attraction.name.includes('网络'))) {
+        throw new Error('Network Error');
+      }
+
+      // 根据景点名称决定是否有达人数据
+      if (attraction?.name && (attraction.name.includes('测试') || attraction.name.includes('空状态'))) {
+        // 模拟空状态
+        setExperts([]);
+      } else {
+        // 模拟有数据状态
+        setExperts(mockExperts);
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error('获取达人数据失败:', error);
+      setError(error);
+      setLoading(false);
+    }
+  };
+
+  // 重试函数
+  const handleRetry = () => {
+    fetchExperts();
+  };
+
+  // 模拟数据加载
+  useEffect(() => {
+    if (isOpen && attraction) {
+      fetchExperts();
+    }
+  }, [isOpen, attraction]);
+
+  // 处理预约
+  const [loginModalVisible, setLoginModalVisible] = useState(false);
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
+  const [selectedExpert, setSelectedExpert] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [bookedExperts, setBookedExperts] = useState([]);
   const navigate = useNavigate();
   const handleBooking = (expert) => {
     //localStorage.removeItem('token');
@@ -97,45 +142,215 @@ export default function ExpertListModal({
 
   // 处理确认预约
   const handleConfirmBooking = () => {
+    console.log('已预约达人:', selectedExpert);
     if (selectedExpert) {
+      setShowSuccessModal(true);
       setBookedExperts([...bookedExperts, selectedExpert.id]);
       if (onSelectExpert) {
         onSelectExpert(selectedExpert);
       }
       setConfirmModalVisible(false);
-      setShowSuccessModal(true);
     }
   };
 
+  useEffect(() => {
+    if (!confirmModalVisible && !showSuccessModal) {
+      // 只有在確認彈窗關閉且不是顯示成功彈窗時才清除
+      setSelectedExpert(null);
+    }
+  }, [confirmModalVisible, showSuccessModal]);
+
+  useEffect(() => {
+    console.log('confirmModalVisible:', confirmModalVisible);
+    console.log('showSuccessModal:', showSuccessModal);
+    console.log('selectedExpert:', selectedExpert);
+  }, [confirmModalVisible, showSuccessModal, selectedExpert]);
+
+
   const handleContinuePlanning = () => {
     setShowSuccessModal(false);
-    onClose();
+    setTimeout(() => {
+      setSelectedExpert(null);
+      onClose();
+    }, 100);
   };
 
   // 取消预约确认
   const handleCancelBooking = () => {
+    console.log('取消预约');
     setConfirmModalVisible(false);
     setSelectedExpert(null);
   };
 
-  return (
-    <div>
-      <Modal
-        title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <EnvironmentOutlined style={{ color: '#ff6b35' }} />
-            <span>{attraction?.name || '景点'} 当地达人</span>
+  // 处理推荐其他景点
+  const handleRecommendOtherAttractions = () => {
+    console.log('推荐其他景点');
+    // 这里可以添加推荐其他景点的逻辑
+    onClose();
+  };
+
+  // 骨架屏组件
+  const ExpertSkeleton = () => (
+    <Card style={{ borderRadius: '12px', marginBottom: '16px' }}>
+      <div style={{ display: 'flex', gap: '16px' }}>
+        <Skeleton.Avatar size={64} active />
+        <div style={{ flex: 1 }}>
+          <Skeleton active>
+            <Skeleton.Input style={{ width: '200px', height: '20px' }} active />
+            <Skeleton.Input style={{ width: '150px', height: '16px', marginTop: '8px' }} active />
+            <div style={{ marginTop: '12px' }}>
+              <Skeleton.Button size="small" active style={{ marginRight: '8px' }} />
+              <Skeleton.Button size="small" active style={{ marginRight: '8px' }} />
+              <Skeleton.Button size="small" active />
+            </div>
+            <div style={{
+              backgroundColor: '#f5f5f5',
+              padding: '12px',
+              borderRadius: '8px',
+              marginTop: '12px'
+            }}>
+              <Skeleton.Input style={{ width: '100%', height: '16px' }} active />
+              <Skeleton.Input style={{ width: '80%', height: '14px', marginTop: '8px' }} active />
+            </div>
+            <Skeleton.Button
+              style={{ width: '100%', height: '40px', marginTop: '12px' }}
+              active
+            />
+          </Skeleton>
+        </div>
+      </div>
+    </Card>
+  );
+
+  // 渲染内容
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <div>
+          <div style={{ marginBottom: '16px' }}>
+            <Skeleton.Input style={{ width: '300px', height: '16px' }} active />
+            <br />
+            <Skeleton.Input style={{ width: '150px', height: '12px', marginTop: '4px' }} active />
           </div>
-        }
-        open={isOpen}
-        onCancel={onClose}
-        footer={null}
-        width={600}
-        centered
-        styles={{
-          body: { maxHeight: '70vh', overflowY: 'auto' }
-        }}
-      >
+          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <ExpertSkeleton />
+            <ExpertSkeleton />
+            <ExpertSkeleton />
+          </Space>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+          <Result
+            icon={<ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />}
+            title="网络开小差了"
+            subTitle="无法获取达人信息，请检查网络连接后重试"
+            extra={
+              <Space direction="vertical" size="middle">
+                <Button
+                  type="primary"
+                  size="large"
+                  style={{
+                    background: 'linear-gradient(to right, #ff6b35, #f7931e)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    height: '44px',
+                    fontSize: '16px',
+                    fontWeight: 'bold'
+                  }}
+                  onClick={handleRetry}
+                >
+                  重试
+                </Button>
+                <Button
+                  type="default"
+                  size="large"
+                  style={{
+                    borderRadius: '8px',
+                    height: '44px',
+                    fontSize: '14px'
+                  }}
+                  onClick={onClose}
+                >
+                  返回行程
+                </Button>
+              </Space>
+            }
+          />
+        </div>
+      );
+    }
+
+    if (experts.length === 0) {
+      return (
+        <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+          <Empty
+            image={
+              <div style={{
+                width: '120px',
+                height: '120px',
+                margin: '0 auto 20px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <SearchOutlined style={{ fontSize: '48px', color: 'white' }} />
+              </div>
+            }
+            imageStyle={{ marginBottom: '20px' }}
+            description={
+              <div>
+                <Title level={4} style={{ color: '#666', marginBottom: '8px' }}>
+                  暂无达人为该景点提供服务
+                </Title>
+                <Paragraph style={{ color: '#999', marginBottom: '24px' }}>
+                  很抱歉，{attraction?.name || '该景点'}暂时没有认证达人提供专业服务。
+                  <br />
+                  您可以尝试查看其他热门景点的达人服务。
+                </Paragraph>
+                <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                  <Button
+                    type="primary"
+                    size="large"
+                    style={{
+                      background: 'linear-gradient(to right, #ff6b35, #f7931e)',
+                      border: 'none',
+                      borderRadius: '8px',
+                      height: '44px',
+                      fontSize: '16px',
+                      fontWeight: 'bold'
+                    }}
+                    onClick={handleRecommendOtherAttractions}
+                  >
+                    推荐其他景点
+                  </Button>
+                  <Button
+                    type="default"
+                    size="large"
+                    style={{
+                      borderRadius: '8px',
+                      height: '44px',
+                      fontSize: '14px'
+                    }}
+                    onClick={onClose}
+                  >
+                    返回行程
+                  </Button>
+                </Space>
+              </div>
+            }
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div>
         <div style={{ marginBottom: '16px' }}>
           <Text type="secondary">发现专业的当地向导，获得独特的旅行体验</Text>
           <br />
@@ -280,8 +495,30 @@ export default function ExpertListModal({
             点击预约达人按钮即可直接预约专业服务
           </Text>
         </div>
-      </Modal>
+      </div>
+    );
+  };
 
+  return (
+    <div>
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <EnvironmentOutlined style={{ color: '#ff6b35' }} />
+            <span>{attraction?.name || '景点'} 当地达人</span>
+          </div>
+        }
+        open={isOpen}
+        onCancel={onClose}
+        footer={null}
+        width={600}
+        centered
+        styles={{
+          body: { maxHeight: '70vh', overflowY: 'auto' }
+        }}
+      >
+        {renderContent()}
+      </Modal>
       {/* 登录提示弹窗 */}
       <LoginTipsModal
         open={loginModalVisible}
@@ -301,15 +538,17 @@ export default function ExpertListModal({
         price={selectedExpert?.service.price}
       />
 
+
       {/* 预约成功弹窗 */}
+
       <BookingSuccessModal
         open={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
         expertName={selectedExpert?.name}
         serviceName={selectedExpert?.service.name}
         bookingDateTime={`2025年9月22日星期一 13:30-15:00`}
         onContinuePlanning={handleContinuePlanning}
       />
     </div>
+
   );
 }

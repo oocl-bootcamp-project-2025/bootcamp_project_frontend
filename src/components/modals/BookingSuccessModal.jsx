@@ -1,21 +1,29 @@
 import { Button, Modal, Typography } from 'antd';
+import { useEffect } from 'react';
 
 const { Text } = Typography;
 
 export default function BookingSuccessModal({
   open,
-  onClose,
   expertName,
   serviceName,
   bookingDateTime,
   onContinuePlanning
 }) {
+
+  useEffect(() => {
+    if (open) {
+      window.scrollTo(0, 0);
+    }
+  }, [open]);
+
   return (
     <Modal
       title={null}
       open={open}
-      onCancel={onClose}
       footer={null}
+      closable={false}
+      maskClosable={false}
       width={400}
       centered
     >
