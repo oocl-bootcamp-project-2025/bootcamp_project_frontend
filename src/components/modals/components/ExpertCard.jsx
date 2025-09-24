@@ -1,10 +1,8 @@
 import { EnvironmentOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, Card, Space, Tag, Typography } from 'antd';
 import {
-  BUTTON_HEIGHTS,
   COLORS,
   FONT_SIZES,
-  GRADIENTS,
   SPACING
 } from '../constants/styleConstants';
 import {
@@ -21,6 +19,8 @@ const { Title, Text, Paragraph } = Typography;
 export const ExpertCard = ({
   expert,
   onBooking,
+  disabled,
+  isBooked,
   setSelectedExpertForLink,
   setLinkConfirmVisible
 }) => {
@@ -144,22 +144,36 @@ export const ExpertCard = ({
         {/* 预约按钮 - 占据整个卡片宽度 */}
         <Button
           type="primary"
-          size="large"
-          block
+          disabled={disabled}
           style={{
-            background: GRADIENTS.primary,
+            background: isBooked
+              ? '#ccc'
+              : 'linear-gradient(to right, #ff6b35, #f7931e)',
             border: 'none',
             borderRadius: '8px',
-            height: getResponsiveFontSize(BUTTON_HEIGHTS.mobile, BUTTON_HEIGHTS.desktop),
-            fontWeight: 'bold',
-            fontSize: getResponsiveFontSize(16, 15),
-            boxShadow: '0 2px 8px rgba(255, 107, 53, 0.3)',
-            width: '100%'
+            width: '100%',
+            height: '40px',
+            fontWeight: 'bold'
           }}
-          onClick={() => onBooking(expert)}
+          onClick={() => !disabled && onBooking(expert)}
         >
-          预约达人
+          {isBooked ? '已预约' : '预约达人'}
         </Button>
+
+        {/* {isBooked && (
+        <Button
+          type="link"
+          style={{
+            padding: 0,
+            color: COLORS.primary,
+            fontSize: getResponsiveFontSize(14, 16)
+          }}
+          onClick={() => onCancelBooking(expert)}
+        >
+          取消预约
+        </Button>
+      )} */}
+
       </div>
     </Card>
   );
