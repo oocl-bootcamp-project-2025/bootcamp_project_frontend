@@ -1,66 +1,105 @@
-export default function ExpertBookingModal({ expert, isOpen, onClose, onConfirmBooking }) {
-  if (!isOpen) return null;
+import { Button, Modal, Typography } from 'antd';
 
-  const handleConfirm = () => {
-    if (onConfirmBooking) {
-      onConfirmBooking({
-        expert,
-        date: new Date(),
-        time: '10:00',
-        service: '导游服务',
-        serviceDetails: {
-          name: '导游服务',
-          price: '¥200/天'
-        }
-      });
-    }
+const { Title, Text } = Typography;
+
+export default function ExpertBookingModal({
+  open,
+  onCancel,
+  onConfirm,
+  date,
+  startTime,
+  endTime,
+  serviceName,
+  price
+}) {
+  const formatDateTime = () => {
+    return `${date} ${startTime} - ${endTime}`;
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">预约确认</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            ✕
-          </button>
+    <Modal
+      title={null}
+      open={open}
+      onCancel={onCancel}
+      footer={null}
+      closeIcon={
+        <Button
+          type="text"
+          style={{
+            color: '#ff6b35',
+            fontSize: '15px',
+            fontWeight: 'bold'
+          }}
+        >
+          取消
+        </Button>
+      }
+      width={400}
+      centered
+    >
+      <div style={{ padding: '20px' }}>
+        <Title level={4} style={{ textAlign: 'center', marginBottom: '24px' }}>
+          预约信息确认
+        </Title>
+
+
+        <div style={{ marginBottom: '24px' }}>
+          <div style={{
+            background: '#fff8f6',
+            padding: '16px'
+          }}>
+
+            <div style={{ marginBottom: '20px' }}>
+              <Text strong style={{ fontSize: '16px' }}>预约日期和时间</Text>
+              <div style={{ marginTop: '8px', color: '#666' }}>
+                {formatDateTime()}
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <Text strong style={{ fontSize: '16px' }}>服务内容</Text>
+              <div style={{ marginTop: '8px', color: '#666' }}>
+                {serviceName}
+              </div>
+            </div>
+            <Text style={{ fontSize: '16px' }}>费用：</Text>
+            <Text style={{
+              color: '#ff6b35',
+              fontSize: '20px',
+              fontWeight: 'bold',
+              marginLeft: '8px'
+            }}>
+              {price}
+            </Text>
+          </div>
         </div>
-        
-        <div className="space-y-4">
-          <div>
-            <h3 className="font-medium mb-2">专家信息</h3>
-            <p>{expert?.name || '专家'}</p>
-          </div>
-          
-          <div>
-            <h3 className="font-medium mb-2">服务详情</h3>
-            <p>导游服务 - ¥200/天</p>
-          </div>
-          
-          <div>
-            <h3 className="font-medium mb-2">预约时间</h3>
-            <p>今天 10:00</p>
-          </div>
-          
-          <div className="flex space-x-3 pt-4">
-            <button
-              onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-            >
-              取消
-            </button>
-            <button
-              onClick={handleConfirm}
-              className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
-            >
-              确认预约
-            </button>
-          </div>
+
+        <Button
+          type="primary"
+          block
+          size="large"
+          onClick={onConfirm}
+          style={{
+            background: 'linear-gradient(to right, #ff6b35, #f7931e)',
+            border: 'none',
+            borderRadius: '8px',
+            height: '48px',
+            fontSize: '16px',
+            fontWeight: 'bold'
+          }}
+        >
+          确认预约
+        </Button>
+
+        <div style={{
+          textAlign: 'center',
+          marginTop: '16px',
+          fontSize: '12px',
+          color: '#999'
+        }}>
+          点击确认预约表示您同意我们的服务条款和隐私政策
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }
