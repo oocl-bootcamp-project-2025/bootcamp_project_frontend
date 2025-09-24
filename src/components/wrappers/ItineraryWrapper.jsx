@@ -1,12 +1,12 @@
 import { useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import ItineraryResults from '../pages/ItineraryResults';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../context/AppProvider';
+import ItineraryResults from '../pages/ItineraryResults';
 
 export default function ItineraryWrapper() {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // 从路由state中获取搜索数据，或使用默认数据
   const searchData = location.state?.searchData || {
     destination: '北京',
@@ -81,7 +81,7 @@ export default function ItineraryWrapper() {
     updateItinerary(updatedItinerary);
     // 更新预约列表
     setBookings(filteredBookings);
-    
+
     console.log(`景点 ${oldAttractionId} 已替换为 ${newAttraction.name}，相关预约已清空`);
   }, [bookings, itinerary, updateItinerary, setBookings]);
 

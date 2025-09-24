@@ -1,5 +1,6 @@
 import { Calendar, ChevronLeft, Clock, MapPin, Plus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { UserOutlined } from '@ant-design/icons';
 import AMapComponent from '../map/AMapComponent';
 import { Button } from '../ui/button';
 import './css/ItineraryOverviewCard.css';
@@ -73,7 +74,25 @@ export default function ItineraryResults({
         location: '海淀区',
         images: ['https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=500'],
         experts: []
-      }
+      },{
+      id: 'attraction5',
+      name: '测试中',
+      description: '明清两朝的皇家宫殿，现为综合性博物馆',
+      duration: '3小时',
+      time: '13:00-16:00',
+      location: '东城区',
+      images: ['https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=500'],
+      experts: []
+       },{
+      id: 'attraction6',
+       name: '网络',
+      description: '明清两朝的皇家宫殿，现为综合性博物馆',
+      duration: '1小时',
+      time: '16:30-17:30',
+      location: '东城区',
+      images: ['https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=500'],
+      experts: []
+}
     ]
   });
 
@@ -373,8 +392,10 @@ export default function ItineraryResults({
                     <div className="attraction-actions">
                       <button
                         className="action-btn primary width-auto"
+                        style={{ minWidth: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                         onClick={() => onFindExperts && onFindExperts(attraction)}
                       >
+                        <UserOutlined style={{ fontSize: '16px',paddingLeft :'1px' }} />
                         找达人
                       </button>
                     </div>
