@@ -1,0 +1,136 @@
+import React, { useState } from 'react';
+import './css/Login.css';
+import logo from '../../assets/logo192.png'; // 图片路径
+import { login as loginApi } from '../apis/api';
+
+const Login = () => {
+  // 状态管理
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
+  // 表单验证（留空，供后续填写）
+  const validateForm = () => {
+    // 后续自行添加验证逻辑
+    // 验证输入发手机号是否为11个数字
+    if (!/^\d{11}$/.test(phone)) {
+      setError('请输入有效的手机号');
+      return false;
+    }
+    // 验证密码是否为6-16个字符
+    if (!/^\w{6,16}$/.test(password)) {
+      setError('请输入有效的密码');
+      return false;
+    }
+    return true;
+  };
+
+  // 登录处理
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+    try {
+      const response = await loginApi({ "phone": phone, "password": password });
+      // 处理不同的成功状态码
+      if (response.status === 200 || response.status === 201) {
+        const token = response?.data?.token || response?.data;
+        if (token) {
+          localStorage.setItem('token', token);
+          console.log('登录成功，token已保存 :      ' + token);
+          // window.location.href = '/'; // 登录成功后的跳转
+        } else {
+          setError('登录成功，但未获取到token');
+        }
+      } else {
+        setError('登录失败，未知响应码');
+      }
+    } catch (err) {
+      const status = err?.response?.status;
+      if (status === 400) {
+        setError('请求参数错误，请检查手机号和密码');
+      } else if (status === 404) {
+        setError('用户不存在，请注册或检查手机号');
+      } else if (status === 401) {
+        setError('密码错误，请重试');
+      } else {
+        setError(err?.response?.data?.message || '登录失败，请重试');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="login-container">
+      <div className="login-card">
+        {/* 品牌logo */}
+        <div className="login-logo">
+          <img src={logo} alt="私途logo" className="logo-image" />
+          <h1 className="logo-text">欢迎回来</h1>
+          <h6 className="logo-subtext">登录您的 Sito 账号</h6>
+        </div>
+
+        {/* 登录表单 */}
+        <form onSubmit={handleLogin} className="login-form">
+          {error && <div className="error-message">{error}</div>}
+
+          <div className="form-group">
+            <label htmlFor="phone" className="form-label">手机号</label>
+            <div className="input-wrapper">
+              <input
+                type="tel"
+                id="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="请输入手机号"
+                className="form-input"
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password" className="form-label">密码</label>
+            <div className="input-wrapper">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="请输入密码"
+                className="form-input"
+                disabled={isLoading}
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+                disabled={isLoading}
+              >
+                {showPassword ? '隐藏' : '显示'}
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="login-button"
+            disabled={isLoading}
+          >
+            {isLoading ? '登录中...' : '登录'}
+          </button>
+        </form>
+
+        {/* 注册选项 */}
+        <div className="register-section">
+          <p>还没有账号? <a href="/register" className="register-link">立即注册</a></p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;

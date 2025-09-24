@@ -12,3 +12,11 @@ export const saveItinerary = async (itineraryData) => {
 export const getAIPlanningRoute = async (searchData) => {
   return await instance.post('route/process',searchData);
 }
+
+export const login = async (userData) => {
+  return await instance.post('accounts/login', userData);
+}
+
+export const register = async (userData) => {
+  return await instance.post('accounts/register', userData);
+}
