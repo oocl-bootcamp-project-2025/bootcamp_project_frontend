@@ -84,6 +84,8 @@ const MapRoutes = ({ map, locations, routeData }) => {
                 mainRouteLine.setMap(map);
                 routeLinesRef.current.push(mainRouteLine);
 
+                // 注释掉起点和终点标记，避免碍眼
+                /*
                 // 添加起点和终点标记
                 if (origin) {
                     const [originLng, originLat] = origin.split(',').map(Number);
@@ -122,6 +124,7 @@ const MapRoutes = ({ map, locations, routeData }) => {
                         console.log('✅ 终点标记已添加');
                     }
                 }
+                */
 
                 // 绘制其他可选路径（如果有的话）
                 if (paths.length > 1) {
