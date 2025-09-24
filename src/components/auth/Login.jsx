@@ -3,6 +3,7 @@ import './css/Login.css';
 import logo from '../../assets/logo192.png'; // 图片路径
 import { login as loginApi } from '../apis/api';
 import { useLocation, useNavigate } from 'react-router';
+import { PhoneOutlined, LockOutlined } from '@ant-design/icons';
 
 
 // README！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
@@ -112,6 +113,7 @@ const Login = () => {
           <div className="form-group">
             <label htmlFor="phone" className="form-label">手机号</label>
             <div className="input-wrapper">
+              <span className="input-icon"><PhoneOutlined /></span>
               <input
                 type="tel"
                 id="phone"
@@ -127,6 +129,7 @@ const Login = () => {
           <div className="form-group">
             <label htmlFor="password" className="form-label">密码</label>
             <div className="input-wrapper">
+              <span className="input-icon"><LockOutlined /></span>
               <input
                 type={showPassword ? "text" : "password"}
                 id="password"

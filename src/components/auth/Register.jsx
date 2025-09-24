@@ -4,6 +4,7 @@ import logo from '../../assets/logo192.png';
 import { register } from '@/components/apis/api';
 import { useNavigate, useLocation } from 'react-router';
 import { message } from 'antd';
+import { PhoneOutlined, LockOutlined } from '@ant-design/icons';
 
 const Register = () => {
   const [phone, setPhone] = useState('');
@@ -87,6 +88,7 @@ const Register = () => {
           <div className="form-group">
             <label htmlFor="phone" className="form-label">手机号</label>
             <div className="input-wrapper">
+              <span className="input-icon"><PhoneOutlined /></span>
               <input
                 type="tel"
                 id="phone"
@@ -102,6 +104,7 @@ const Register = () => {
           <div className="form-group">
             <label htmlFor="password" className="form-label">密码</label>
             <div className="input-wrapper">
+              <span className="input-icon"><LockOutlined /></span>
               <input
                 type={showPassword ? "text" : "password"}
                 id="password"

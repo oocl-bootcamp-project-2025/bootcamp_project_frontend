@@ -86,11 +86,25 @@
 
 .input-wrapper {
     position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 2vw;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #bdbdbd;
+    font-size: 4vw;
+    pointer-events: none;
+    z-index: 2;
 }
 
 .form-input {
     width: 100%;
     padding: 3.5vw 4vw;
+    padding-left: 8vw;
     border: 0.25vw solid #ddd;
     border-radius: 2vw;
     font-size: 4vw;
