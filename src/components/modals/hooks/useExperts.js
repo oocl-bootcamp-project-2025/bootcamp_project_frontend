@@ -96,7 +96,7 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
   // 登录弹窗处理
   const handleGoLogin = () => {
     setLoginModalVisible(false);
-    navigate('/login');
+    navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
   };
 
   const handleCancelLoginModal = () => {
@@ -135,10 +135,17 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
   };
 
   // 预约成功后继续规划
-  const handleContinuePlanning = () => {
+  const handleContinuePlanning = (bookingInfo) => {
+    if (onSelectExpert) {
+      onSelectExpert(attraction, {
+        expertName: selectedExpert?.name,
+        serviceName: selectedExpert?.service.name,
+        bookingDateTime: bookingInfo?.bookingDateTime
+      });
+    }
     setBookingSuccessVisible(false);
     setSelectedExpert(null);
-    onClose(); // 关闭整个达人选择模态框
+    onClose();
   };
 
   // 推荐其他景点
