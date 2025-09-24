@@ -460,7 +460,6 @@ export default function Homepage() {
       <LoadingModal
         isOpen={showLoadingModal}
         onClose={() => setShowLoadingModal(false)}
-        message="AI正在智能规划路线\n请耐心等待"
       />
       {/* 新增：AI规划失败弹窗 */}
       <ResultModal

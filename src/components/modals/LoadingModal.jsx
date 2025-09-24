@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import './css/ResultModal.css';
 import './css/loadingmodal.css';
 
-const LoadingModal = ({ isOpen, onClose, message = 'AI正在智能规划路线,请耐心等待', spinnerColor = '#ff7518' }) => {
+const LoadingModal = ({ isOpen, onClose, message = 'AI正在智能规划路线', message2 = '请耐心等待...', spinnerColor = '#ff7518' }) => {
   if (!isOpen) return null;
 
   useEffect(() => {
@@ -24,9 +24,9 @@ const LoadingModal = ({ isOpen, onClose, message = 'AI正在智能规划路线,�
         <div className="loading-modal-content">
           <h3 className="loading-modal-title">
             {message}
-            <span className="loading-modal-dots">
-              <span className="dot">.</span><span className="dot">.</span><span className="dot">.</span>
-            </span>
+          </h3>
+          <h3 className="loading-modal-title">
+            {message2}
           </h3>
           <div className="loading-modal-desc">
             预计需要10-30秒，请耐心等待AI为您生成专属路线
