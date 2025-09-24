@@ -18,6 +18,7 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
   const [selectedExpert, setSelectedExpert] = useState(null);
   const [linkConfirmVisible, setLinkConfirmVisible] = useState(false);
   const [selectedExpertForLink, setSelectedExpertForLink] = useState(null);
+  const [bookingSuccessVisible, setBookingSuccessVisible] = useState(false);
   const navigate = useNavigate();
 
   // 获取达人数据
@@ -87,15 +88,25 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
 
   // 预约确认处理
   const handleConfirmBooking = () => {
+    setConfirmModalVisible(false);
+    // 显示预约成功弹窗
+    setBookingSuccessVisible(true);
+
     if (onSelectExpert && selectedExpert) {
       onSelectExpert(selectedExpert);
     }
-    setConfirmModalVisible(false);
   };
 
   const handleCancelBooking = () => {
     setConfirmModalVisible(false);
     setSelectedExpert(null);
+  };
+
+  // 预约成功后继续规划
+  const handleContinuePlanning = () => {
+    setBookingSuccessVisible(false);
+    setSelectedExpert(null);
+    onClose(); // 关闭整个达人选择模态框
   };
 
   // 推荐其他景点
@@ -111,6 +122,7 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
     loginModalVisible,
     confirmModalVisible,
     selectedExpert,
+    bookingSuccessVisible,
     linkConfirmVisible,
     selectedExpertForLink,
 
@@ -125,6 +137,7 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
     handleCancelLoginModal,
     handleConfirmBooking,
     handleCancelBooking,
+    handleContinuePlanning,
     handleRecommendOtherAttractions
   };
 };
