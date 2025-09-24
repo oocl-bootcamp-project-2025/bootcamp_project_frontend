@@ -37,7 +37,7 @@ const LoadingModal = ({ isOpen, onClose, message = 'AI正在智能规划路线�
         </div>
         {/* 内容区域 */}
         <div className="result-modal-content">
-          <h3 className="result-modal-title" style={{ textAlign: 'center' }}>
+          <h3 className="result-modal-title" style={{ textAlign: 'center', userSelect: 'none', cursor: 'default' }}>
             {message}
           </h3>
         </div>
