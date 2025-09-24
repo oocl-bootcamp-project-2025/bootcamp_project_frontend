@@ -1,0 +1,111 @@
+/* 遮罩层 */
+.loading-modal-overlay {
+  background: rgba(0,0,0,0.35);
+  z-index: 9999;
+  position: fixed;
+  left: 0; top: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 弹窗容器 */
+.loading-modal-container {
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 40px 40px 32px 40px; /* 左右间距加大 */
+  min-width: 280px;
+  max-width: 400px; /* 桌面端最大宽度收窄 */
+  width: 100%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+@media (max-width: 500px) {
+  .loading-modal-container {
+    max-width: 90vw; /* 移动端最大宽度 */
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+/* AI图标 */
+.loading-modal-ai {
+  margin-bottom: 12px;
+  font-size: 32px;
+  color: #ff7518;
+  filter: drop-shadow(0 2px 6px #ff7518aa);
+}
+
+/* loading动画区域 */
+.loading-modal-spinner-section {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.loading-modal-spinner-bg {
+  box-shadow: 0 0 12px #ff7518aa;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* 去除多余的样式，保证居中 */
+}
+.loading-modal-spinner {
+  display: block;
+  width: 44px;
+  height: 44px;
+  border: 6px solid #ff7518;
+  border-top: 6px solid #fff;
+  border-radius: 50%;
+  animation: loadingmodal-spin 1s linear infinite;
+  box-sizing: border-box;
+}
+@keyframes loadingmodal-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 内容区域 */
+.loading-modal-content {
+  width: 100%;
+  text-align: center;
+}
+.loading-modal-title {
+  text-align: center;
+  user-select: none;
+  cursor: default;
+  font-weight: 700;
+  font-size: 22px;
+  color: #333;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+.loading-modal-dots {
+  font-weight: 400;
+  font-size: 22px;
+  color: #ff7518;
+  margin-left: 2px;
+}
+.loading-modal-dots .dot {
+  animation: loadingmodal-blink 1.2s infinite;
+  opacity: 0.5;
+}
+.loading-modal-dots .dot:nth-child(1) { animation-delay: 0s; }
+.loading-modal-dots .dot:nth-child(2) { animation-delay: 0.3s; }
+.loading-modal-dots .dot:nth-child(3) { animation-delay: 0.6s; }
+@keyframes loadingmodal-blink {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+.loading-modal-desc {
+  font-size: 14px;
+  color: #888;
+  margin-top: 6px;
+  user-select: none;
+}
