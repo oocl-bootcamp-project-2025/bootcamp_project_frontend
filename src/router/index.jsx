@@ -12,7 +12,8 @@ const ExpertProfilePage = lazy(() => import('../components/pages/ExpertProfilePa
 const PostDetailPage = lazy(() => import('../components/pages/PostDetailPage'));
 const ItineraryResults = lazy(() => import('../components/pages/ItineraryResults'));
 const TestItineraryResults = lazy(() => import('../TestItineraryResults'));
-
+const Login = lazy(() => import('../components/auth/Login'));
+const Register = lazy(() => import('../components/auth/Register'));
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -61,6 +62,14 @@ export const router = createBrowserRouter([
       {
         path: 'post',
         element: <PostDetailPage />
+      },
+      {
+        path: 'login',
+        element: <Login />
+      },
+      {
+        path: 'register',
+        element: <Register />
       }
     ]
   }
