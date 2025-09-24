@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './css/Register.css';
-import logo from '../../assets/logo192.png';
 import { register } from '@/components/apis/api';
 import { useNavigate, useLocation } from 'react-router';
 import { message } from 'antd';
@@ -77,8 +76,7 @@ const Register = () => {
       <div className="register-card">
         {/* 品牌logo */}
         <div className="register-logo">
-          <img src={logo} alt="私途logo" className="logo-image" />
-          <h1 className="logo-text">私途</h1>
+          <div className="logo-block"><span className="logo-brand-text">Sito</span></div>
         </div>
 
         {/* 注册表单 */}

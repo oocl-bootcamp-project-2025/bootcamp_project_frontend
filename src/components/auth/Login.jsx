@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './css/Login.css';
-import logo from '../../assets/logo192.png'; // 图片路径
 import { login as loginApi } from '../apis/api';
 import { useLocation, useNavigate } from 'react-router';
 import { PhoneOutlined, LockOutlined } from '@ant-design/icons';
@@ -100,7 +99,7 @@ const Login = () => {
       <div className="login-card">
         {/* 品牌logo */}
         <div className="login-logo">
-          <img src={logo} alt="私途logo" className="logo-image" />
+          <div className="logo-block"><span className="logo-brand-text">Sito</span></div>
           <h1 className="logo-text">欢迎回来</h1>
           <h6 className="logo-subtext">登录您的 Sito 账号</h6>
         </div>
