@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './css/Login.css';
 import logo from '../../assets/logo192.png'; // 图片路径
 import { login as loginApi } from '../apis/api';
@@ -10,6 +10,21 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [registerMsg, setRegisterMsg] = useState('');
+
+  // 自动填充手机号和显示注册成功提示
+  useEffect(() => {
+    const regPhone = localStorage.getItem('registerPhone');
+    // const regMsg = localStorage.getItem('registerSuccessMsg');
+    if (regPhone) {
+      setPhone(regPhone);
+      localStorage.removeItem('registerPhone');
+    }
+    // if (regMsg) {
+    //   setRegisterMsg(regMsg);
+    //   localStorage.removeItem('registerSuccessMsg');
+    // }
+  }, []);
 
   // 表单验证（留空，供后续填写）
   const validateForm = () => {
@@ -30,13 +45,14 @@ const Login = () => {
   // 登录处理
   const handleLogin = async (e) => {
     e.preventDefault();
+    validateForm();
     setIsLoading(true);
-    setError('');
+    // setError('');
     try {
       const response = await loginApi({ "phone": phone, "password": password });
       // 处理不同的成功状态码
-      if (response.status === 200 || response.status === 201) {
-        const token = response?.data?.token || response?.data;
+      if (response.status === 201) {
+        const token = response?.data;
         if (token) {
           localStorage.setItem('token', token);
           console.log('登录成功，token已保存 :      ' + token);
@@ -53,10 +69,8 @@ const Login = () => {
         setError('请求参数错误，请检查手机号和密码');
       } else if (status === 404) {
         setError('用户不存在，请注册或检查手机号');
-      } else if (status === 401) {
-        setError('密码错误，请重试');
       } else {
-        setError(err?.response?.data?.message || '登录失败，请重试');
+        setError('登录失败，请重试');
       }
     } finally {
       setIsLoading(false);
@@ -72,7 +86,8 @@ const Login = () => {
           <h1 className="logo-text">欢迎回来</h1>
           <h6 className="logo-subtext">登录您的 Sito 账号</h6>
         </div>
-
+        {/* 注册成功提示 */}
+        {registerMsg && <div className="success-message">{registerMsg}</div>}
         {/* 登录表单 */}
         <form onSubmit={handleLogin} className="login-form">
           {error && <div className="error-message">{error}</div>}
