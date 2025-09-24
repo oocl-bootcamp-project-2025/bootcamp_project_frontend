@@ -2,6 +2,7 @@ import { ClockCircleOutlined, EnvironmentOutlined, ExclamationCircleOutlined, Me
 import { Avatar, Button, Card, Empty, Modal, Result, Skeleton, Space, Tag, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import BookingFailedModal from './BookingFailedModal';
 import BookingSuccessModal from './BookingSuccessModal';
 import ExpertBookingModal from './ExpertBookingModal';
 import LoginTipsModal from './LoginTipsModal';
@@ -116,6 +117,7 @@ export default function ExpertListModal({
   const [selectedExpert, setSelectedExpert] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [bookedExperts, setBookedExperts] = useState([]);
+  const [showFailedModal, setShowFailedModal] = useState(false);
   const navigate = useNavigate();
   const handleBooking = (expert) => {
     //localStorage.removeItem('token');
@@ -144,7 +146,8 @@ export default function ExpertListModal({
   const handleConfirmBooking = () => {
     console.log('已预约达人:', selectedExpert);
     if (selectedExpert) {
-      setShowSuccessModal(true);
+      setShowFailedModal(true);
+      //setShowSuccessModal(true);
       setBookedExperts([...bookedExperts, selectedExpert.id]);
       if (onSelectExpert) {
         onSelectExpert(selectedExpert);
@@ -166,6 +169,9 @@ export default function ExpertListModal({
     console.log('selectedExpert:', selectedExpert);
   }, [confirmModalVisible, showSuccessModal, selectedExpert]);
 
+  const handleCloseFailedModal = () => {
+    setShowFailedModal(false);
+  };
 
   const handleContinuePlanning = () => {
     setShowSuccessModal(false);
@@ -548,6 +554,14 @@ export default function ExpertListModal({
         bookingDateTime={`2025年9月22日星期一 13:30-15:00`}
         onContinuePlanning={handleContinuePlanning}
       />
+
+      {/* 预约失败弹窗 */}
+      <BookingFailedModal
+        open={showFailedModal}
+        errorMessage="网络宕机了，请重新预约"
+        onClose={handleCloseFailedModal}
+      />
+
     </div>
 
   );
