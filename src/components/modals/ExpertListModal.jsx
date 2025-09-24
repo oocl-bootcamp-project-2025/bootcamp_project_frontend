@@ -44,6 +44,7 @@ export default function ExpertListModal({
     handleGoLogin,
     handleCancelLoginModal,
     handleConfirmBooking,
+    handleCancelConfirmModal,
     handleCancelBooking,
     handleContinuePlanning,
     handleRecommendOtherAttractions
@@ -96,6 +97,7 @@ export default function ExpertListModal({
               key={expert.id}
               expert={expert}
               onBooking={handleBooking}
+              onCancelBooking={handleCancelBooking}
               disabled={bookedExperts.includes(expert.id)}
               isBooked={bookedExperts.includes(expert.id)}
               setSelectedExpertForLink={setSelectedExpertForLink}
@@ -151,7 +153,7 @@ export default function ExpertListModal({
       {/* 预约确认弹窗 */}
       <ExpertBookingModal
         open={confirmModalVisible}
-        onCancel={handleCancelBooking}
+        onCancel={handleCancelConfirmModal}
         onConfirm={handleConfirmBooking}
         date="2025年9月22日星期一"
         startTime="13:30"

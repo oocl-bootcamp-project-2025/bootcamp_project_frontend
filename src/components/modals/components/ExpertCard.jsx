@@ -19,6 +19,7 @@ const { Title, Text, Paragraph } = Typography;
 export const ExpertCard = ({
   expert,
   onBooking,
+  onCancelBooking,
   disabled,
   isBooked,
   setSelectedExpertForLink,
@@ -141,38 +142,60 @@ export const ExpertCard = ({
           </Paragraph>
         </div>
 
-        {/* 预约按钮 - 占据整个卡片宽度 */}
-        <Button
-          type="primary"
-          disabled={disabled}
-          style={{
-            background: isBooked
-              ? '#ccc'
-              : 'linear-gradient(to right, #ff6b35, #f7931e)',
-            border: 'none',
-            borderRadius: '8px',
-            width: '100%',
-            height: '40px',
-            fontWeight: 'bold'
-          }}
-          onClick={() => !disabled && onBooking(expert)}
-        >
-          {isBooked ? '已预约' : '预约达人'}
-        </Button>
-
-        {/* {isBooked && (
-        <Button
-          type="link"
-          style={{
-            padding: 0,
-            color: COLORS.primary,
-            fontSize: getResponsiveFontSize(14, 16)
-          }}
-          onClick={() => onCancelBooking(expert)}
-        >
-          取消预约
-        </Button>
-      )} */}
+        {/* 预约/已預約按钮 */}
+        {isBooked ? (
+          <div style={{
+            display: 'flex',
+            gap: SPACING.small,
+            justifyContent: 'space-between'
+          }}>
+            <Button
+              type="primary"
+              disabled={disabled}
+              style={{
+                background: '#ccc',
+                border: 'none',
+                borderRadius: '8px',
+                flex: 1,
+                height: '40px',
+                fontWeight: 'bold'
+              }}
+            >
+              已预约
+            </Button>
+            <Button
+              style={{
+                background: 'linear-gradient(to right, #ff6b35, #f7931e)',
+                color: 'white',
+                border: 'none',
+                fontSize: '14px',
+                flex: 1,
+                borderRadius: '8px',
+                height: '40px'
+              }}
+              onClick={() => onCancelBooking(expert)}
+            >
+              取消预约
+            </Button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Button
+              type="primary"
+              disabled={disabled}
+              style={{
+                background: 'linear-gradient(to right, #ff6b35, #f7931e)',
+                border: 'none',
+                borderRadius: '8px',
+                width: '60%',
+                height: '40px',
+                fontWeight: 'bold'
+              }}
+              onClick={() => !disabled && onBooking(expert)}
+            >
+              预约达人
+            </Button>
+          </div>)}
 
       </div>
     </Card>

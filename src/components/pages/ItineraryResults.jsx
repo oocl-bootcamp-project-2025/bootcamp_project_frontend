@@ -1,3 +1,5 @@
+import { saveItinerary } from '@/components/apis/api';
+import itineraryTestData3 from '@/components/pages/testdata/ItineraryTestData3';
 import { Calendar, ChevronLeft, Clock, MapPin, Plus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import AMapComponent from '../map/AMapComponent';
@@ -7,12 +9,6 @@ import { Button } from '../ui/button';
 import './css/ItineraryOverviewCard.css';
 import './css/ItineraryResults.css';
 import './css/ItineraryStatistics.css';
-import SaveItineraryModal from '../modals/SaveItineraryModal';
-import ResultModal from '../modals/ResultModal';
-import { saveItinerary } from '@/components/apis/api';
-import itineraryTestData2 from '@/components/pages/testdata/ItineraryTestData2';
-import itineraryTestData3 from '@/components/pages/testdata/ItineraryTestData3';
-import itineraryTestData4 from '@/components/pages/testdata/ItineraryTestData4';
 
 export default function ItineraryResults({
   searchData,
