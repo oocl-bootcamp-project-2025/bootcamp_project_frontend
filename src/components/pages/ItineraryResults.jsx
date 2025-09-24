@@ -35,6 +35,9 @@ export default function ItineraryResults({
   // 初始化行程数据 - 使用 testdata2 的 itinerary 部分
   const [currentItinerary, setCurrentItinerary] = useState(itinerary || itineraryTestData2.itinerary);
 
+  // 添加路线数据
+  const routeData = itineraryTestData2.route;
+
   // 处理景点拖拽移动
   const handleAttractionMove = (draggedItem, targetItem) => {
     const { dayKey: sourceDayKey, index: sourceIndex } = draggedItem;
@@ -398,6 +401,7 @@ export default function ItineraryResults({
           selectedTab={selectedTab}
           itinerary={currentItinerary}
           searchData={searchData}
+          routeData={routeData}
         />
 
         {/* 我的位置按钮 */}

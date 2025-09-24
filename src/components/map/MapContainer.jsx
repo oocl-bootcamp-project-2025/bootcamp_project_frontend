@@ -5,7 +5,7 @@ import MapLoadingStates from './MapLoadingStates';
 import MapMarkers from './MapMarkers';
 import MapRoutes from './MapRoutes';
 
-const MapContainer = ({ selectedTab, itinerary, searchData }) => {
+const MapContainer = ({ selectedTab, itinerary, searchData, routeData }) => {
     const [map, setMap] = useState(null);
     const [showJourney, setShowJourney] = useState(false);
     const [prevSelectedTab, setPrevSelectedTab] = useState(null);
@@ -425,6 +425,7 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
                             map={map}
                             locations={allLocations}
                             selectedTab={selectedTab}
+                            routeData={routeData}
                         />
                     </>
                 )}
