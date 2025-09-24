@@ -15,7 +15,7 @@ const LoadingModal = ({ isOpen, onClose, message = 'AI正在智能规划路线�
   }, [isOpen, onClose]);
 
   return (
-    <div className="result-modal-overlay" onClick={onClose}>
+    <div className="result-modal-overlay">
       <div className="result-modal-container" onClick={e => e.stopPropagation()}>
         {/* Loading 动画区域 */}
         <div className="result-modal-icon-section">
@@ -54,4 +54,3 @@ const LoadingModal = ({ isOpen, onClose, message = 'AI正在智能规划路线�
 };
 
 export default LoadingModal;
-
