@@ -35,10 +35,10 @@ export default function ItineraryResults({
   const [resultMessage, setResultMessage] = useState('');
 
   // 初始化行程数据 - 使用 testdata2 的 itinerary 部分
-  const [currentItinerary, setCurrentItinerary] = useState(itinerary || itineraryTestData4.itinerary);
+  const [currentItinerary, setCurrentItinerary] = useState(itinerary || itineraryTestData3.itinerary);
 
   // 添加路线数据
-  const routeData = itineraryTestData4.route;
+  const routeData = itineraryTestData3.route;
 
   // 处理景点拖拽移动
   const handleAttractionMove = (draggedItem, targetItem) => {
