@@ -4,6 +4,17 @@ import logo from '../../assets/logo192.png'; // 图片路径
 import { login as loginApi } from '../apis/api';
 import { useLocation, useNavigate } from 'react-router';
 
+
+// README！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+// 用我，就这样，
+// window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+// 或者你用navigate，就这样
+// import { useNavigate } from 'react-router-dom';
+// const navigate = useNavigate();
+// navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+// README！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+
+
 const Login = () => {
   // 状态管理
   const [phone, setPhone] = useState('');
