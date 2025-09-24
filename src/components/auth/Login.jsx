@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './css/Login.css';
 import logo from '../../assets/logo192.png'; // 图片路径
+import { login as loginApi } from '../apis/api';
+
 const Login = () => {
   // 状态管理
   const [phone, setPhone] = useState('');
@@ -12,13 +14,53 @@ const Login = () => {
   // 表单验证（留空，供后续填写）
   const validateForm = () => {
     // 后续自行添加验证逻辑
+    // 验证输入发手机号是否为11个数字
+    if (!/^\d{11}$/.test(phone)) {
+      setError('请输入有效的手机号');
+      return false;
+    }
+    // 验证密码是否为6-16个字符
+    if (!/^\w{6,16}$/.test(password)) {
+      setError('请输入有效的密码');
+      return false;
+    }
     return true;
   };
 
-  // 登录处理（留空，供后续填写）
-  const handleLogin = (e) => {
+  // 登录处理
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // 后续自行添加登录逻辑
+    setIsLoading(true);
+    setError('');
+    try {
+      const response = await loginApi({ "phone": phone, "password": password });
+      // 处理不同的成功状态码
+      if (response.status === 200 || response.status === 201) {
+        const token = response?.data?.token || response?.data;
+        if (token) {
+          localStorage.setItem('token', token);
+          console.log('登录成功，token已保存 :      ' + token);
+          // window.location.href = '/'; // 登录成功后的跳转
+        } else {
+          setError('登录成功，但未获取到token');
+        }
+      } else {
+        setError('登录失败，未知响应码');
+      }
+    } catch (err) {
+      const status = err?.response?.status;
+      if (status === 400) {
+        setError('请求参数错误，请检查手机号和密码');
+      } else if (status === 404) {
+        setError('用户不存在，请注册或检查手机号');
+      } else if (status === 401) {
+        setError('密码错误，请重试');
+      } else {
+        setError(err?.response?.data?.message || '登录失败，请重试');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -27,7 +69,8 @@ const Login = () => {
         {/* 品牌logo */}
         <div className="login-logo">
           <img src={logo} alt="私途logo" className="logo-image" />
-          <h1 className="logo-text">私途</h1>
+          <h1 className="logo-text">欢迎回来</h1>
+          <h6 className="logo-subtext">登录您的 Sito 账号</h6>
         </div>
 
         {/* 登录表单 */}

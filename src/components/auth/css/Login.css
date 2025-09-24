@@ -58,6 +58,12 @@
     color: #333;
     text-align: center;
 }
+.logo-subtext {
+    font-size: 3.5vw;
+    font-weight: 500;
+    color: #555;
+    text-align: center;
+}
 
 /* 表单样式 */
 .login-form {
