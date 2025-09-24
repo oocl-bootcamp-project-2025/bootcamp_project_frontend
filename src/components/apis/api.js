@@ -8,3 +8,7 @@ const instance = axios.create({
 export const saveItinerary = async (itineraryData) => {
   return await instance.post('trips', itineraryData);
 }
+
+export const login = async (userData) => {
+  return await instance.post('accounts/login', userData);
+}
