@@ -19,6 +19,9 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
   const [linkConfirmVisible, setLinkConfirmVisible] = useState(false);
   const [selectedExpertForLink, setSelectedExpertForLink] = useState(null);
   const [bookingSuccessVisible, setBookingSuccessVisible] = useState(false);
+  const [bookedExperts, setBookedExperts] = useState([]); // 添加已预约达人状态
+  const [showFailedModal, setShowFailedModal] = useState(false); // 添加预约失败状态
+
   const navigate = useNavigate();
 
   // 获取达人数据
@@ -64,9 +67,23 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
     }
   }, [isOpen, attraction]);
 
+  // 添加模拟预约请求函数
+  const mockBookingRequest = async () => {
+    // 模拟网络延迟 1-2 秒
+    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
+
+    // 随机返回成功或失败 (70% 成功率)
+    if (Math.random() < 0.7) {
+      return Promise.resolve();
+    } else {
+      return Promise.reject(new Error('预约失败，请稍后重试'));
+    }
+  };
+
   // 处理预约
   const handleBooking = (expert) => {
-    localStorage.removeItem('token');
+    //localStorage.removeItem('token');
+    localStorage.setItem('token', 'mock-token');
     const isLoggedIn = !!localStorage.getItem('token');
     if (!isLoggedIn) {
       setLoginModalVisible(true);
@@ -87,14 +104,29 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
   };
 
   // 预约确认处理
-  const handleConfirmBooking = () => {
-    setConfirmModalVisible(false);
-    // 显示预约成功弹窗
-    setBookingSuccessVisible(true);
+  const handleConfirmBooking = async () => {
+    if (selectedExpert) {
+      try {
+        setConfirmModalVisible(false);
+        // 调用模拟预约请求
+        await mockBookingRequest();
 
-    if (onSelectExpert && selectedExpert) {
-      onSelectExpert(selectedExpert);
+        // 预约成功
+        setBookingSuccessVisible(true);
+        setBookedExperts([...bookedExperts, selectedExpert.id]);
+        if (onSelectExpert) {
+          onSelectExpert(selectedExpert);
+        }
+      } catch (error) {
+        // 预约失败
+        console.error('预约失败:', error);
+        setShowFailedModal(true);
+      }
     }
+  };
+
+  const handleCloseFailedModal = () => {
+    setShowFailedModal(false);
   };
 
   const handleCancelBooking = () => {
@@ -125,6 +157,8 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
     bookingSuccessVisible,
     linkConfirmVisible,
     selectedExpertForLink,
+    bookedExperts,
+    showFailedModal,
 
     // 设置状态的函数
     setLinkConfirmVisible,
@@ -138,6 +172,7 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
     handleConfirmBooking,
     handleCancelBooking,
     handleContinuePlanning,
+    handleCloseFailedModal,
     handleRecommendOtherAttractions
   };
 };

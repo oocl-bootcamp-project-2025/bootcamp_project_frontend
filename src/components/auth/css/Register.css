@@ -59,6 +59,28 @@
     text-align: center;
 }
 
+.logo-block {
+    width: 18vw;
+    height: 18vw;
+    border-radius: 3vw;
+    background: linear-gradient(135deg, #f7931e 0%, #ff6b35 100%);
+    box-shadow: 0 2vw 6vw rgba(217, 123, 58, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 3vw auto;
+}
+
+.logo-brand-text {
+    font-family: 'Brush Script MT', 'Pacifico', 'Dancing Script', cursive, sans-serif;
+    font-size: 6vw;
+    color: #fff;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-shadow: 0 1vw 2vw rgba(0,0,0,0.10);
+    user-select: none;
+}
+
 /* 表单样式 */
 .register-form {
     display: flex;
@@ -80,11 +102,25 @@
 
 .input-wrapper {
     position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 2vw;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #bdbdbd;
+    font-size: 4vw;
+    pointer-events: none;
+    z-index: 2;
 }
 
 .form-input {
     width: 100%;
     padding: 3.5vw 4vw;
+    padding-left: 8vw;
     border: 0.25vw solid #ddd;
     border-radius: 2vw;
     font-size: 4vw;
@@ -195,5 +231,3 @@
     10%, 30%, 50%, 70%, 90% { transform: translateX(-1.25vw); }
     20%, 40%, 60%, 80% { transform: translateX(1.25vw); }
 }
-
-
