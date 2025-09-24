@@ -13,6 +13,7 @@ import {
 
 import { EnvironmentOutlined } from '@ant-design/icons';
 import { Modal, Skeleton, Space, Typography } from 'antd';
+import BookingSuccessModal from './BookingSuccessModal';
 import ExpertBookingModal from './ExpertBookingModal';
 import LoginTipsModal from './LoginTipsModal';
 const { Text } = Typography;
@@ -30,6 +31,7 @@ export default function ExpertListModal({
     loginModalVisible,
     confirmModalVisible,
     selectedExpert,
+    bookingSuccessVisible,
     linkConfirmVisible,
     selectedExpertForLink,
     setLinkConfirmVisible,
@@ -40,6 +42,7 @@ export default function ExpertListModal({
     handleCancelLoginModal,
     handleConfirmBooking,
     handleCancelBooking,
+    handleContinuePlanning,
     handleRecommendOtherAttractions
   } = useExperts(attraction, isOpen, onClose, onSelectExpert);  // 渲染内容
   const renderContent = () => {
@@ -149,6 +152,12 @@ export default function ExpertListModal({
         endTime="15:00"
         serviceName={selectedExpert?.service.name}
         price={selectedExpert?.service.price}
+      />
+
+      {/* 预约成功弹窗 */}
+      <BookingSuccessModal
+        visible={bookingSuccessVisible}
+        onClose={handleContinuePlanning}
       />
 
       {/* 小红书链接确认弹窗 */}
