@@ -92,18 +92,27 @@ export default function ExpertListModal({
         </div>
 
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-          {experts.map((expert) => (
-            <ExpertCard
-              key={expert.id}
-              expert={expert}
-              onBooking={handleBooking}
-              onCancelBooking={handleCancelBooking}
-              disabled={bookedExperts.includes(expert.id)}
-              isBooked={bookedExperts.includes(expert.id)}
-              setSelectedExpertForLink={setSelectedExpertForLink}
-              setLinkConfirmVisible={setLinkConfirmVisible}
-            />
-          ))}
+          {experts.map((expert) => {
+            const isBookedForThisAttraction = bookedExperts.some(
+              bookedExpert =>
+                bookedExpert.expertId === expert.id &&
+                (bookedExpert.attractionId === attraction?.id ||
+                  bookedExpert.attractionName === attraction?.name)
+            );
+
+            return (
+              <ExpertCard
+                key={expert.id}
+                expert={expert}
+                onBooking={handleBooking}
+                onCancelBooking={handleCancelBooking}
+                disabled={isBookedForThisAttraction}
+                isBooked={isBookedForThisAttraction}
+                setSelectedExpertForLink={setSelectedExpertForLink}
+                setLinkConfirmVisible={setLinkConfirmVisible}
+              />
+            )
+          })}
         </Space>
 
         <div style={{

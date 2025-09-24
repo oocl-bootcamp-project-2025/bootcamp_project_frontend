@@ -82,7 +82,11 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
 
   // 处理预约
   const handleBooking = (expert) => {
-    if (bookedExperts.length > 0) {
+    const attractionHasBooking = bookedExperts.some(bookedExpert =>
+      bookedExpert.attractionId === attraction.id ||
+      bookedExpert.attractionName === attraction.name
+    );
+    if (attractionHasBooking) {
       message.warning('该景点已预约达人服务,请先取消当前预约');
       return;
     }
@@ -101,7 +105,10 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
   // 取消预约
   const handleCancelBooking = (expert) => {
     // 移除已预约专家
-    setBookedExperts(prev => prev.filter(id => id !== expert.id));
+    setBookedExperts(prev => prev.filter(item =>
+      !(item.expertId === expert.id &&
+        (item.attractionId === attraction.id || item.attractionName === attraction.name))
+    ));
 
     // 调用父组件的取消预约回调
     if (onSelectExpert) {
@@ -110,8 +117,6 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
         expertId: expert.id
       });
     }
-
-    message.success('已取消预约');
   };
 
   // 登录弹窗处理
@@ -133,11 +138,13 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
         setBookingSuccessVisible(false);
         // 调用模拟预约请求
         await mockBookingRequest();
-
-        console.log('预约成功:');
         // 预约成功
         setBookingSuccessVisible(true);
-        setBookedExperts([...bookedExperts, selectedExpert.id]);
+        setBookedExperts(prev => [...prev, {
+          expertId: selectedExpert.id,
+          attractionId: attraction.id,
+          attractionName: attraction.name
+        }]);
         if (onSelectExpert) {
           onSelectExpert(attraction, {  // 正确: 传递两个参数
             expertName: selectedExpert?.name,
@@ -147,7 +154,6 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
         }
       } catch (error) {
         // 预约失败
-        console.error('预约失败:', error);
         setBookingSuccessVisible(false);
         setShowFailedModal(true);
 
