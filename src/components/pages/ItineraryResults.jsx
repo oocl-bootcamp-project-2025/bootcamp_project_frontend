@@ -1,6 +1,5 @@
 import { Calendar, ChevronLeft, Clock, MapPin, Plus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { UserOutlined } from '@ant-design/icons';
 import AMapComponent from '../map/AMapComponent';
 import { Button } from '../ui/button';
 import './css/ItineraryOverviewCard.css';
@@ -11,16 +10,16 @@ import ResultModal from '../modals/ResultModal';
 import { saveItinerary } from '@/components/apis/api';
 
 export default function ItineraryResults({
-  searchData,
-  bookings = [],
-  itinerary,
-  onBack,
-  onViewExpertArticle,
-  onFindExperts,
-  onReplaceAttraction,
-  onResetItinerary,
-  onUpdateItinerary
-}) {
+                                           searchData,
+                                           bookings = [],
+                                           itinerary,
+                                           onBack,
+                                           onViewExpertArticle,
+                                           onFindExperts,
+                                           onReplaceAttraction,
+                                           onResetItinerary,
+                                           onUpdateItinerary
+                                         }) {
   const [selectedTab, setSelectedTab] = useState('overview');
   const [isExpanded, setIsExpanded] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -36,7 +35,6 @@ export default function ItineraryResults({
   const [currentItinerary, setCurrentItinerary] = useState(itinerary || {
     day1: [
       {
-        id: 'attraction1',
         name: '天安门广场',
         description: '中华人民共和国首都北京市的城市广场，位于北京市中心',
         duration: '2小时',
@@ -46,7 +44,6 @@ export default function ItineraryResults({
         experts: []
       },
       {
-        id: 'attraction2',
         name: '故宫博物院',
         description: '明清两朝的皇家宫殿，现为综合性博物馆',
         duration: '3小时',
@@ -58,7 +55,6 @@ export default function ItineraryResults({
     ],
     day2: [
       {
-        id: 'attraction3',
         name: '长城',
         description: '中国古代的军事防御工程',
         duration: '4小时',
@@ -70,7 +66,6 @@ export default function ItineraryResults({
     ],
     day3: [
       {
-        id: 'attraction4',
         name: '颐和园',
         description: '中国清朝时期皇家园林',
         duration: '3小时',
@@ -78,25 +73,7 @@ export default function ItineraryResults({
         location: '海淀区',
         images: ['https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=500'],
         experts: []
-      },{
-      id: 'attraction5',
-      name: '测试中',
-      description: '明清两朝的皇家宫殿，现为综合性博物馆',
-      duration: '3小时',
-      time: '13:00-16:00',
-      location: '东城区',
-      images: ['https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=500'],
-      experts: []
-       },{
-      id: 'attraction6',
-       name: '网络',
-      description: '明清两朝的皇家宫殿，现为综合性博物馆',
-      duration: '1小时',
-      time: '16:30-17:30',
-      location: '东城区',
-      images: ['https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=500'],
-      experts: []
-}
+      }
     ]
   });
 
@@ -133,25 +110,26 @@ export default function ItineraryResults({
       setShowResultModal(true);
       return;
     }
-      const itineraryData = {
-        phoneNumber,
-        startDate: searchData?.departureDate || '',
-        allNumber: getTotalAttractions(),
-        itineraryData: currentItinerary
-      };
-      await saveItinerary(itineraryData).then(response => {
-        if (response.code !== 201) {
-          throw new Error('保存失败');
-        }
-        setShowSaveModal(false);
-        setResultType('success');
-        setResultMessage('行程已成功保存！我们已将行程链接发送到您的手机，请注意查收短信。');
-        setShowResultModal(true);
-      }).catch(error => {
-        setResultType('error');
-        setResultMessage('保存失败，请检查网络连接后重试。如问题持续存在，请联系客服。');
-        setShowResultModal(true);
-      })
+    const itineraryData = {
+      phoneNumber: phoneNumber,
+      startDate: searchData?.departureDate || '',
+      allNumber: getTotalAttractions(),
+      itineraryData: currentItinerary
+    };
+    await saveItinerary(itineraryData).then(response => {
+      console.log("保存行程响应:", response);
+      if (response.status !== 201) {
+        throw new Error('保存失败');
+      }
+      setShowSaveModal(false);
+      setResultType('success');
+      setResultMessage('行程已成功保存！我们已将行程链接发送到您的手机，请注意查收短信。');
+      setShowResultModal(true);
+    }).catch(error => {
+      setResultType('error');
+      setResultMessage('保存失败，请检查网络连接后重试。如问题持续存在，请联系客服。');
+      setShowResultModal(true);
+    })
   };
   // 处理触摸开始
   const handleTouchStart = (e) => {
@@ -395,10 +373,8 @@ export default function ItineraryResults({
                     <div className="attraction-actions">
                       <button
                         className="action-btn primary width-auto"
-                        style={{ minWidth: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                         onClick={() => onFindExperts && onFindExperts(attraction)}
                       >
-                        <UserOutlined style={{ fontSize: '16px',paddingLeft :'1px' }} />
                         找达人
                       </button>
                     </div>
