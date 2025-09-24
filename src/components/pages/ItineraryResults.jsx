@@ -1,4 +1,3 @@
-import { saveItinerary } from '@/components/apis/api';
 import { Calendar, ChevronLeft, Clock, MapPin, Plus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import AMapComponent from '../map/AMapComponent';
@@ -8,6 +7,12 @@ import { Button } from '../ui/button';
 import './css/ItineraryOverviewCard.css';
 import './css/ItineraryResults.css';
 import './css/ItineraryStatistics.css';
+import SaveItineraryModal from '../modals/SaveItineraryModal';
+import ResultModal from '../modals/ResultModal';
+import { saveItinerary } from '@/components/apis/api';
+import itineraryTestData2 from '@/components/pages/testdata/ItineraryTestData2';
+import itineraryTestData3 from '@/components/pages/testdata/ItineraryTestData3';
+import itineraryTestData4 from '@/components/pages/testdata/ItineraryTestData4';
 
 export default function ItineraryResults({
   searchData,
@@ -32,57 +37,11 @@ export default function ItineraryResults({
   const [resultMessage, setResultMessage] = useState('');
   const [bookingInfos, setBookingInfos] = useState({});
 
-  const handleBookingInfo = (attractionName, bookingInfo) => {
-    setBookingInfos(prev => ({
-      ...prev,
-      [attractionName]: bookingInfo
-    }));
-  }
-  // 初始化行程数据
-  const [currentItinerary, setCurrentItinerary] = useState(itinerary || {
-    day1: [
-      {
-        name: '天安门广场',
-        description: '中华人民共和国首都北京市的城市广场，位于北京市中心',
-        duration: '2小时',
-        time: '09:00-11:00',
-        location: '东城区',
-        images: ['https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=500'],
-        experts: []
-      },
-      {
-        name: '故宫博物院',
-        description: '明清两朝的皇家宫殿，现为综合性博物馆',
-        duration: '3小时',
-        time: '13:00-16:00',
-        location: '东城区',
-        images: ['https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=500'],
-        experts: []
-      }
-    ],
-    day2: [
-      {
-        name: '长城',
-        description: '中国古代的军事防御工程',
-        duration: '4小时',
-        time: '09:00-13:00',
-        location: '延庆区',
-        images: ['https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=500'],
-        experts: []
-      }
-    ],
-    day3: [
-      {
-        name: '颐和园',
-        description: '中国清朝时期皇家园林',
-        duration: '3小时',
-        time: '10:00-13:00',
-        location: '海淀区',
-        images: ['https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=500'],
-        experts: []
-      }
-    ]
-  });
+  // 初始化行程数据 - 使用 testdata2 的 itinerary 部分
+  const [currentItinerary, setCurrentItinerary] = useState(itinerary || itineraryTestData3.itinerary);
+
+  // 添加路线数据
+  const routeData = itineraryTestData3.route;
 
   // 处理景点拖拽移动
   const handleAttractionMove = (draggedItem, targetItem) => {
@@ -278,6 +237,18 @@ export default function ItineraryResults({
     return searchData?.travelers || 0;
   };
 
+  // 辅助函数：格式化图片和时长
+  function parseImages(images) {
+    if (!images) return [];
+    if (Array.isArray(images)) return images;
+    return images.split(',');
+  }
+  function formatDuration(duration) {
+    if (typeof duration === 'number') return `${duration}小时`;
+    if (typeof duration === 'string' && duration.match(/^\d+$/)) return `${duration}小时`;
+    return duration || '2小时';
+  }
+
   // 构建Tabs的items数据
   const tabItems = [
     {
@@ -327,15 +298,15 @@ export default function ItineraryResults({
 
                     <div className="attractions-list">
                       {attractions.map((attraction, idx) => (
-                        <div key={attraction.id} className="attraction-overview-item">
-                          {attraction.images && attraction.images[0] && (
-                            <img src={attraction.images[0]} alt={attraction.name} className="attraction-thumb" />
+                        <div key={attraction.id || idx} className="attraction-overview-item">
+                          {parseImages(attraction.images)[0] && (
+                            <img src={parseImages(attraction.images)[0]} alt={attraction.name} className="attraction-thumb" />
                           )}
                           <div className="attraction-details">
                             <div className="attraction-name">{attraction.name}</div>
                             <div className="attraction-time-info">
                               <span className="arrival-time">{attraction.time?.split('-')[0] || '09:00'}</span>
-                              <span className="duration">· {attraction.duration || '2小时'}</span>
+                              <span className="duration">· {formatDuration(attraction.duration)}</span>
                             </div>
                           </div>
                         </div>
@@ -361,16 +332,16 @@ export default function ItineraryResults({
 
           <div className="attractions-timeline">
             {(currentItinerary[dayKey] || []).map((attraction, attractionIndex) => (
-              <div key={attraction.id} className="attraction-item">
+              <div key={attraction.id || attractionIndex} className="attraction-item">
                 <div className="time-dot">
                   <Clock className="w-4 h-4" />
                   <span>{attraction.time?.split('-')[0] || '09:00'}</span>
-                  <small>({attraction.duration || '2小时'})</small>
+                  <small>({formatDuration(attraction.duration)})</small>
                 </div>
 
                 <div className="attraction-card">
-                  {attraction.images && attraction.images[0] && (
-                    <img src={attraction.images[0]} alt={attraction.name} />
+                  {parseImages(attraction.images)[0] && (
+                    <img src={parseImages(attraction.images)[0]} alt={attraction.name} />
                   )}
 
                   <div className="attraction-info">
@@ -449,6 +420,7 @@ export default function ItineraryResults({
           selectedTab={selectedTab}
           itinerary={currentItinerary}
           searchData={searchData}
+          routeData={routeData}
         />
 
         {/* 我的位置按钮 */}

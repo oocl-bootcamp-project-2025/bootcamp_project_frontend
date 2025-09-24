@@ -5,30 +5,40 @@ import MapLoadingStates from './MapLoadingStates';
 import MapMarkers from './MapMarkers';
 import MapRoutes from './MapRoutes';
 
-const MapContainer = ({ selectedTab, itinerary, searchData }) => {
+const MapContainer = ({ selectedTab, itinerary, searchData, routeData }) => {
     const [map, setMap] = useState(null);
     const [showJourney, setShowJourney] = useState(false);
     const [prevSelectedTab, setPrevSelectedTab] = useState(null);
     const [mapError, setMapError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isUpdatingView, setIsUpdatingView] = useState(false);
-    const [allLocations, setAllLocations] = useState([]); // 改为状态管理
-    const [isLoadingLocations, setIsLoadingLocations] = useState(false); // 新增：坐标加载状态
+    const [allLocations, setAllLocations] = useState([]);
+    const [isLoadingLocations, setIsLoadingLocations] = useState(false);
 
     const updateTimeoutRef = useRef(null);
 
-    // 获取景点坐标的辅助函数（使用高德地图地理编码API）
-    const getAttractionPosition = async (name) => {
-        console.log(`🔍 开始获取景点 "${name}" 的坐标...`);
+    // 获取景点坐标的辅助函数（优先使用数据中的经纬度）
+    const getAttractionPosition = async (attraction) => {
+        console.log(`🔍 开始获取景点 "${attraction.name}" 的坐标...`);
 
         try {
+            // 优先使用景点数据中的经纬度字段
+            if (attraction.longitude && attraction.latitude) {
+                const position = [attraction.longitude, attraction.latitude];
+                console.log(`✅ 从景点数据直接获取 "${attraction.name}" 坐标:`, position);
+                return position;
+            }
+
+            // 如果没有经纬度数据，回退到地理编码
+            console.log(`⚠️ 景点 "${attraction.name}" 没有经纬度数据，尝试地理编码...`);
+
             // 如果高德地图未加载，返回默认坐标
             if (!window.AMap) {
                 console.warn('❌ 高德地图未加载，使用默认坐标');
                 return [116.397428, 39.909187];
             }
 
-            // 先尝试从本地测试数据获取坐标（确保基本功能）
+            // 从本地测试数据获取坐标（作为备用）
             const testPositions = {
                 '天安门广场': [116.397428, 39.909187],
                 '故宫博物院': [116.403963, 39.917219],
@@ -39,18 +49,22 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
                 '圆明园': [116.303511, 40.006626],
                 '天坛': [116.407394, 39.883544],
                 '雍和宫': [116.420316, 39.952398],
-                '王府井': [116.416357, 39.913855]
+                '王府井': [116.416357, 39.913855],
+                '三里屯': [116.4563, 39.9335],
+                '鳥巢 (國家體育場)': [116.3906, 39.9917],
+                '水立方 (國家游泳中心)': [116.3906, 39.991],
+                '長城 (八達嶺)': [116.0119, 40.3588]
             };
 
             // 如果是测试数据中的景点，直接返回
-            if (testPositions[name]) {
-                console.log(`✅ 从测试数据获取景点 "${name}" 坐标:`, testPositions[name]);
-                return testPositions[name];
+            if (testPositions[attraction.name]) {
+                console.log(`✅ 从测试数据获取景点 "${attraction.name}" 坐标:`, testPositions[attraction.name]);
+                return testPositions[attraction.name];
             }
 
             // 尝试使用地理编码API
             return new Promise((resolve, reject) => {
-                console.log(`🌐 尝试通过地理编码API获取景点 "${name}" 坐标...`);
+                console.log(`🌐 尝试通过地理编码API获取景点 "${attraction.name}" 坐标...`);
 
                 // API v2.0 直接使用，无需手动加载插件
                 if (!window.AMap.Geocoder) {
@@ -65,10 +79,10 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
                     extensions: 'all'
                 });
 
-                console.log(`📍 开始地理编码查询: "${name}", 城市: ${searchData?.destination || '北京'}`);
+                console.log(`📍 开始地理编码查询: "${attraction.name}", 城市: ${searchData?.destination || '北京'}`);
 
-                geocoder.getLocation(name, (status, result) => {
-                    console.log(`📋 景点 "${name}" 地理编码API响应:`, {
+                geocoder.getLocation(attraction.name, (status, result) => {
+                    console.log(`📋 景点 "${attraction.name}" 地理编码API响应:`, {
                         status,
                         resultCount: result?.geocodes?.length || 0,
                         result
@@ -79,7 +93,7 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
                         const location = geocode.location;
                         const position = [location.lng, location.lat];
 
-                        console.log(`🎉 景点 "${name}" 坐标获取成功:`, position, `地址: ${geocode.formattedAddress}`);
+                        console.log(`🎉 景点 "${attraction.name}" 坐标获取成功:`, position, `地址: ${geocode.formattedAddress}`);
                         resolve(position);
                     } else {
                         // 尝试POI搜索作为备选
@@ -89,26 +103,26 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
                                 pageSize: 1
                             });
 
-                            placeSearch.search(name, (searchStatus, searchResult) => {
+                            placeSearch.search(attraction.name, (searchStatus, searchResult) => {
                                 if (searchStatus === 'complete' && searchResult.poiList && searchResult.poiList.pois.length > 0) {
                                     const poi = searchResult.poiList.pois[0];
                                     const position = [poi.location.lng, poi.location.lat];
-                                    console.log(`🎉 景点 "${name}" POI搜索成功:`, position);
+                                    console.log(`🎉 景点 "${attraction.name}" POI搜索成功:`, position);
                                     resolve(position);
                                 } else {
-                                    console.warn(`❌ 景点 "${name}" 所有搜索方式都失败，使用默认坐标`);
+                                    console.warn(`❌ 景点 "${attraction.name}" 所有搜索方式都失败，使用默认坐标`);
                                     resolve([116.397428, 39.909187]);
                                 }
                             });
                         } else {
-                            console.warn(`❌ 景点 "${name}" 地理编码失败，使用默认坐标`);
+                            console.warn(`❌ 景点 "${attraction.name}" 地理编码失败，使用默认坐标`);
                             resolve([116.397428, 39.909187]);
                         }
                     }
                 });
             });
         } catch (error) {
-            console.error(`💥 获取景点 "${name}" 坐标时发生异常:`, error);
+            console.error(`💥 获取景点 "${attraction.name}" 坐标时发生异常:`, error);
             return [116.397428, 39.909187];
         }
     };
@@ -118,6 +132,7 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
         if (!itinerary || !window.AMap) return;
 
         console.log('=== 开始加载景点坐标 ===');
+        console.log('行程数据:', itinerary);
         setIsLoadingLocations(true);
 
         try {
@@ -125,10 +140,17 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
 
             for (const [dayKey, dayIndex] of Object.keys(itinerary).map((key, idx) => [key, idx])) {
                 const dayAttractions = itinerary[dayKey] || [];
+                console.log(`处理第${dayIndex + 1}天 (${dayKey})，景点数量: ${dayAttractions.length}`);
 
                 for (const attraction of dayAttractions) {
-                    console.log(`正在获取景点 "${attraction.name}" 的坐标...`);
-                    const position = await getAttractionPosition(attraction.name);
+                    console.log(`正在处理景点:`, {
+                        name: attraction.name,
+                        longitude: attraction.longitude,
+                        latitude: attraction.latitude,
+                        id: attraction.id
+                    });
+
+                    const position = await getAttractionPosition(attraction);
 
                     locations.push({
                         name: attraction.name,
@@ -138,6 +160,8 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
                         attraction: attraction,
                         isCurrentDay: selectedTab === 'overview' || selectedTab === dayKey
                     });
+
+                    console.log(`✅ 景点 "${attraction.name}" 坐标设置完成:`, position);
                 }
             }
 
@@ -401,6 +425,7 @@ const MapContainer = ({ selectedTab, itinerary, searchData }) => {
                             map={map}
                             locations={allLocations}
                             selectedTab={selectedTab}
+                            routeData={routeData}
                         />
                     </>
                 )}
