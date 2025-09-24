@@ -9,6 +9,7 @@ import SaveItineraryModal from '../modals/SaveItineraryModal';
 import ResultModal from '../modals/ResultModal';
 import { saveItinerary } from '@/components/apis/api';
 import itineraryTestData2 from '@/components/pages/testdata/ItineraryTestData2';
+import itineraryTestData3 from '@/components/pages/testdata/ItineraryTestData3';
 
 export default function ItineraryResults({
                                            searchData,
@@ -33,10 +34,10 @@ export default function ItineraryResults({
   const [resultMessage, setResultMessage] = useState('');
 
   // 初始化行程数据 - 使用 testdata2 的 itinerary 部分
-  const [currentItinerary, setCurrentItinerary] = useState(itinerary || itineraryTestData2.itinerary);
+  const [currentItinerary, setCurrentItinerary] = useState(itinerary || itineraryTestData3.itinerary);
 
   // 添加路线数据
-  const routeData = itineraryTestData2.route;
+  const routeData = itineraryTestData3.route;
 
   // 处理景点拖拽移动
   const handleAttractionMove = (draggedItem, targetItem) => {
