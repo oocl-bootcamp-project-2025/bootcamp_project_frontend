@@ -6,13 +6,13 @@ import { LinkConfirmModal } from './components/LinkConfirmModal';
 import { COLORS, SPACING } from './constants/styleConstants';
 import { useExperts } from './hooks/useExperts';
 import {
-  getCurrentDateString,
   handleCancelOpenLink,
   handleConfirmOpenLink
 } from './utils/expertUtils';
 
 import { EnvironmentOutlined } from '@ant-design/icons';
 import { Modal, Skeleton, Space, Typography } from 'antd';
+import BookingFailedModal from './BookingFailedModal';
 import BookingSuccessModal from './BookingSuccessModal';
 import ExpertBookingModal from './ExpertBookingModal';
 import LoginTipsModal from './LoginTipsModal';
@@ -34,6 +34,9 @@ export default function ExpertListModal({
     bookingSuccessVisible,
     linkConfirmVisible,
     selectedExpertForLink,
+    bookedExperts,
+    showFailedModal,
+    handleCloseFailedModal,
     setLinkConfirmVisible,
     setSelectedExpertForLink,
     handleRetry,
@@ -93,6 +96,8 @@ export default function ExpertListModal({
               key={expert.id}
               expert={expert}
               onBooking={handleBooking}
+              disabled={bookedExperts.includes(expert.id)}
+              isBooked={bookedExperts.includes(expert.id)}
               setSelectedExpertForLink={setSelectedExpertForLink}
               setLinkConfirmVisible={setLinkConfirmVisible}
             />
@@ -147,7 +152,7 @@ export default function ExpertListModal({
         open={confirmModalVisible}
         onCancel={handleCancelBooking}
         onConfirm={handleConfirmBooking}
-        date={getCurrentDateString()}
+        date="2025年9月22日星期一"
         startTime="13:30"
         endTime="15:00"
         serviceName={selectedExpert?.service.name}
@@ -156,8 +161,18 @@ export default function ExpertListModal({
 
       {/* 预约成功弹窗 */}
       <BookingSuccessModal
-        visible={bookingSuccessVisible}
-        onClose={handleContinuePlanning}
+        open={bookingSuccessVisible}
+        onContinuePlanning={handleContinuePlanning}
+        expertName={selectedExpert?.name}
+        serviceName={selectedExpert?.service.name}
+        bookingDateTime={`2025年9月22日星期一 13:30-15:00`}
+      />
+
+      {/* 预约失败弹窗 */}
+      <BookingFailedModal
+        open={showFailedModal}
+        errorMessage="网络宕机了，请重新预约"
+        onClose={handleCloseFailedModal}
       />
 
       {/* 小红书链接确认弹窗 */}
