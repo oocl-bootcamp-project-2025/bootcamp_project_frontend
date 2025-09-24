@@ -2,6 +2,19 @@ import React, { useState, useEffect } from 'react';
 import './css/Login.css';
 import logo from '../../assets/logo192.png'; // 图片路径
 import { login as loginApi } from '../apis/api';
+import { useLocation, useNavigate } from 'react-router';
+import { PhoneOutlined, LockOutlined } from '@ant-design/icons';
+
+
+// README！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+// 用我，就这样，
+// window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+// 或者你用navigate，就这样
+// import { useNavigate } from 'react-router-dom';
+// const navigate = useNavigate();
+// navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+// README！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+
 
 const Login = () => {
   // 状态管理
@@ -11,30 +24,28 @@ const Login = () => {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [registerMsg, setRegisterMsg] = useState('');
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // 获取redirect参数
+  const searchParams = new URLSearchParams(location.search);
+  const redirect = searchParams.get('redirect') || '/';
 
   // 自动填充手机号和显示注册成功提示
   useEffect(() => {
     const regPhone = localStorage.getItem('registerPhone');
-    // const regMsg = localStorage.getItem('registerSuccessMsg');
     if (regPhone) {
       setPhone(regPhone);
       localStorage.removeItem('registerPhone');
     }
-    // if (regMsg) {
-    //   setRegisterMsg(regMsg);
-    //   localStorage.removeItem('registerSuccessMsg');
-    // }
   }, []);
 
   // 表单验证（留空，供后续填写）
   const validateForm = () => {
-    // 后续自行添加验证逻辑
-    // 验证输入发手机号是否为11个数字
-    if (!/^\d{11}$/.test(phone)) {
+    if (!/^[\d]{11}$/.test(phone)) {
       setError('请输入有效的手机号');
       return false;
     }
-    // 验证密码是否为6-16个字符
     if (!/^\w{6,16}$/.test(password)) {
       setError('请输入有效的密码');
       return false;
@@ -45,18 +56,17 @@ const Login = () => {
   // 登录处理
   const handleLogin = async (e) => {
     e.preventDefault();
-    validateForm();
+    if (!validateForm()) return;
     setIsLoading(true);
-    // setError('');
+    setError('');
     try {
-      const response = await loginApi({ "phone": phone, "password": password });
-      // 处理不同的成功状态码
-      if (response.status === 201) {
+      const response = await loginApi({"phone": phone, "password": password});
+      if (response.status === 201 || response.status === 200) {
         const token = response?.data;
         if (token) {
           localStorage.setItem('token', token);
-          console.log('登录成功，token已保存 :      ' + token);
-          // window.location.href = '/'; // 登录成功后的跳转
+          // 登录成功后跳转到redirect
+          window.location.href = redirect;
         } else {
           setError('登录成功，但未获取到token');
         }
@@ -69,12 +79,20 @@ const Login = () => {
         setError('请求参数错误，请检查手机号和密码');
       } else if (status === 404) {
         setError('用户不存在，请注册或检查手机号');
+      } else if (status === 401) {
+        setError('密码错误，请重试');
       } else {
         setError('登录失败，请重试');
       }
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // 跳转到注册页，带上redirect参数
+  const handleGoRegister = (e) => {
+    e.preventDefault();
+    navigate(`/register?redirect=${encodeURIComponent(redirect)}`);
   };
 
   return (
@@ -95,6 +113,7 @@ const Login = () => {
           <div className="form-group">
             <label htmlFor="phone" className="form-label">手机号</label>
             <div className="input-wrapper">
+              <span className="input-icon"><PhoneOutlined /></span>
               <input
                 type="tel"
                 id="phone"
@@ -110,6 +129,7 @@ const Login = () => {
           <div className="form-group">
             <label htmlFor="password" className="form-label">密码</label>
             <div className="input-wrapper">
+              <span className="input-icon"><LockOutlined /></span>
               <input
                 type={showPassword ? "text" : "password"}
                 id="password"
@@ -141,7 +161,7 @@ const Login = () => {
 
         {/* 注册选项 */}
         <div className="register-section">
-          <p>还没有账号? <a href="/register" className="register-link">立即注册</a></p>
+          <p>还没有账号? <a href="/register" className="register-link" onClick={handleGoRegister}>立即注册</a></p>
         </div>
       </div>
     </div>

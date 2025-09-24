@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import './css/Register.css';
 import logo from '../../assets/logo192.png';
-import { register as registerApi } from '@/components/apis/api';
+import { register } from '@/components/apis/api';
+import { useNavigate, useLocation } from 'react-router';
 import { message } from 'antd';
-import { useNavigate } from 'react-router';
+import { PhoneOutlined, LockOutlined } from '@ant-design/icons';
 
 const Register = () => {
   const [phone, setPhone] = useState('');
@@ -12,6 +13,11 @@ const Register = () => {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // 获取redirect参数
+  const searchParams = new URLSearchParams(location.search);
+  const redirect = searchParams.get('redirect') || '/';
 
   // 表单验证（留空，供后续填写）
   const validateForm = () => {
@@ -38,24 +44,32 @@ const Register = () => {
     setIsLoading(true);
     try {
       // 发送注册请求
-      const response = await registerApi({ "phone": phone, "password": password });
+      const response = await register({"phone": phone, "password": password});
       if (response.status === 201) {
         setIsLoading(false);
-        // 注册成功，保存手机号和提示到localStorage
+        // 注册成功，保存手机号到localStorage
         localStorage.setItem('registerPhone', phone);
-        message.success('注册成功，请登录');
-        // localStorage.setItem('registerSuccessMsg', '注册成功，请登录');
-        navigate('/login');
+        message.success('注册成功, 请登录');
+        // 注册成功后跳转到登录页，带上redirect参数
+        navigate(`/login?redirect=${encodeURIComponent(redirect)}`);
+      }else {
+        message.error('注册失败，未知错误，请重试');
       }
     } catch (err) {
-      if (err.response && err.response.status === 409) {
-        setError('手机号已被注册，请直接登录');
-      }else if (err.response && err.response.status === 400) {
-        setError('手机号或密码格式错误，请重新输入');
+      const status = err?.response?.status;
+      if (status === 409) {
+        message.error('该手机号已被注册');
+      }else {
+        message.error('注册失败，请重试');
       }
-      setError('注册失败，请重试');
       setIsLoading(false);
     }
+  };
+
+  // 跳转到登录页，带上redirect参数
+  const handleGoLogin = (e) => {
+    e.preventDefault();
+    navigate(`/login?redirect=${encodeURIComponent(redirect)}`);
   };
 
   return (
@@ -74,6 +88,7 @@ const Register = () => {
           <div className="form-group">
             <label htmlFor="phone" className="form-label">手机号</label>
             <div className="input-wrapper">
+              <span className="input-icon"><PhoneOutlined /></span>
               <input
                 type="tel"
                 id="phone"
@@ -89,6 +104,7 @@ const Register = () => {
           <div className="form-group">
             <label htmlFor="password" className="form-label">密码</label>
             <div className="input-wrapper">
+              <span className="input-icon"><LockOutlined /></span>
               <input
                 type={showPassword ? "text" : "password"}
                 id="password"
@@ -120,7 +136,7 @@ const Register = () => {
 
         {/* 登录选项 */}
         <div className="login-section">
-          <p>已有账号? <a href="/login" className="login-link">立即登录</a></p>
+          <p>已有账号? <a href="/login" className="login-link" onClick={handleGoLogin}>立即登录</a></p>
         </div>
       </div>
     </div>
