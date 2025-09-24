@@ -4,10 +4,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import './css/Homepage.css';
+import LoadingModal from '../modals/LoadingModal';
+import ResultModal from '../modals/ResultModal';
 
 // 导入常量和工具函数
 import { CHINESE_CITIES, TIME_OPTIONS } from '../../constants';
 import { calculateDuration, filterCities } from '../../utils';
+import { getAIPlanningRoute } from '../apis/api';
 
 export default function Homepage() {
   const navigate = useNavigate();
@@ -22,6 +25,10 @@ export default function Homepage() {
   const [showDepartureTime, setShowDepartureTime] = useState(false);
   const [showReturnTime, setShowReturnTime] = useState(false);
   const [preference, setPreference] = useState([]);
+  const [showLoadingModal, setShowLoadingModal] = useState(false);
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [resultType, setResultType] = useState('error');
+  const [resultMessage, setResultMessage] = useState('');
   const departureTimeRef = useRef(null);
   const returnTimeRef = useRef(null);
   const cityDropdownRef = useRef(null);
@@ -83,27 +90,23 @@ export default function Homepage() {
 
   const dateOptions = getDateOptions();
 
-  const handleStartPlanning = () => {
+  const handleStartPlanning = async () => {
     if (!destination.trim()) {
       alert('请选择目的地');
       return;
     }
-
     if (!departureDate) {
       alert('请选择出发日期');
       return;
     }
-
     if (!returnDate) {
       alert('请选择返回日期');
       return;
     }
-
     if (!preference.length) {
       alert('请选择旅行偏好');
       return;
     }
-
     const searchData = {
       destination: destination.trim(),
       departureDate,
@@ -113,10 +116,25 @@ export default function Homepage() {
       preference,
       duration: calculateDuration(departureDate, returnDate)
     };
-    console.log('搜索数据:', searchData);
-    // 使用useNavigate进行路由跳转，传递搜索数据
-    navigate('/itinerary', { state: { searchData } });
-
+    setShowLoadingModal(true);
+    try {
+      const response = await getAIPlanningRoute(searchData);
+      const { itinerary, route } = response.data || {};
+      setShowLoadingModal(false);
+      if (!itinerary || !route) {
+        setResultType('error');
+        setResultMessage('AI行程规划失败，请稍后重试');
+        setShowResultModal(true);
+        return;
+      }
+      navigate('/itinerary', { state: { searchData, itinerary, routeData: route } });
+    } catch (err) {
+      setShowLoadingModal(false);
+      setResultType('error');
+      setResultMessage('AI行程规划失败，请检查网络或稍后重试');
+      setShowResultModal(true);
+      console.error('AI规划接口异常:', err);
+    }
   };
 
   const getMaxReturnDate = () => {
@@ -437,6 +455,20 @@ export default function Homepage() {
 
         </div>
       </div>
+
+      {/* 新增：AI智能规划等待弹窗 */}
+      <LoadingModal
+        isOpen={showLoadingModal}
+        onClose={() => setShowLoadingModal(false)}
+        message="AI正在智能规划路线，请耐心等待"
+      />
+      {/* 新增：AI规划失败弹窗 */}
+      <ResultModal
+        isOpen={showResultModal}
+        onClose={() => setShowResultModal(false)}
+        type={resultType}
+        message={resultMessage}
+      />
     </div>
   );
 }

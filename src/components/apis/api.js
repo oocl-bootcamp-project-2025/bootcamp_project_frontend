@@ -5,6 +5,10 @@ const instance = axios.create({
   baseURL: 'http://localhost:8080/',
 });
 
+const railWayInstance = axios.create({
+  baseURL: 'https://sito-service.up.railway.app/',
+});
+
 export const saveItinerary = async (itineraryData) => {
   return await instance.post('trips', itineraryData);
 }
@@ -23,7 +27,7 @@ export const getAIPlanningRoute = async (searchData) => {
   params.append('days', days);
 
   // GET请求
-  return await instance.get(`route/planner?${params.toString()}`);
+  return await railWayInstance.get(`route/planner?${params.toString()}`);
 }
 
 export const login = async (userData) => {
