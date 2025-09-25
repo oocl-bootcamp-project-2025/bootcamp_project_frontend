@@ -5,8 +5,11 @@ const instance = axios.create({
   baseURL: 'http://localhost:8080/',
 });
 
+
+let baseURL = process.env.REACT_APP_BACKEND_BASEURL || 'http://localhost:8080/';
+
 const railWayInstance = axios.create({
-  baseURL: 'https://sito-service.up.railway.app/',
+  baseURL: baseURL
 });
 
 // 添加请求拦截器，为每个请求自动添加 Authorization 请求头
