@@ -13,7 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { TIME_OPTIONS } from '../../constants';
 import { calculateDuration } from '../../utils';
 
-import { getAIPlanningRoute, getCities, isLogin } from '../apis/api';
+import { getAIPlanningRoute, getCities } from '../apis/api';
 
 export default function Homepage() {
   const navigate = useNavigate();
@@ -136,7 +136,7 @@ export default function Homepage() {
     if (selectedDate > maxDate) {
       // Either show an error message or reset to max allowed date
       setReturnDate(getMaxReturnDate());
-      alert('Maximum trip duration is 5 days');
+      alert('最长旅行时间为5天');
     } else {
       setReturnDate(e.target.value);
     }
