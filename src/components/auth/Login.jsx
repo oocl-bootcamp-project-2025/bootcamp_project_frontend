@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import './css/Login.css';
-import { login as loginApi } from '../apis/api';
+import { LockOutlined, PhoneOutlined } from '@ant-design/icons';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { PhoneOutlined, LockOutlined } from '@ant-design/icons';
+import { login as loginApi } from '../apis/api';
+import './css/Login.css';
 
 
 // README！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
@@ -60,13 +60,26 @@ const Login = () => {
     setError('');
     try {
       const response = await loginApi({"phone": phone, "password": password});
-      if (response.status === 201 || response.status === 200) {
+      if (response.status === 200) {
         const token = response?.data;
         if (token) {
           localStorage.setItem('token', token);
           console.log('登录成功，token已保存:   ' + token);
-          // 登录成功后跳转到redirect
-          window.location.href = redirect;
+          
+          // 验证token是否真的保存成功
+          const savedToken = localStorage.getItem('token');
+          console.log('验证保存的token:', savedToken);
+          
+          if (savedToken === token) {
+            console.log('Token保存成功，准备跳转到:', redirect);
+            // 稍微延迟一下确保localStorage写入完成
+            setTimeout(() => {
+              window.location.href = redirect;
+            }, 100);
+          } else {
+            console.error('Token保存失败！');
+            setError('Token保存失败，请重试');
+          }
         } else {
           setError('登录成功，但未获取到token');
         }

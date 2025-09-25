@@ -1,5 +1,4 @@
 import axios from 'axios';
-import {useNavigate} from "react-router";
 
 const instance = axios.create({
   baseURL: 'http://localhost:8080/',
@@ -19,12 +18,43 @@ instance.interceptors.request.use(
       config.headers['Authorization'] = `Bearer ${token}`;
       console.log('Added Authorization header:', config.headers['Authorization']);
       console.log("token:   ", token)
+    } else {
+      console.log('没有找到token，跳过Authorization header');
     }
     return config;
   },
   error => {
     // 对请求错误做些什么
     console.log(error)
+    return Promise.reject(error);
+  }
+);
+
+// 添加响应拦截器，处理401未授权错误
+instance.interceptors.response.use(
+  response => {
+    // 响应成功，直接返回
+    return response;
+  },
+  error => {
+    console.log('响应拦截器捕获错误:', error);
+    
+    // 如果是403错误，说明token无效，需要重新登录
+    if (error.response?.status === 403) {
+      console.log('检测到403错误，token可能无效，清除token并跳转到登录页');
+
+      // 清除无效的token
+      localStorage.removeItem('token');
+      
+      // 获取当前页面路径，用于登录后重定向
+      const currentPath = window.location.pathname + window.location.search;
+      
+      // 如果不是在登录页面，则重定向到登录页面
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+      }
+    }
+    
     return Promise.reject(error);
   }
 );
@@ -65,3 +95,19 @@ export const getCities = async () => {
 export const isLogin = async () => {
   return await instance.get('/accounts/isLogin');
 }
+
+// 调试工具函数
+export const debugTokenStatus = () => {
+  const token = localStorage.getItem('token');
+  console.log('=== Token状态调试 ===');
+  console.log('当前时间:', new Date().toLocaleString());
+  console.log('当前URL:', window.location.href);
+  console.log('localStorage中是否有token:', !!token);
+  if (token) {
+    console.log('Token值:', token);
+    console.log('Token长度:', token.length);
+  }
+  console.log('localStorage所有键:', Object.keys(localStorage));
+  console.log('====================');
+  return !!token;
+};
