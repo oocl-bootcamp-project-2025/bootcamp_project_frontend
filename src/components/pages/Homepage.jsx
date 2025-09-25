@@ -11,6 +11,7 @@ import './css/Homepage.css';
 import preferenceOptionsValue from '@/common/preferenceOptionsValue';
 import { TIME_OPTIONS } from '../../constants';
 import { calculateDuration } from '../../utils';
+import { useAuth} from "@/contexts/AuthContext";
 
 import { getAIPlanningRoute, isLogin } from '../apis/api';
 
@@ -36,6 +37,7 @@ export default function Homepage() {
   const departureTimeRef = useRef(null);
   const returnTimeRef = useRef(null);
   const cityDropdownRef = useRef(null);
+  const { isAuthenticated, getToken } = useAuth(); // 🎯 获取认证状态
 
   const preferenceOptions = preferenceOptionsValue;
 
@@ -246,10 +248,7 @@ export default function Homepage() {
         <button
           onClick={async () => {
             try {
-
-              const response = await isLogin();
-
-              if (response.data.status === 200) {
+              if (isAuthenticated) {
                 // 已登录，直接导航到个人资料页面
                 console.log('API确认已登录，跳转到用户页面');
                 navigate('/user/profile');

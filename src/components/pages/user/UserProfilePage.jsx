@@ -2,11 +2,13 @@ import { Button, Card, Spin, Tabs, message } from 'antd';
 import { ArrowLeft, Book, Clock, MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../contexts/AuthContext'; // 🎯 添加认证上下文
 import { fetchItineraries } from '../../apis/api.js';
 import './UserProfilePage.css';
 
 export default function UserProfilePage() {
   const navigate = useNavigate();
+  const { isAuthenticated, getToken } = useAuth(); // 🎯 使用认证上下文
   const [activeTab, setActiveTab] = useState('itineraries');
   const [userItineraries, setUserItineraries] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -48,18 +50,19 @@ export default function UserProfilePage() {
 
   // 组件加载时获取用户行程数据
   useEffect(() => {
-    // 检查是否有登录信息
-    const phoneNumber = localStorage.getItem('last_login_phone');
-    const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-
-    if (!phoneNumber || !token) {
-      // 没有登录信息，跳转到登录页面
+    // 🎯 使用AuthContext检查认证状态
+    console.log('UserProfilePage: 检查认证状态');
+    console.log('isAuthenticated:', isAuthenticated);
+    
+    if (!isAuthenticated) {
+      console.log('UserProfilePage: 用户未登录，跳转到登录页面');
       navigate('/login?redirect=%2Fuser%2Fprofile');
       return;
     }
 
+    console.log('UserProfilePage: 用户已登录，获取用户数据');
     fetchUserItineraries();
-  }, [navigate]);
+  }, [navigate, isAuthenticated]); // 🎯 依赖isAuthenticated而不是手动检查localStorage
 
   // 重试函数
   const handleRetry = () => {

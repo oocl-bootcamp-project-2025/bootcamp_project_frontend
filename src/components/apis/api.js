@@ -60,43 +60,43 @@ instance.interceptors.request.use(
 );
 
 // 添加响应拦截器，处理401/403未授权错误
-instance.interceptors.response.use(
-  response => {
-    console.log('=== 响应成功 ===');
-    console.log('响应状态:', response.status);
-    console.log('响应URL:', response.config.url);
-    console.log('===============');
-    // 响应成功，直接返回
-    return response;
-  },
-  error => {
-    console.log('=== 响应拦截器捕获错误 ===');
-    console.log('错误对象:', error);
-    console.log('响应状态:', error.response?.status);
-    console.log('响应数据:', error.response?.data);
-    console.log('请求URL:', error.config?.url);
-
-    // 如果是401或403错误，说明token无效，需要重新登录
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      console.log(`检测到${error.response.status}错误，token可能无效，清除token并跳转到登录页`);
-
-      // 清除无效的token
-      localStorage.removeItem('token');
-
-      // 获取当前页面路径，用于登录后重定向
-      const currentPath = window.location.pathname + window.location.search;
-
-      // 如果不是在登录页面，则重定向到登录页面
-      if (!window.location.pathname.includes('/login')) {
-        console.log('准备重定向到登录页，当前路径:', currentPath);
-        window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
-      }
-    }
-
-    console.log('========================');
-    return Promise.reject(error);
-  }
-);
+// instance.interceptors.response.use(
+//   response => {
+//     console.log('=== 响应成功 ===');
+//     console.log('响应状态:', response.status);
+//     console.log('响应URL:', response.config.url);
+//     console.log('===============');
+//     // 响应成功，直接返回
+//     return response;
+//   },
+//   error => {
+//     console.log('=== 响应拦截器捕获错误 ===');
+//     console.log('错误对象:', error);
+//     console.log('响应状态:', error.response?.status);
+//     console.log('响应数据:', error.response?.data);
+//     console.log('请求URL:', error.config?.url);
+//
+//     // 如果是401或403错误，说明token无效，需要重新登录
+//     if (error.response?.status === 401 || error.response?.status === 403) {
+//       console.log(`检测到${error.response.status}错误，token可能无效，清除token并跳转到登录页`);
+//
+//       // 清除无效的token
+//       localStorage.removeItem('token');
+//
+//       // 获取当前页面路径，用于登录后重定向
+//       const currentPath = window.location.pathname + window.location.search;
+//
+//       // 如果不是在登录页面，则重定向到登录页面
+//       if (!window.location.pathname.includes('/login')) {
+//         console.log('准备重定向到登录页，当前路径:', currentPath);
+//         window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+//       }
+//     }
+//
+//     console.log('========================');
+//     return Promise.reject(error);
+//   }
+// );
 
 export const saveItinerary = async (itineraryData) => {
   return await railWayInstance.post('itineraries', itineraryData);
