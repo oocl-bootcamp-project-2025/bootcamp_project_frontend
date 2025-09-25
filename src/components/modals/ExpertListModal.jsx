@@ -22,7 +22,8 @@ export default function ExpertListModal({
   attraction,
   isOpen,
   onClose,
-  onSelectExpert
+  onSelectExpert,
+  onGoLogin
 }) {
   const {
     loading,
@@ -130,6 +131,7 @@ export default function ExpertListModal({
     );
   };
 
+  const handleLoginClick = onGoLogin || handleGoLogin;
 
   return (
     <div>
@@ -156,7 +158,7 @@ export default function ExpertListModal({
       <LoginTipsModal
         open={loginModalVisible}
         onCancel={handleCancelLoginModal}
-        onLogin={handleGoLogin}
+        onLogin={handleLoginClick}
       />
 
       {/* 预约确认弹窗 */}

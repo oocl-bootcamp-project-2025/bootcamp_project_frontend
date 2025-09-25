@@ -17,6 +17,8 @@ instance.interceptors.request.use(
     // 如果存在 token，则添加到请求头
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
+      console.log('Added Authorization header:', config.headers['Authorization']);
+      console.log("token:   ", token)
     }
     return config;
   },
@@ -32,6 +34,7 @@ export const saveItinerary = async (itineraryData) => {
 }
 
 export const getAIPlanningRoute = async (searchData) => {
+  return await instance.post('route/process', searchData);
   // 处理参数
   const area = searchData.destination;
   // preference转为数字数组并拼接成字符串
@@ -54,4 +57,12 @@ export const login = async (userData) => {
 
 export const register = async (userData) => {
   return await instance.post('accounts/register', userData);
+}
+
+export const getCities = async () => {
+  return await instance.post('/cities');
+}
+
+export const isLogin = async () => {
+  return await instance.get('/accounts/isLogin');
 }
