@@ -68,6 +68,12 @@ export default function UserProfilePage() {
   const handleRetry = () => {
     fetchUserItineraries();
   };
+  const handleTabClick = () => {
+    try {
+    }catch (error) {
+    }
+    navigate(`/itinerary/${itinerary.id}`);
+  };
 
   return (
       <div className="min-h-screen max-h-screen overflow-hidden flex flex-col" style={{ height: '844px', background: '#f8f9fa' }}>
@@ -172,7 +178,7 @@ export default function UserProfilePage() {
                                       <Card
                                           key={itinerary.id || index}
                                           className="cursor-pointer transition-all duration-200 hover:shadow-lg"
-                                          onClick={() => navigate(`/itinerary/${itinerary.id}`)}
+                                          onClick={handleTabClick}
                                           style={{
                                             borderRadius: '12px',
                                             border: '1px solid #f0f0f0',

@@ -46,10 +46,10 @@ export default function ExpertBookingModal({
           }}>
 
             <div style={{ marginBottom: '20px' }}>
-              <Text strong style={{ fontSize: '16px' }}>预约日期和时间</Text>
-              <div style={{ marginTop: '8px', color: '#666' }}>
-                {date}
-              </div>
+              {/*<Text strong style={{ fontSize: '16px' }}>预约日期和时间</Text>*/}
+              {/*<div style={{ marginTop: '8px', color: '#666' }}>*/}
+              {/*  {date}*/}
+              {/*</div>*/}
             </div>
 
             <div style={{ marginBottom: '20px' }}>
