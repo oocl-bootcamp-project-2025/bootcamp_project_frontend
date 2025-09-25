@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { debugTokenStatus, testTokenApi } from '../components/apis/api-new';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { debugTokenStatus, testTokenApi } from '../apis/api-new';
 
 const TokenTestPage = () => {
   const { token, isAuthenticated, logout } = useAuth();

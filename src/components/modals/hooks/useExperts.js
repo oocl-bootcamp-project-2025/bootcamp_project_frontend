@@ -141,11 +141,6 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
       return;
     }
 
-    // 检查认证状态
-    console.log('=== 预约流程开始 ===');
-    console.log('当前认证状态:', isAuthenticated);
-    console.log('当前token:', getToken() ? `${getToken().substring(0, 20)}...` : '无');
-
     if (!isAuthenticated) {
       console.log('用户未登录，显示登录提示');
       setSelectedExpert(expert); // 设置选中的专家，用于登录跳转时保存信息

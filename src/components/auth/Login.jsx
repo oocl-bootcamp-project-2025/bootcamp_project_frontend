@@ -114,6 +114,8 @@ const Login = () => {
         const token = response?.data;
         if (token) {
           console.log('登录成功，准备保存token:', token);
+           //  当前登录的手机号保存到localStorage
+          localStorage.setItem('last_login_phone', phone);
           
           // 使用认证系统保存token
           saveToken(token);
