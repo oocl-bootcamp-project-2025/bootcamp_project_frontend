@@ -11,6 +11,7 @@ import { saveItinerary } from '@/components/apis/api';
 import itineraryTestData2 from '@/components/pages/testdata/ItineraryTestData2';
 import itineraryTestData3 from '@/components/pages/testdata/ItineraryTestData3';
 import itineraryTestData4 from '@/components/pages/testdata/ItineraryTestData4';
+import preferenceOptionsValue from '@/common/preferenceOptionsValue';
 
 export default function ItineraryResults({
                                            searchData,
@@ -65,6 +66,29 @@ export default function ItineraryResults({
     });
   };
 
+  // 辅助函数：根据偏好生成描述
+  const generatePreferenceDescription = () => {
+    if (!searchData?.preference || !Array.isArray(searchData.preference) || searchData.preference.length === 0) {
+      return `为您精心规划的${searchData?.days || 3}天深度游`;
+    }
+
+    // 根据偏好ID匹配对应的标签
+    const preferenceLabels = searchData.preference
+      .map(prefId => {
+        const option = preferenceOptionsValue.find(opt => opt.id === prefId);
+        return option ? option.label : null;
+      })
+      .filter(label => label !== null); // 过滤掉未找到的偏好
+
+    if (preferenceLabels.length === 0) {
+      return `为您精心规划的${searchData?.days || 3}天深度游`;
+    }
+
+    // 拼接偏好标签
+    const preferenceText = preferenceLabels.join('、');
+    return `${preferenceText}游`;
+  };
+
   // 新增：处理保存行程
   const handleSaveItinerary = async (phoneNumber) => {
     // 参数校验
@@ -77,9 +101,10 @@ export default function ItineraryResults({
     const itineraryData = {
       title: (searchData.destination && searchData.days) ? `${searchData.destination}${searchData.days}天游` : '默认自助游行程',
       phoneNumber: phoneNumber,
+      description: generatePreferenceDescription(),
       startDate: searchData?.departureDate || '',
       allNumber: getTotalAttractions(),
-      itineraryData: currentItinerary
+      itineraryData: { itinerary:currentItinerary, route:routeData }
     };
     await saveItinerary(itineraryData).then(response => {
       if (response.status !== 201) {
