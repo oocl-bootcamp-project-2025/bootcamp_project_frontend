@@ -5,9 +5,17 @@ const instance = axios.create({
 });
 
 
-let baseURL = 'http://localhost:8080/';
-if (typeof process !== 'undefined') {
-  baseURL = process.env.REACT_APP_BACKEND_BASEURL;
+const baseURL = () => {
+  const hostname = window.location.hostname;
+  if (hostname.includes("localhost")) {
+    return "http://localhost:8080/";
+  }
+  else if (hostname.includes("production")) {
+    return "https://sito-web-service-backend-production.up.railway.app/"
+  }
+  else {
+    return "https://sito-service.up.railway.app/"
+  }
 }
 
 const railWayInstance = axios.create({
