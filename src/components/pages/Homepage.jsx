@@ -289,7 +289,7 @@ export default function Homepage() {
                 textShadow: 'none'
               }}
             >
-              让AI为您规划
+              让Sito为您规划
             </h1>
             <h1
               className="text-3xl font-bold"
