@@ -10,7 +10,7 @@ import './css/Homepage.css';
 // 导入常量和工具函数
 import { CHINESE_CITIES, TIME_OPTIONS } from '../../constants';
 import { calculateDuration, filterCities } from '../../utils';
-import { getAIPlanningRoute } from '../apis/api';
+import {getAIPlanningRoute, getCities} from '../apis/api';
 import preferenceOptionsValue from '@/common/preferenceOptionsValue';
 
 export default function Homepage() {
@@ -41,31 +41,14 @@ export default function Homepage() {
   const fetchCities = async () => {
     setLoading(true);
     try {
-      // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      // 模拟API返回数据
-      const response = {
-        status: 200,
-        data: [
-          { name: '北京', province: '北京市' },
-          { name: '上海', province: '上海市' },
-          { name: '广州', province: '广东省' },
-          { name: '深圳', province: '广东省' },
-          { name: '杭州', province: '浙江省' },
-          { name: '南京', province: '江苏省' },
-          { name: '成都', province: '四川省' },
-          { name: '西安', province: '陕西省' },
-          { name: '武汉', province: '湖北省' },
-          { name: '重庆', province: '重庆市' },
-          { name: '天津', province: '天津市' },
-          { name: '苏州', province: '江苏省' },
-          { name: '青岛', province: '山东省' },
-          { name: '长沙', province: '湖南省' },
-          { name: '厦门', province: '福建省' }
-        ]
-      };
-      setCities(response.data);
+      // API返回数据
+      const response = await getCities();
+      const formattedCities = response.data.map(city => ({
+        name: city[0],  // First element is the city name
+        province: city[1] // Second element is the province
+      }));
+      setCities(formattedCities);
+      console.log('获取城市数据成功:', formattedCities);
     } catch (error) {
       console.error('获取城市数据失败:', error);
       // 设置一些默认城市数据作为备选
