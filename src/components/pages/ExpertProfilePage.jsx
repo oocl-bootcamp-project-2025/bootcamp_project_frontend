@@ -20,7 +20,7 @@ export default function ExpertProfilePage({ expert }) {
           </button>
           <h1 className="text-xl font-bold">专家档案</h1>
         </div>
-        
+
         <div className="space-y-4">
           <div className="flex items-center space-x-4">
             <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
@@ -37,22 +37,15 @@ export default function ExpertProfilePage({ expert }) {
               </p>
             </div>
           </div>
-          
+
           <div>
             <h3 className="font-medium mb-2">专业领域</h3>
             <div className="flex flex-wrap gap-2">
-              {expert?.specialties?.map((specialty, index) => (
-                <span
-                  key={index}
-                  className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm"
-                >
-                  {specialty}
-                </span>
-              )) || (
-                <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                  旅游咨询
-                </span>
-              )}
+              <span
+                className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm"
+              >
+                {expert?.speciality || '旅游咨询'}
+              </span>
             </div>
           </div>
         </div>

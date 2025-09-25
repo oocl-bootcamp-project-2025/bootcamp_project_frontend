@@ -62,19 +62,18 @@ export const ExpertCard = ({
                   fontSize: getResponsiveFontSize(14, 16),
                   lineHeight: 1.2
                 }}>{expert.name}</Title>
-                {expert.verified && (
-                  <Tag color="blue" style={{
-                    fontSize: FONT_SIZES.small,
-                    padding: '1px 4px',
-                    lineHeight: 1.2
-                  }}>认证达人</Tag>
-                )}
+                {/* 前端写死显示认证达人标签 */}
+                <Tag color="blue" style={{
+                  fontSize: FONT_SIZES.small,
+                  padding: '1px 4px',
+                  lineHeight: 1.2
+                }}>认证达人</Tag>
               </div>
 
               <Space size="small" style={{ fontSize: '11px', color: COLORS.gray }}>
                 <span>
                   <EnvironmentOutlined style={{ marginRight: '2px', fontSize: FONT_SIZES.small }} />
-                  {expert.location}
+                  位置ID: {expert.locationId}
                 </span>
               </Space>
             </div>
@@ -82,25 +81,13 @@ export const ExpertCard = ({
             {/* 专长标签 */}
             <div>
               <Space wrap size="small">
-                {typeof expert.specialties === 'string' ? (
-                  <Tag color="orange" style={{
-                    fontSize: FONT_SIZES.small,
-                    padding: '1px 4px',
-                    lineHeight: 1.2
-                  }}>
-                    {expert.specialties}
-                  </Tag>
-                ) : (
-                  expert.specialties?.map((specialty, index) => (
-                    <Tag key={index} color="orange" style={{
-                      fontSize: FONT_SIZES.small,
-                      padding: '1px 4px',
-                      lineHeight: 1.2
-                    }}>
-                      {specialty}
-                    </Tag>
-                  ))
-                )}
+                <Tag color="orange" style={{
+                  fontSize: FONT_SIZES.small,
+                  padding: '1px 4px',
+                  lineHeight: 1.2
+                }}>
+                  {expert.speciality}
+                </Tag>
               </Space>
             </div>
           </div>
@@ -118,14 +105,14 @@ export const ExpertCard = ({
             <Text strong style={{
               fontSize: getResponsiveFontSize(14, 16),
               lineHeight: 1.3
-            }}>{expert.service.name}</Text>
+            }}>{expert.serviceName}</Text>
             <div style={{ textAlign: 'right' }}>
               <div style={{
                 color: COLORS.primary,
                 fontWeight: 'bold',
                 fontSize: getResponsiveFontSize(14, 16)
               }}>
-                {expert.service.price}
+                ¥{expert.price}/天
               </div>
             </div>
           </div>
@@ -138,7 +125,7 @@ export const ExpertCard = ({
             }}
             ellipsis={{ rows: 2 }}
           >
-            {expert.service.description}
+            {expert.description}
           </Paragraph>
         </div>
 

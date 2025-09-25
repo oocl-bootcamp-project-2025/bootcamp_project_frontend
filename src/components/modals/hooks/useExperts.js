@@ -150,7 +150,7 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
         if (onSelectExpert) {
           onSelectExpert(attraction, {  // 正确: 传递两个参数
             expertName: selectedExpert?.name,
-            serviceName: selectedExpert?.service?.name,
+            serviceName: selectedExpert?.serviceName,
             bookingDateTime: "2025年9月24日 预约成功"  // 可以根据实际情况设置日期时间
           });
         }
@@ -179,7 +179,7 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
     if (onSelectExpert) {
       onSelectExpert(attraction, {
         expertName: selectedExpert?.name,
-        serviceName: selectedExpert?.service.name,
+        serviceName: selectedExpert?.serviceName,
         bookingDateTime: bookingInfo?.bookingDateTime
       });
     }
