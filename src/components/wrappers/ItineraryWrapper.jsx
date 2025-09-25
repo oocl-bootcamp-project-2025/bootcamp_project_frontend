@@ -114,8 +114,8 @@ export default function ItineraryWrapper() {
     <ItineraryResults
       searchData={searchData}
       bookings={bookings}
-      itinerary={location.state?.itinerary || {}}
-      routeData={location.state?.routeData || {}}
+      itinerary={location.state?.itinerary || null}
+      routeData={location.state?.routeData || null}
       onBack={handleBackToHome}
       onViewExpertArticle={handleViewExpertArticle}
       onFindExperts={handleFindExperts}

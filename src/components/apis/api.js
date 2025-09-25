@@ -34,7 +34,6 @@ export const saveItinerary = async (itineraryData) => {
 }
 
 export const getAIPlanningRoute = async (searchData) => {
-  return await instance.post('route/process', searchData);
   // 处理参数
   const area = searchData.destination;
   // preference转为数字数组并拼接成字符串
