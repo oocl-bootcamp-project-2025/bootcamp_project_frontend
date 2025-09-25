@@ -22,8 +22,8 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
   const [bookingSuccessVisible, setBookingSuccessVisible] = useState(false);
   const [bookedExperts, setBookedExperts] = useState([]); // 添加已预约达人状态
   const [showFailedModal, setShowFailedModal] = useState(false); // 添加预约失败状态
-
   const navigate = useNavigate();
+  const { isAuthenticated, getToken } = useAuth(); // 🎯 获取认证状态
 
   // 获取达人数据
   const fetchExperts = async () => {
