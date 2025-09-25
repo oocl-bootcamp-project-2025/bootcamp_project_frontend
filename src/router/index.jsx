@@ -1,7 +1,7 @@
 // router/index.js
 import { lazy } from 'react';
 import { createBrowserRouter } from "react-router-dom";
-import DefaultLayOut from "../layout/DefaultLayOut";
+import AuthWrappedLayout from "../layout/AuthWrappedLayout";
 
 // Lazy load components for better performance
 const Homepage = lazy(() => import('../components/pages/Homepage'));
@@ -14,10 +14,11 @@ const ItineraryResults = lazy(() => import('../components/pages/ItineraryResults
 const TestItineraryResults = lazy(() => import('../TestItineraryResults'));
 const Login = lazy(() => import('../components/auth/Login'));
 const Register = lazy(() => import('../components/auth/Register'));
+const TokenTestPage = lazy(() => import('../components/debug/TokenTestPage'));
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <DefaultLayOut />,
+    element: <AuthWrappedLayout />,
     children: [
       {
         index: true, // 默认路由 -> 首页
@@ -70,6 +71,10 @@ export const router = createBrowserRouter([
       {
         path: 'register',
         element: <Register />
+      },
+      {
+        path: 'token-test',
+        element: <TokenTestPage />
       }
     ]
   }
