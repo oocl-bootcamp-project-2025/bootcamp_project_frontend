@@ -56,10 +56,12 @@ const Register = () => {
       }
     } catch (err) {
       const status = err?.response?.status;
-      if (status === 409) {
-        message.error('该手机号已被注册');
-      }else {
-        message.error('注册失败，请重试');
+      if (status === 400) {
+        setError('请求参数错误，请检查手机号和密码');
+      } else if (status === 409) {
+        setError('该手机号已被注册，请使用其他手机号或直接登录');
+      } else {
+        setError('注册失败，请重试');
       }
       setIsLoading(false);
     }
@@ -72,45 +74,54 @@ const Register = () => {
   };
 
   return (
-    <div className="register-container">
+    <div className="auth-page">
       <div className="register-card">
         {/* 品牌logo */}
         <div className="register-logo">
-          <div className="logo-block"><span className="logo-brand-text">Sito</span></div>
+          <div className="logo-block">
+            <span className="logo-brand-text">Sito</span>
+          </div>
+          <h1 className="logo-text">创建账号</h1>
+          <p className="logo-subtext">注册以开始您的旅行</p>
         </div>
 
         {/* 注册表单 */}
-        <form onSubmit={handleRegister} className="register-form">
+        <form className="register-form" onSubmit={handleRegister}>
+          {/* 显示错误信息 */}
           {error && <div className="error-message">{error}</div>}
 
+          {/* 手机号输入框 */}
           <div className="form-group">
-            <label htmlFor="phone" className="form-label">手机号</label>
+            <label className="form-label" htmlFor="phone">手机号</label>
             <div className="input-wrapper">
-              <span className="input-icon"><PhoneOutlined /></span>
+              <PhoneOutlined className="input-icon" />
               <input
-                type="tel"
                 id="phone"
+                type="text"
+                className="form-input"
+                placeholder="请输入手机号"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="请输入手机号"
-                className="form-input"
                 disabled={isLoading}
+                maxLength={11}
               />
             </div>
           </div>
 
+          {/* 密码输入框 */}
           <div className="form-group">
-            <label htmlFor="password" className="form-label">密码</label>
+            <label className="form-label" htmlFor="password">密码</label>
             <div className="input-wrapper">
-              <span className="input-icon"><LockOutlined /></span>
+              <LockOutlined className="input-icon" />
               <input
-                type={showPassword ? "text" : "password"}
                 id="password"
+                type={showPassword ? "text" : "password"}
+                className="form-input"
+                placeholder="请输入6-16位字母、数字或下划线"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="请输入密码"
-                className="form-input"
                 disabled={isLoading}
+                maxLength={16}
               />
               <button
                 type="button"
@@ -123,6 +134,7 @@ const Register = () => {
             </div>
           </div>
 
+          {/* 注册按钮 */}
           <button
             type="submit"
             className="register-button"
@@ -130,12 +142,13 @@ const Register = () => {
           >
             {isLoading ? '注册中...' : '注册'}
           </button>
-        </form>
 
-        {/* 登录选项 */}
-        <div className="login-section">
-          <p>已有账号? <a href="/login" className="login-link" onClick={handleGoLogin}>立即登录</a></p>
-        </div>
+          {/* 登录入口 */}
+          <div className="login-section">
+            已有账号？
+            <a href="#" className="login-link" onClick={handleGoLogin}>去登录</a>
+          </div>
+        </form>
       </div>
     </div>
   );

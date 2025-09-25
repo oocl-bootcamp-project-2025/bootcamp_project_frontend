@@ -1,35 +1,36 @@
 /* 基础样式重置 */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+/** {*/
+/*    margin: 0;*/
+/*    padding: 0;*/
+/*    box-sizing: border-box;*/
+/*    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;*/
+/*}*/
 
-/* 注册页面容器 */
-.register-container {
+/* 认证页面容器 */
+.auth-page {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    padding: 1rem;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    padding: 5vw;
 }
 
 /* 注册卡片 */
 .register-card {
     width: 100%;
-    max-width: 90vw;
+    max-width: 480px;
     background-color: white;
-    border-radius: 3vw;
-    box-shadow: 0 2.5vw 7.5vw rgba(0, 0, 0, 0.1);
-    padding: 10vw 7.5vw;
+    border-radius: 1rem;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+    padding: 2rem 1.5rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .register-card:hover {
-    transform: translateY(-1.25vw);
-    box-shadow: 0 3.75vw 8.75vw rgba(0, 0, 0, 0.15);
+    transform: translateY(-0.25rem);
+    box-shadow: 0 0.75rem 1.75rem rgba(0, 0, 0, 0.15);
 }
 
 /* Logo部分 */
@@ -37,14 +38,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 7.5vw;
+    margin-bottom: 1.5rem;
 }
 
 .logo-image {
-    width: 20vw;
-    height: 20vw;
+    width: 4rem;
+    height: 4rem;
     object-fit: contain;
-    margin-bottom: 3.75vw;
+    margin-bottom: 0.75rem;
     transition: transform 0.3s ease;
 }
 
@@ -53,31 +54,41 @@
 }
 
 .logo-text {
-    font-size: 6vw;
+    font-size: 1.5rem;
     font-weight: 600;
     color: #333;
     text-align: center;
+    margin: 0.5rem 0;
 }
 
+.logo-subtext {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #555;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+/* 品牌样式 */
 .logo-block {
-    width: 18vw;
-    height: 18vw;
-    border-radius: 3vw;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 0.75rem;
     background: linear-gradient(135deg, #f7931e 0%, #ff6b35 100%);
-    box-shadow: 0 2vw 6vw rgba(217, 123, 58, 0.18);
+    box-shadow: 0 0.5rem 1.5rem rgba(217, 123, 58, 0.18);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 3vw auto;
+    margin: 0 auto 0.75rem auto;
 }
 
 .logo-brand-text {
     font-family: 'Brush Script MT', 'Pacifico', 'Dancing Script', cursive, sans-serif;
-    font-size: 6vw;
+    font-size: 1.25rem;
     color: #fff;
     font-weight: 400;
     letter-spacing: 0.1em;
-    text-shadow: 0 1vw 2vw rgba(0,0,0,0.10);
+    text-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.10);
     user-select: none;
 }
 
@@ -85,17 +96,17 @@
 .register-form {
     display: flex;
     flex-direction: column;
-    gap: 5vw;
+    gap: 1.25rem;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 2vw;
+    gap: 0.5rem;
 }
 
 .form-label {
-    font-size: 3.5vw;
+    font-size: 0.875rem;
     font-weight: 500;
     color: #555;
 }
@@ -108,33 +119,34 @@
 
 .input-icon {
     position: absolute;
-    left: 2vw;
+    left: 0.75rem;
     top: 50%;
     transform: translateY(-50%);
     color: #bdbdbd;
-    font-size: 4vw;
+    font-size: 1rem;
     pointer-events: none;
     z-index: 2;
 }
 
 .form-input {
     width: 100%;
-    padding: 3.5vw 4vw;
-    padding-left: 8vw;
-    border: 0.25vw solid #ddd;
-    border-radius: 2vw;
-    font-size: 4vw;
+    padding: 0.75rem 1rem;
+    padding-left: 2.5rem;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    font-size: 1rem;
     transition: all 0.3s ease;
 }
 
+/* 手机号输入框特殊样式 */
 #phone.form-input {
-    letter-spacing: 0.5vw;
+    letter-spacing: 0.125rem;
 }
 
 .form-input:focus {
     outline: none;
     border-color: #4a90e2;
-    box-shadow: 0 0 0 0.75vw rgba(74, 144, 226, 0.2);
+    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.2);
 }
 
 .form-input:disabled {
@@ -142,18 +154,19 @@
     cursor: not-allowed;
 }
 
+/* 显示/隐藏密码按钮 */
 .toggle-password {
     position: absolute;
-    right: 3vw;
+    right: 0.75rem;
     top: 50%;
     transform: translateY(-50%);
     background: none;
     border: none;
     color: #666;
-    font-size: 3.5vw;
+    font-size: 0.875rem;
     cursor: pointer;
-    padding: 1vw 2vw;
-    border-radius: 1vw;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
     transition: background-color 0.2s ease;
 }
 
@@ -169,16 +182,16 @@
 /* 注册按钮 */
 .register-button {
     width: 100%;
-    padding: 3.5vw;
+    padding: 0.75rem;
     background-color: #eeae69;
     color: white;
     border: none;
-    border-radius: 2vw;
-    font-size: 4vw;
+    border-radius: 0.5rem;
+    font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-top: 2.5vw;
+    margin-top: 0.75rem;
 }
 
 .register-button:hover {
@@ -198,8 +211,9 @@
 .login-link {
     color: #faa88a;
     text-decoration: none;
-    font-size: 3.5vw;
+    font-size: 0.875rem;
     transition: color 0.2s ease;
+    margin-left: 0.5rem;
 }
 
 .login-link:hover {
@@ -209,25 +223,50 @@
 
 /* 登录区域 */
 .login-section {
-    margin-top: 6.25vw;
+    margin-top: 1.25rem;
     text-align: center;
     color: #666;
-    font-size: 3.5vw;
+    font-size: 0.875rem;
 }
 
 /* 错误消息 */
 .error-message {
     background-color: #fff0f0;
     color: #e53e3e;
-    padding: 3vw;
-    border-radius: 2vw;
-    font-size: 3.5vw;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
     text-align: center;
     animation: shake 0.5s ease;
 }
 
+/* 错误动画 */
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-1.25vw); }
-    20%, 40%, 60%, 80% { transform: translateX(1.25vw); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-0.25rem); }
+    20%, 40%, 60%, 80% { transform: translateX(0.25rem); }
+}
+
+/* 响应式样式 */
+@media (max-width: 480px) {
+    .register-card {
+        padding: 1.5rem 1rem;
+    }
+
+    .logo-text {
+        font-size: 1.25rem;
+    }
+
+    .logo-subtext {
+        font-size: 0.75rem;
+    }
+
+    .form-input {
+        padding: 0.625rem 0.875rem;
+        padding-left: 2.25rem;
+    }
+
+    .register-button {
+        padding: 0.625rem;
+    }
 }
