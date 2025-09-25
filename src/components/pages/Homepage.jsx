@@ -1,5 +1,5 @@
 import { Alert, Button, Input } from 'antd';
-import { Building, Calendar, Camera, ChevronDown, Coffee, Compass, MapPin, Mountain, Search, Users, UtensilsCrossed } from 'lucide-react';
+import { Calendar, ChevronDown, MapPin, Search, Users } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,6 +12,11 @@ import { CHINESE_CITIES, TIME_OPTIONS } from '../../constants';
 import { calculateDuration, filterCities } from '../../utils';
 import {getAIPlanningRoute, getCities} from '../apis/api';
 import preferenceOptionsValue from '@/common/preferenceOptionsValue';
+import { TIME_OPTIONS } from '../../constants';
+import { calculateDuration } from '../../utils';
+import { useAuth} from "@/contexts/AuthContext";
+
+import { getAIPlanningRoute, isLogin } from '../apis/api';
 
 export default function Homepage() {
   const navigate = useNavigate();
@@ -35,6 +40,7 @@ export default function Homepage() {
   const departureTimeRef = useRef(null);
   const returnTimeRef = useRef(null);
   const cityDropdownRef = useRef(null);
+  const { isAuthenticated, getToken } = useAuth(); // 🎯 获取认证状态
 
   const preferenceOptions = preferenceOptionsValue;
 
@@ -182,7 +188,7 @@ export default function Homepage() {
   const getMaxReturnDate = () => {
     if (!departureDate) return '';
     const dep = new Date(departureDate);
-    dep.setDate(dep.getDate() + 6);
+    dep.setDate(dep.getDate() + 4);
     return dep.toISOString().split('T')[0];
   };
 
@@ -244,10 +250,38 @@ export default function Homepage() {
           </div>
         </div>
         <button
-          onClick={() => {
-            // 如果onGoToMyPage函数不存在，则定义一个默认行为
-            const goToMyPage = window.onGoToMyPage || (() => navigate('/my-page'));
-            goToMyPage();
+          onClick={async () => {
+            try {
+              if (isAuthenticated) {
+                // 已登录，直接导航到个人资料页面
+                console.log('API确认已登录，跳转到用户页面');
+                navigate('/user/profile');
+              } else {
+                // 未登录，导航到登录页面，并设置登录成功后的重定向路径
+                console.log('API确认未登录，跳转到登录页面');
+                navigate(`/login?redirect=${encodeURIComponent('/user/profile')}`);
+              }
+            } catch (error) {
+              console.error('检查登录状态失败:', error);
+              // 如果API请求失败，检查本地存储作为备用方案
+              const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+              const phoneNumber = localStorage.getItem('last_login_phone');
+
+              console.log('API失败，检查localStorage:');
+              console.log('token:', token);
+              console.log('phoneNumber:', phoneNumber);
+
+              if (token && phoneNumber) {
+                // 有本地登录信息，直接跳转
+                console.log('localStorage确认已登录，跳转到用户页面');
+                navigate('/user/profile');
+              } else {
+                // 没有登录信息，导航到登录页面
+                console.log('localStorage确认未登录，跳转到登录页面');
+                navigate(`/login?redirect=${encodeURIComponent('/user/profile')}`);
+              }
+            }
+            console.log('=== 登录状态检查结束 ===');
           }}
           className="btn-mobile-icon bg-gradient-to-r from-brand-orange to-brand-yellow text-white shadow-sm hover:shadow-md"
         >
@@ -306,40 +340,40 @@ export default function Homepage() {
                   value={destination}
                   onChange={(e) => handleDestinationChange(e.target.value)}
 
-                placeholder={loading ? "加载城市中..." : "搜索城市名称或省份"}
-                className="w-full"
-                style={{
-                  height: '40px',
-                  borderRadius: '12px',
-                  border: 'none',
-                  boxShadow: 'none'
-                }}
-                onFocus={(e) => {
-  e.target.style.border = '3px solid #ff7518';
-  e.target.style.boxShadow = '0 0 0 2px rgba(255, 117, 24, 0.2)';
-  if (destination.trim()) {
-    // 如果输入框有值，尝试再次过滤和显示下拉框
-    const filtered = filterCities(cities, destination);
-    if (filtered.length > 0) {
-      setFilteredCities(filtered);
-      setShowCityDropdown(true);
-    }
-  }
-}}
-                onBlur={(e) => {
-                  e.target.style.border = 'none';
-                  e.target.style.boxShadow = 'none';
-                  handleDestinationBlur();
-                }}
-              />
-              {loading ? (
-  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
-  </div>
-) : (
-  <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
-)}
-            </div>
+                  placeholder={loading ? "加载城市中..." : "搜索城市名称或省份"}
+                  className="w-full"
+                  style={{
+                    height: '40px',
+                    borderRadius: '12px',
+                    border: 'none',
+                    boxShadow: 'none'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.border = '3px solid #ff7518';
+                    e.target.style.boxShadow = '0 0 0 2px rgba(255, 117, 24, 0.2)';
+                    if (destination.trim()) {
+                      // 如果输入框有值，尝试再次过滤和显示下拉框
+                      const filtered = filterCities(cities, destination);
+                      if (filtered.length > 0) {
+                        setFilteredCities(filtered);
+                        setShowCityDropdown(true);
+                      }
+                    }
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.border = 'none';
+                    e.target.style.boxShadow = 'none';
+                    handleDestinationBlur();
+                  }}
+                />
+                {loading ? (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
+                  </div>
+                ) : (
+                  <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
+                )}
+              </div>
 
               {/* 城市下拉选择 */}
               {showCityDropdown && filteredCities.length > 0 && (

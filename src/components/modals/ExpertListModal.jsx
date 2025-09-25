@@ -20,6 +20,7 @@ const { Text } = Typography;
 
 export default function ExpertListModal({
   attraction,
+  visitDate,
   isOpen,
   onClose,
   onSelectExpert,
@@ -166,9 +167,7 @@ export default function ExpertListModal({
         open={confirmModalVisible}
         onCancel={handleCancelConfirmModal}
         onConfirm={handleConfirmBooking}
-        date="2025年9月22日星期一"
-        startTime="13:30"
-        endTime="15:00"
+        date={visitDate}
         serviceName={selectedExpert?.serviceName}
         price={selectedExpert?.price}
       />
@@ -179,7 +178,7 @@ export default function ExpertListModal({
         onContinuePlanning={handleContinuePlanning}
         expertName={selectedExpert?.name}
         serviceName={selectedExpert?.serviceName}
-        bookingDateTime={`2025年9月22日星期一 13:30-15:00`}
+        bookingDate={visitDate}
       />
 
       {/* 预约失败弹窗 */}

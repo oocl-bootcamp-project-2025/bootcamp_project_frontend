@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { isLogin as isLoginApi } from '../../apis/api-new';
+import { baseURL } from '../../apis/api';
 /**
  * 达人列表相关的状态管理Hook
  * @param {Object} attraction - 景点信息
@@ -22,9 +23,8 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
   const [bookingSuccessVisible, setBookingSuccessVisible] = useState(false);
   const [bookedExperts, setBookedExperts] = useState([]); // 添加已预约达人状态
   const [showFailedModal, setShowFailedModal] = useState(false); // 添加预约失败状态
-
   const navigate = useNavigate();
-  const { isAuthenticated, getToken } = useAuth();
+  const { isAuthenticated, getToken } = useAuth(); // 🎯 获取认证状态
 
   // 获取达人数据
   const fetchExperts = async () => {
@@ -39,7 +39,7 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
       }
 
       // 调用后端API获取达人数据
-      const response = await fetch(`http://localhost:8080/experts/${attraction.id}`, {
+      const response = await fetch(`${baseURL()}experts/${attraction.id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -88,24 +88,24 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
       const shouldAutoBook = urlParams.get('autoBooking') === 'true';
       const expertId = urlParams.get('expertId');
       const attractionId = urlParams.get('attractionId');
-      
-      if (shouldAutoBook && expertId && attractionId && 
+
+      if (shouldAutoBook && expertId && attractionId &&
           attractionId === attraction?.id?.toString()) {
         console.log('检测到自动预约参数，准备执行自动预约');
-        
+
         // 查找匹配的专家
         const expertToBook = experts.find(expert => expert.id.toString() === expertId);
         if (expertToBook) {
           console.log('找到匹配的专家，执行自动预约:', expertToBook);
-          
+
           // 清除URL参数
           urlParams.delete('autoBooking');
           urlParams.delete('expertId');
           urlParams.delete('attractionId');
-          const newUrl = window.location.pathname + 
+          const newUrl = window.location.pathname +
                         (urlParams.toString() ? '?' + urlParams.toString() : '');
           window.history.replaceState({}, '', newUrl);
-          
+
           // 自动执行预约（跳过登录检查，因为已经登录了）
           setSelectedExpert(expertToBook);
           setConfirmModalVisible(true);
@@ -135,7 +135,7 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
       bookedExpert.attractionId === attraction.id ||
       bookedExpert.attractionName === attraction.name
     );
-    
+
     if (attractionHasBooking) {
       message.warning('该景点已预约达人服务,请先取消当前预约');
       return;

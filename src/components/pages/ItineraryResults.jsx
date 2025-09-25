@@ -1,30 +1,48 @@
+import { saveItinerary } from '@/components/apis/api';
+import itineraryTestData3 from '@/components/pages/testdata/ItineraryTestData3';
 import { Calendar, ChevronLeft, Clock, MapPin, Plus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import AMapComponent from '../map/AMapComponent';
+import ResultModal from '../modals/ResultModal';
+import SaveItineraryModal from '../modals/SaveItineraryModal';
 import { Button } from '../ui/button';
 import './css/ItineraryOverviewCard.css';
 import './css/ItineraryResults.css';
 import './css/ItineraryStatistics.css';
-import SaveItineraryModal from '../modals/SaveItineraryModal';
-import ResultModal from '../modals/ResultModal';
-import { saveItinerary } from '@/components/apis/api';
-import itineraryTestData2 from '@/components/pages/testdata/ItineraryTestData2';
-import itineraryTestData3 from '@/components/pages/testdata/ItineraryTestData3';
-import itineraryTestData4 from '@/components/pages/testdata/ItineraryTestData4';
+
+function calculateDayDate(departureDate, dayIndex) {
+  if (!departureDate) return "2025年9月22日"; // Fallback date
+
+  // Parse the departure date
+  const date = new Date(departureDate);
+  // Add days based on the day index (0 for first day)
+  date.setDate(date.getDate() + dayIndex);
+
+  // Format the date as "YYYY年MM月DD日星期X"
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+
+  // Get day of week in Chinese
+  const weekDays = ["日", "一", "二", "三", "四", "五", "六"];
+  const weekDay = weekDays[date.getDay()];
+
+  return `${year}年${month}月${day}日星期${weekDay}`;
+}
 import preferenceOptionsValue from '@/common/preferenceOptionsValue';
 
 export default function ItineraryResults({
-                                           searchData,
-                                           bookings = [],
-                                           itinerary,
-                                           routeData,
-                                           onBack,
-                                           onViewExpertArticle,
-                                           onFindExperts,
-                                           onReplaceAttraction,
-                                           onResetItinerary,
-                                           onUpdateItinerary
-                                         }) {
+  searchData,
+  bookings = [],
+  itinerary,
+  routeData,
+  onBack,
+  onViewExpertArticle,
+  onFindExperts,
+  onReplaceAttraction,
+  onResetItinerary,
+  onUpdateItinerary
+}) {
   const [selectedTab, setSelectedTab] = useState('overview');
   const [isExpanded, setIsExpanded] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -104,10 +122,10 @@ export default function ItineraryResults({
       description: generatePreferenceDescription(),
       startDate: searchData?.departureDate || '',
       allNumber: getTotalAttractions(),
-      itineraryData: { itinerary:currentItinerary, route:routeData }
+      itineraryData: JSON.stringify({ itinerary: currentItinerary})
     };
     await saveItinerary(itineraryData).then(response => {
-      if (response.status !== 201) {
+      if (response.status !== 200) {
         throw new Error('保存失败');
       }
       setShowSaveModal(false);
@@ -394,7 +412,23 @@ export default function ItineraryResults({
                     <div className="attraction-actions">
                       <button
                         className="action-btn primary width-auto"
-                        onClick={() => onFindExperts && onFindExperts(attraction)}
+                        onClick={() => {
+                          // Find which day this attraction belongs to
+                          const dayKey = Object.keys(currentItinerary).find(day =>
+                            currentItinerary[day].some(attr =>
+                              attr.id === attraction.id || attr.name === attraction.name
+                            )
+                          );
+
+                          // Get the day index (0-based)
+                          const dayIndex = days.indexOf(dayKey);
+
+                          // Calculate the actual date for this day
+                          const visitDate = calculateDayDate(searchData?.departureDate, dayIndex);
+
+                          // Call onFindExperts with attraction and date info
+                          onFindExperts && onFindExperts(attraction, visitDate);
+                        }}
                       >
                         找达人
                       </button>
