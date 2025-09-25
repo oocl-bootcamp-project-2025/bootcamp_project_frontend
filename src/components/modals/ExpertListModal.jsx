@@ -167,8 +167,8 @@ export default function ExpertListModal({
         date="2025年9月22日星期一"
         startTime="13:30"
         endTime="15:00"
-        serviceName={selectedExpert?.service.name}
-        price={selectedExpert?.service.price}
+        serviceName={selectedExpert?.serviceName}
+        price={selectedExpert?.price}
       />
 
       {/* 预约成功弹窗 */}
@@ -176,7 +176,7 @@ export default function ExpertListModal({
         open={bookingSuccessVisible}
         onContinuePlanning={handleContinuePlanning}
         expertName={selectedExpert?.name}
-        serviceName={selectedExpert?.service.name}
+        serviceName={selectedExpert?.serviceName}
         bookingDateTime={`2025年9月22日星期一 13:30-15:00`}
       />
 

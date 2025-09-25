@@ -9,6 +9,24 @@ const railWayInstance = axios.create({
   baseURL: 'https://sito-service.up.railway.app/',
 });
 
+// 添加请求拦截器，为每个请求自动添加 Authorization 请求头
+instance.interceptors.request.use(
+  config => {
+    // 从 localStorage 获取 token
+    const token = localStorage.getItem('token');
+    // 如果存在 token，则添加到请求头
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  error => {
+    // 对请求错误做些什么
+    console.log(error)
+    return Promise.reject(error);
+  }
+);
+
 export const saveItinerary = async (itineraryData) => {
   return await instance.post('trips', itineraryData);
 }

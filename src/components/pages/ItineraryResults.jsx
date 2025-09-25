@@ -350,15 +350,21 @@ export default function ItineraryResults({
                     <p>{attraction.description}</p>
 
                     {/* 添加预约信息提示框 */}
-                    {bookings.find(booking =>
-                      booking.attraction?.name === attraction.name
+                    {bookings && bookings.some(booking =>
+                      booking.attraction?.name === attraction.name || booking.attraction?.id === attraction.id
                     ) && (
                         <div className="booking-info-tag">
                           <Clock className="w-4 h-4" style={{ width: '20px' }} />
                           <div>
                             <p style={{ color: '#ff6b35', margin: 0 }}>已预约:</p>
-                            <span>{bookings.find(b => b.attraction?.name === attraction.name)?.expert?.name}</span>
-                            <span>{bookings.find(b => b.attraction?.name === attraction.name)?.service}</span>
+                            <span>{bookings.find(b =>
+                              b.attraction?.name === attraction.name ||
+                              b.attraction?.id === attraction.id
+                            )?.expert?.name}</span>
+                            <span>{bookings.find(b =>
+                              b.attraction?.name === attraction.name ||
+                              b.attraction?.id === attraction.id
+                            )?.service}</span>
                           </div>
                         </div>
                       )}
