@@ -75,6 +75,7 @@ export default function ItineraryResults({
       return;
     }
     const itineraryData = {
+      title: (searchData.destination && searchData.days) ? `${searchData.destination}${searchData.days}天游` : '默认自助游行程',
       phoneNumber: phoneNumber,
       startDate: searchData?.departureDate || '',
       allNumber: getTotalAttractions(),

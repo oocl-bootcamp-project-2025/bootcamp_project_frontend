@@ -38,7 +38,6 @@ export default function ItineraryWrapper() {
     openArticleModal,
     openExpertList
   } = useAppContext();
-
   // 事件处理函数
   const handleBackToHome = useCallback(() => {
     // Show confirmation dialog before leaving
@@ -115,8 +114,8 @@ export default function ItineraryWrapper() {
     <ItineraryResults
       searchData={searchData}
       bookings={bookings}
-      itinerary={itinerary}
-      routeData={routeData}
+      itinerary={location.state?.itinerary || {}}
+      routeData={location.state?.routeData || {}}
       onBack={handleBackToHome}
       onViewExpertArticle={handleViewExpertArticle}
       onFindExperts={handleFindExperts}

@@ -29,7 +29,7 @@ const LoadingModal = ({ isOpen, onClose, message = 'AI正在智能规划路线',
             {message2}
           </h3>
           <div className="loading-modal-desc">
-            预计需要15-45秒，请耐心等待AI为您生成专属路线
+            预计需要1分钟左右，请耐心等待AI为您生成专属路线
           </div>
         </div>
       </div>

@@ -45,7 +45,7 @@ export const getAIPlanningRoute = async (searchData) => {
   params.append('days', days);
 
   // GET请求
-  return await railWayInstance.get(`route/planner?${params.toString()}`);
+  return await instance.get(`route/plannerByAI?${params.toString()}`);
 }
 
 export const login = async (userData) => {
