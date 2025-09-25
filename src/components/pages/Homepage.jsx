@@ -9,11 +9,11 @@ import './css/Homepage.css';
 
 // 导入常量和工具函数
 import preferenceOptionsValue from '@/common/preferenceOptionsValue';
+import { useAuth } from "@/contexts/AuthContext";
 import { TIME_OPTIONS } from '../../constants';
 import { calculateDuration } from '../../utils';
-import { useAuth} from "@/contexts/AuthContext";
 
-import { getAIPlanningRoute, isLogin } from '../apis/api';
+import { getAIPlanningRoute } from '../apis/api';
 
 export default function Homepage() {
   const navigate = useNavigate();
@@ -126,6 +126,19 @@ export default function Homepage() {
   };
 
   const dateOptions = getDateOptions();
+
+  const handleReturnDateChange = (e) => {
+    const selectedDate = new Date(e.target.value);
+    const maxDate = new Date(getMaxReturnDate());
+
+    if (selectedDate > maxDate) {
+      // Either show an error message or reset to max allowed date
+      setReturnDate(getMaxReturnDate());
+      alert('Maximum trip duration is 5 days');
+    } else {
+      setReturnDate(e.target.value);
+    }
+  };
 
   const handleStartPlanning = async () => {
     if (!destination.trim()) {
@@ -451,7 +464,7 @@ export default function Homepage() {
                   <Input
                     type="date"
                     value={returnDate}
-                    onChange={(e) => setReturnDate(e.target.value)}
+                    onChange={handleReturnDateChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     style={{ colorScheme: 'light', height: '36px' }}
                     min={departureDate || undefined}
