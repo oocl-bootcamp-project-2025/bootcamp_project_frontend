@@ -1,5 +1,4 @@
 import axios from 'axios';
-import {useNavigate} from "react-router";
 
 const instance = axios.create({
   baseURL: 'http://localhost:8080/',
@@ -13,6 +12,8 @@ instance.interceptors.request.use(
     // 如果存在 token，则添加到请求头
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
+      console.log('Added Authorization header:', config.headers['Authorization']);
+      console.log("token:   ", token)
     }
     return config;
   },
@@ -28,7 +29,7 @@ export const saveItinerary = async (itineraryData) => {
 }
 
 export const getAIPlanningRoute = async (searchData) => {
-  return await instance.post('route/process',searchData);
+  return await instance.post('route/process', searchData);
 }
 
 export const login = async (userData) => {
@@ -37,4 +38,12 @@ export const login = async (userData) => {
 
 export const register = async (userData) => {
   return await instance.post('accounts/register', userData);
+}
+
+export const getCities = async () => {
+  return await instance.post('/cities');
+}
+
+export const isLogin = async () => {
+  return await instance.get('/accounts/isLogin');
 }
