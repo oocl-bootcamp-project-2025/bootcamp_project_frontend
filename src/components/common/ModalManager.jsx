@@ -12,14 +12,16 @@ export default function ModalManager() {
   // 处理专家选择 及预约信息
   const handleSelectExpert = (attraction, bookingInfo) => {
     if (bookingInfo.cancelled) {
-      cancelBooking(bookingInfo.id);
+      const attractionId = attraction?.id || attraction?.name;
+      cancelBooking(bookingInfo.expertId, null, attractionId);
     }
-    else if (bookingInfo) {
+    else if (bookingInfo && bookingInfo.expertName) {
       // 添加预约信息到全局状态
       addBooking({
         attraction,
         expert: {
-          name: bookingInfo.expertName
+          name: bookingInfo.expertName,
+          id: bookingInfo.expertId
         },
         service: bookingInfo.serviceName,
         time: bookingInfo.bookingDateTime

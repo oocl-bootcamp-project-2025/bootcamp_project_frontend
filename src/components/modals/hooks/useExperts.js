@@ -114,7 +114,9 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
     if (onSelectExpert) {
       onSelectExpert(attraction, {
         cancelled: true,
-        expertId: expert.id
+        expertId: expert.id,
+        attractionId: attraction.id,
+        attractionName: attraction.name
       });
     }
   };
