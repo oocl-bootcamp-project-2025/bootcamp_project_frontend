@@ -1,7 +1,6 @@
 import { message } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { mockExperts } from '../data/mockExpertsData';
 /**
  * 达人列表相关的状态管理Hook
  * @param {Object} attraction - 景点信息
@@ -31,22 +30,34 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
       setError(null);
       setExperts([]);
 
-      // 模拟网络延迟
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // 模拟网络错误（景点名称包含"错误"或"网络"时）
-      if (attraction?.name && (attraction.name.includes('错误') || attraction.name.includes('网络'))) {
-        throw new Error('Network Error');
+      // 检查是否有景点ID
+      if (!attraction?.id) {
+        throw new Error('缺少景点ID');
       }
 
-      // 根据景点名称决定是否有达人数据
-      if (attraction?.name && (attraction.name.includes('测试') || attraction.name.includes('空状态'))) {
-        // 模拟空状态
-        setExperts([]);
+      // 调用后端API获取达人数据
+      const response = await fetch(`http://localhost:8080/experts/${attraction.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // 设置超时时间
+        signal: AbortSignal.timeout(10000) // 10秒超时
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const expertsData = await response.json();
+
+      // 确保返回的是数组格式
+      if (Array.isArray(expertsData)) {
+        setExperts(expertsData);
       } else {
-        // 模拟有数据状态
-        setExperts(mockExperts);
+        setExperts([]);
       }
+
       setLoading(false);
     } catch (error) {
       console.error('获取达人数据失败:', error);
