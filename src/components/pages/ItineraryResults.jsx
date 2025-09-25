@@ -1,3 +1,4 @@
+import preferenceOptionsValue from '@/common/preferenceOptionsValue';
 import { saveItinerary } from '@/components/apis/api';
 import itineraryTestData3 from '@/components/pages/testdata/ItineraryTestData3';
 import { Calendar, ChevronLeft, Clock, MapPin, Plus } from 'lucide-react';
@@ -29,7 +30,6 @@ function calculateDayDate(departureDate, dayIndex) {
 
   return `${year}年${month}月${day}日星期${weekDay}`;
 }
-import preferenceOptionsValue from '@/common/preferenceOptionsValue';
 
 export default function ItineraryResults({
   searchData,
@@ -69,12 +69,48 @@ export default function ItineraryResults({
     const [removed] = newItinerary[sourceDayKey].splice(sourceIndex, 1);
     newItinerary[targetDayKey].splice(targetIndex, 0, removed);
 
-    setCurrentItinerary(newItinerary);
-    onUpdateItinerary && onUpdateItinerary(newItinerary);
+    // Recalculate arrival times after moving
+    const updatedItinerary = calculateArrivalTimes(newItinerary);
+    setCurrentItinerary(updatedItinerary);
+    onUpdateItinerary && onUpdateItinerary(updatedItinerary);
   };
 
   // 处理景点替换
+  // const handleReplaceAttraction = (attractionId) => {
+  //   onReplaceAttraction && onReplaceAttraction(attractionId, {
+  //     id: 'new-attraction',
+  //     name: '新景点',
+  //     description: '替换后的景点',
+  //     duration: '2小时',
+  //     location: '新位置'
+  //   });
+  // };
   const handleReplaceAttraction = (attractionId) => {
+    let updatedItinerary = { ...currentItinerary };
+    let found = false;
+
+    Object.keys(updatedItinerary).forEach(dayKey => {
+      if (found) {
+        return;
+      }
+      const index = updatedItinerary[dayKey].findIndex(attr => attr.id === attractionId);
+      if (index !== -1) {
+        updatedItinerary[dayKey][index] = {
+          id: 'new-attraction',
+          name: '新景点',
+          description: '替换后的景点',
+          duration: '2小时',
+          location: '新位置'
+        };
+        found = true;
+      }
+    });
+    if (found) {
+      // Recalculate arrival times after replacement
+      updatedItinerary = calculateArrivalTimes(updatedItinerary);
+      setCurrentItinerary(updatedItinerary);
+      onUpdateItinerary && onUpdateItinerary(updatedItinerary);
+    }
     onReplaceAttraction && onReplaceAttraction(attractionId, {
       id: 'new-attraction',
       name: '新景点',
@@ -122,7 +158,7 @@ export default function ItineraryResults({
       description: generatePreferenceDescription(),
       startDate: searchData?.departureDate || '',
       allNumber: getTotalAttractions(),
-      itineraryData: JSON.stringify({ itinerary: currentItinerary})
+      itineraryData: JSON.stringify({ itinerary: currentItinerary })
     };
     await saveItinerary(itineraryData).then(response => {
       if (response.status !== 200) {
@@ -289,6 +325,65 @@ export default function ItineraryResults({
     if (typeof duration === 'string' && duration.match(/^\d+$/)) return `${duration}小时`;
     return duration || '2小时';
   }
+
+  const parseHours = (duration) => {
+    if (!duration) {
+      return 2;
+    }
+    if (typeof duration === 'number') {
+      return duration;
+    }
+    if (typeof duration === 'string') {
+      if (duration.match(/^\d+$/)) {
+        return parseInt(duration, 10);
+      }
+      const match = duration.match(/(\d+)/);
+      if (match) {
+        return parseInt(match[1], 10);
+      }
+    }
+    return 2
+  }
+
+  const addHoursToTime = (timeString, hours) => {
+    const [hourStr, minuteStr] = timeString.split(':');
+    let hour = parseInt(hourStr, 10);
+    let minute = parseInt(minuteStr, 10) || 0;
+    hour += Math.floor(hours);
+
+    const fractionalHour = hours - Math.floor(hours);
+    minute += Math.round(fractionalHour * 60);
+    if (minute >= 60) {
+      hour += Math.floor(minute / 60);
+      minute %= 60;
+    }
+
+    return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+  }
+
+  const calculateArrivalTimes = (itinerary) => {
+    // Deep clone
+    const updatedItinerary = JSON.parse(JSON.stringify(itinerary));
+    Object.keys(updatedItinerary).forEach(dayKey => {
+      let currentTime = "09:00";
+      updatedItinerary[dayKey] = updatedItinerary[dayKey].map((attraction, index) => {
+        const updatedAttraction = { ...attraction, time: `${currentTime}-` };
+        const hours = parseHours(attraction.duration);
+        currentTime = addHoursToTime(currentTime, hours);
+
+        return updatedAttraction;
+      });
+    });
+
+    return updatedItinerary;
+  }
+
+  useEffect(() => {
+    if (currentItinerary) {
+      const updatedItinerary = calculateArrivalTimes(currentItinerary);
+      setCurrentItinerary(updatedItinerary);
+    }
+  }, [currentItinerary]);
 
   // 构建Tabs的items数据
   const tabItems = [
