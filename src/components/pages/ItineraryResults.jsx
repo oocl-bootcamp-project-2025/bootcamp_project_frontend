@@ -1,10 +1,6 @@
-import { saveItinerary } from '@/components/apis/api';
-import itineraryTestData3 from '@/components/pages/testdata/ItineraryTestData3';
 import { Calendar, ChevronLeft, Clock, MapPin, Plus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import AMapComponent from '../map/AMapComponent';
-import ResultModal from '../modals/ResultModal';
-import SaveItineraryModal from '../modals/SaveItineraryModal';
 import { Button } from '../ui/button';
 import './css/ItineraryOverviewCard.css';
 import './css/ItineraryResults.css';
