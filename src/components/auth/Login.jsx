@@ -95,48 +95,54 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
+    <div className="auth-page">
       <div className="login-card">
         {/* 品牌logo */}
         <div className="login-logo">
-          <div className="logo-block"><span className="logo-brand-text">Sito</span></div>
+          <div className="logo-block">
+            <span className="logo-brand-text">Sito</span>
+          </div>
           <h1 className="logo-text">欢迎回来</h1>
-          <h6 className="logo-subtext">登录您的 Sito 账号</h6>
+          <p className="logo-subtext">请登录以继续使用服务</p>
         </div>
-        {/* 注册成功提示 */}
-        {registerMsg && <div className="success-message">{registerMsg}</div>}
+
         {/* 登录表单 */}
-        <form onSubmit={handleLogin} className="login-form">
+        <form className="login-form" onSubmit={handleLogin}>
+          {/* 显示错误信息 */}
           {error && <div className="error-message">{error}</div>}
 
+          {/* 手机号输入框 */}
           <div className="form-group">
-            <label htmlFor="phone" className="form-label">手机号</label>
+            <label className="form-label" htmlFor="phone">手机号</label>
             <div className="input-wrapper">
-              <span className="input-icon"><PhoneOutlined /></span>
+              <PhoneOutlined className="input-icon" />
               <input
-                type="tel"
                 id="phone"
+                type="text"
+                className="form-input"
+                placeholder="请输入手机号"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="请输入手机号"
-                className="form-input"
                 disabled={isLoading}
+                maxLength={11}
               />
             </div>
           </div>
 
+          {/* 密码输入框 */}
           <div className="form-group">
-            <label htmlFor="password" className="form-label">密码</label>
+            <label className="form-label" htmlFor="password">密码</label>
             <div className="input-wrapper">
-              <span className="input-icon"><LockOutlined /></span>
+              <LockOutlined className="input-icon" />
               <input
-                type={showPassword ? "text" : "password"}
                 id="password"
+                type={showPassword ? "text" : "password"}
+                className="form-input"
+                placeholder="请输入密码，6-16位字母、数字或下划线"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="请输入密码"
-                className="form-input"
                 disabled={isLoading}
+                maxLength={16}
               />
               <button
                 type="button"
@@ -149,6 +155,7 @@ const Login = () => {
             </div>
           </div>
 
+          {/* 登录按钮 */}
           <button
             type="submit"
             className="login-button"
@@ -156,12 +163,13 @@ const Login = () => {
           >
             {isLoading ? '登录中...' : '登录'}
           </button>
-        </form>
 
-        {/* 注册选项 */}
-        <div className="register-section">
-          <p>还没有账号? <a href="/register" className="register-link" onClick={handleGoRegister}>立即注册</a></p>
-        </div>
+          {/* 注册入口 */}
+          <div className="register-section">
+            还没有账号？
+            <a href="#" className="register-link" onClick={handleGoRegister}>立即注册</a>
+          </div>
+        </form>
       </div>
     </div>
   );
