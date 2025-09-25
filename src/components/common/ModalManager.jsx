@@ -1,4 +1,3 @@
-import React from 'react';
 import { useAppContext } from '../../context/AppProvider';
 import { ExpertListModal } from '../modals';
 
@@ -6,12 +5,26 @@ export default function ModalManager() {
   const {
     selectedAttraction,
     isExpertListOpen,
-    closeExpertList
+    closeExpertList,
+    addBooking
   } = useAppContext();
 
-  // 处理专家选择 - 简化版本，只是console.log
-  const handleSelectExpert = (expert) => {
-    console.log('选择了达人:', expert.name);
+  // 处理专家选择 及预约信息
+  const handleSelectExpert = (attraction, bookingInfo) => {
+    if (bookingInfo.cancelled) {
+      cancelBooking(bookingInfo.id);
+    }
+    else if (bookingInfo) {
+      // 添加预约信息到全局状态
+      addBooking({
+        attraction,
+        expert: {
+          name: bookingInfo.expertName
+        },
+        service: bookingInfo.serviceName,
+        time: bookingInfo.bookingDateTime
+      });
+    }
     closeExpertList();
   };
 

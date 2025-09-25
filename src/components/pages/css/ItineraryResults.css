@@ -282,11 +282,13 @@
   touch-action: pan-y;
   /* 确保滚动区域可以被识别 */
   position: relative;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .panel-content::-webkit-scrollbar {
-  display: none; /* Chrome/Safari/Webkit */
+  display: none;
+  /* Chrome/Safari/Webkit */
 }
 
 /* 总览内容 */
@@ -615,10 +617,12 @@
     overscroll-behavior-y: auto;
     /* 在小屏幕上增加底部间距 */
     padding-bottom: 60px;
+
     .itinerary-panel.expanded {
       /* 在移动端减少展开偏移，给内容更多空间 */
       transform: translateY(100px);
     }
+
     /* 面板内容在移动端的优化 */
     /* 移动端使用更合适的高度计算 */
     min-height: 250px;
@@ -693,7 +697,8 @@
   padding: 20px;
 }
 
-.success-message, .error-message {
+.success-message,
+.error-message {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -713,4 +718,21 @@
   border-top: 1px solid #e5e7eb;
   display: flex;
   justify-content: flex-end;
+}
+
+.booking-info-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background-color: #fff8f6;
+  border: 1px solid #fff8f6;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #f7931e;
+}
+
+.booking-info-tag svg {
+  color: #ff6b35;
 }

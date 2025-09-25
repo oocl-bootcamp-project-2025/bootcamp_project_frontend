@@ -30,15 +30,21 @@ const useAppState = () => {
 
   // 添加预约
   const addBooking = useCallback((booking) => {
-    setBookings(prev => [...prev, booking]);
+    setBookings(prev => {
+      // Remove any existing booking for this attraction
+      const filteredBookings = prev.filter(b =>
+        b.attraction?.id !== booking.attraction?.id &&
+        b.attraction?.name !== booking.attraction?.name
+      );
+      // Add the new booking
+      return [...filteredBookings, booking];
+    });
   }, []);
 
   // 取消预约
   const cancelBooking = useCallback((expertId, serviceId, attractionId) => {
     setBookings(prev => prev.filter(booking =>
-      !(booking.expert.id === expertId &&
-        booking.service === serviceId &&
-        (booking.attraction?.id === attractionId || booking.attraction?.name === attractionId))
+      !(booking.attraction?.id === attractionId || booking.attraction?.name === attractionId)
     ));
   }, []);
 

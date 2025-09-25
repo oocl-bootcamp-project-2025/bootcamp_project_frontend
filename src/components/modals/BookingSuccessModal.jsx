@@ -17,6 +17,15 @@ export default function BookingSuccessModal({
     }
   }, [open]);
 
+  const handleContinuePlanning = () => {
+    // 调用父组件的继续规划方法，并传递预约信息
+    onContinuePlanning({
+      expertName,
+      serviceName,
+      bookingDateTime
+    });
+  };
+
   return (
     <Modal
       title={null}
@@ -52,7 +61,7 @@ export default function BookingSuccessModal({
         <Button
           type="primary"
           size="large"
-          onClick={onContinuePlanning}
+          onClick={handleContinuePlanning}
           style={{
             background: 'linear-gradient(to right, #ff6b35, #f7931e)',
             border: 'none',

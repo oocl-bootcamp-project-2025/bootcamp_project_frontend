@@ -1,6 +1,10 @@
+import { saveItinerary } from '@/components/apis/api';
+import itineraryTestData3 from '@/components/pages/testdata/ItineraryTestData3';
 import { Calendar, ChevronLeft, Clock, MapPin, Plus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import AMapComponent from '../map/AMapComponent';
+import ResultModal from '../modals/ResultModal';
+import SaveItineraryModal from '../modals/SaveItineraryModal';
 import { Button } from '../ui/button';
 import './css/ItineraryOverviewCard.css';
 import './css/ItineraryResults.css';
@@ -34,6 +38,7 @@ export default function ItineraryResults({
   const [showResultModal, setShowResultModal] = useState(false);
   const [resultType, setResultType] = useState('success');
   const [resultMessage, setResultMessage] = useState('');
+  const [bookingInfos, setBookingInfos] = useState({});
 
   // 初始化行程数据 - 使用 testdata2 的 itinerary 部分
   const [currentItinerary, setCurrentItinerary] = useState(itinerary || itineraryTestData3.itinerary);
@@ -343,6 +348,20 @@ export default function ItineraryResults({
                   <div className="attraction-info">
                     <h4>{attraction.name}</h4>
                     <p>{attraction.description}</p>
+
+                    {/* 添加预约信息提示框 */}
+                    {bookings.find(booking =>
+                      booking.attraction?.name === attraction.name
+                    ) && (
+                        <div className="booking-info-tag">
+                          <Clock className="w-4 h-4" style={{ width: '20px' }} />
+                          <div>
+                            <p style={{ color: '#ff6b35', margin: 0 }}>已预约:</p>
+                            <span>{bookings.find(b => b.attraction?.name === attraction.name)?.expert?.name}</span>
+                            <span>{bookings.find(b => b.attraction?.name === attraction.name)?.service}</span>
+                          </div>
+                        </div>
+                      )}
 
                     <div className="attraction-actions">
                       <button

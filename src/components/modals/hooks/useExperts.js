@@ -1,7 +1,7 @@
+import { message } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { mockExperts } from '../data/mockExpertsData';
-
 /**
  * 达人列表相关的状态管理Hook
  * @param {Object} attraction - 景点信息
@@ -72,8 +72,8 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
     // 模拟网络延迟 1-2 秒
     await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
 
-    // 随机返回成功或失败 (70% 成功率)
-    if (Math.random() < 0.7) {
+    // 随机返回成功或失败 (100% 成功率)
+    if (Math.random() < 1) {
       return Promise.resolve();
     } else {
       return Promise.reject(new Error('预约失败，请稍后重试'));
@@ -82,8 +82,17 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
 
   // 处理预约
   const handleBooking = (expert) => {
+    const attractionHasBooking = bookedExperts.some(bookedExpert =>
+      bookedExpert.attractionId === attraction.id ||
+      bookedExpert.attractionName === attraction.name
+    );
+    if (attractionHasBooking) {
+      message.warning('该景点已预约达人服务,请先取消当前预约');
+      return;
+    }
     //localStorage.removeItem('token');
     localStorage.setItem('token', 'mock-token');
+
     const isLoggedIn = !!localStorage.getItem('token');
     if (!isLoggedIn) {
       setLoginModalVisible(true);
@@ -93,10 +102,27 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
     setConfirmModalVisible(true);
   };
 
+  // 取消预约
+  const handleCancelBooking = (expert) => {
+    // 移除已预约专家
+    setBookedExperts(prev => prev.filter(item =>
+      !(item.expertId === expert.id &&
+        (item.attractionId === attraction.id || item.attractionName === attraction.name))
+    ));
+
+    // 调用父组件的取消预约回调
+    if (onSelectExpert) {
+      onSelectExpert(attraction, {
+        cancelled: true,
+        expertId: expert.id
+      });
+    }
+  };
+
   // 登录弹窗处理
   const handleGoLogin = () => {
     setLoginModalVisible(false);
-    navigate('/login');
+    navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
   };
 
   const handleCancelLoginModal = () => {
@@ -108,37 +134,57 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
     if (selectedExpert) {
       try {
         setConfirmModalVisible(false);
+        setShowFailedModal(false);
+        setBookingSuccessVisible(false);
         // 调用模拟预约请求
         await mockBookingRequest();
-
         // 预约成功
         setBookingSuccessVisible(true);
-        setBookedExperts([...bookedExperts, selectedExpert.id]);
+        setBookedExperts(prev => [...prev, {
+          expertId: selectedExpert.id,
+          attractionId: attraction.id,
+          attractionName: attraction.name
+        }]);
         if (onSelectExpert) {
-          onSelectExpert(selectedExpert);
+          onSelectExpert(attraction, {  // 正确: 传递两个参数
+            expertName: selectedExpert?.name,
+            serviceName: selectedExpert?.service?.name,
+            bookingDateTime: "2025年9月24日 预约成功"  // 可以根据实际情况设置日期时间
+          });
         }
       } catch (error) {
         // 预约失败
-        console.error('预约失败:', error);
+        setBookingSuccessVisible(false);
         setShowFailedModal(true);
+
       }
     }
   };
 
   const handleCloseFailedModal = () => {
     setShowFailedModal(false);
+    setBookingSuccessVisible(false);
+    setSelectedExpert(null);
   };
 
-  const handleCancelBooking = () => {
+  const handleCancelConfirmModal = () => {
     setConfirmModalVisible(false);
     setSelectedExpert(null);
   };
 
   // 预约成功后继续规划
-  const handleContinuePlanning = () => {
+  const handleContinuePlanning = (bookingInfo) => {
+    if (onSelectExpert) {
+      onSelectExpert(attraction, {
+        expertName: selectedExpert?.name,
+        serviceName: selectedExpert?.service.name,
+        bookingDateTime: bookingInfo?.bookingDateTime
+      });
+    }
     setBookingSuccessVisible(false);
     setSelectedExpert(null);
-    onClose(); // 关闭整个达人选择模态框
+    setShowFailedModal(false);
+    onClose();
   };
 
   // 推荐其他景点
@@ -173,6 +219,7 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
     handleCancelBooking,
     handleContinuePlanning,
     handleCloseFailedModal,
+    handleCancelConfirmModal,
     handleRecommendOtherAttractions
   };
 };
