@@ -182,7 +182,7 @@ export default function Homepage() {
   const getMaxReturnDate = () => {
     if (!departureDate) return '';
     const dep = new Date(departureDate);
-    dep.setDate(dep.getDate() + 6);
+    dep.setDate(dep.getDate() + 4);
     return dep.toISOString().split('T')[0];
   };
 
