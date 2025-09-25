@@ -64,6 +64,7 @@ const Login = () => {
         const token = response?.data;
         if (token) {
           localStorage.setItem('token', token);
+          console.log('登录成功，token已保存:   ' + token);
           // 登录成功后跳转到redirect
           window.location.href = redirect;
         } else {
