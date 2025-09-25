@@ -4,10 +4,16 @@ const instance = axios.create({
     baseURL: 'http://localhost:8080/',
 });
 
-const railWayInstance = axios.create({
-    baseURL: 'https://sito-service.up.railway.app/',
-});
+let baseURL = 'http://localhost:8080/';
+if (typeof process !== 'undefined') {
+  baseURL = process.env.REACT_APP_BACKEND_BASEURL;
+}
+console.log('API Base URL:', baseURL);
 
+
+const railWayInstance = axios.create({
+  baseURL: baseURL,
+});
 // 添加请求拦截器，为每个请求自动添加 Authorization 请求头
 instance.interceptors.request.use(
     config => {
@@ -85,8 +91,8 @@ instance.interceptors.response.use(
 );
 
 export const saveItinerary = async (itineraryData) => {
-    return await instance.post('trips', itineraryData);
-}
+  return await railWayInstance.post('itineraries', itineraryData);
+};
 
 export const getAIPlanningRoute = async (searchData) => {
     // 处理参数
