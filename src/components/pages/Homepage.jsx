@@ -13,7 +13,7 @@ import { TIME_OPTIONS } from '../../constants';
 import { calculateDuration } from '../../utils';
 import { useAuth} from "@/contexts/AuthContext";
 
-import { getAIPlanningRoute, isLogin } from '../apis/api';
+import { getAIPlanningRoute, getCities, isLogin } from '../apis/api';
 
 export default function Homepage() {
   const navigate = useNavigate();
@@ -44,8 +44,10 @@ export default function Homepage() {
   const fetchCities = async () => {
     setLoading(true);
     try {
+      const cityList = await getCities();
+      console.log('城市列表', cityList);
       // API返回数据
-      const formattedCities = response.data.map(city => ({
+      const formattedCities = cityList.data.map(city => ({
         name: city[0],  // First element is the city name
         province: city[1] // Second element is the province
       }));
