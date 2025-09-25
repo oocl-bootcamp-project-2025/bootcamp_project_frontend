@@ -3,8 +3,10 @@ import { ArrowLeft, Book, Clock, MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext'; // 🎯 添加认证上下文
-import { fetchItineraries } from '../../apis/api.js';
+import { fetchItineraries, getItineraryDataByItineraryId, getPlanningRouteByAttractions } from '../../apis/api.js';
 import './UserProfilePage.css';
+import LoadingModal from '@/components/modals/LoadingModal';
+import ResultModal from '@/components/modals/ResultModal';
 
 export default function UserProfilePage() {
   const navigate = useNavigate();
@@ -13,6 +15,10 @@ export default function UserProfilePage() {
   const [userItineraries, setUserItineraries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showLoadingModal, setShowLoadingModal] = useState(false);
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [resultType, setResultType] = useState('error');
+  const [resultMessage, setResultMessage] = useState('');
 
   // 获取用户行程数据
   const fetchUserItineraries = async () => {
@@ -68,11 +74,67 @@ export default function UserProfilePage() {
   const handleRetry = () => {
     fetchUserItineraries();
   };
-  const handleTabClick = () => {
+
+  const getAttractions = (itineraryData) => {
+    if (!itineraryData) return [];
+    // 按day1、day2...顺序排序
+    const dayKeys = Object.keys(itineraryData)
+      .filter(key => key.startsWith('day'))
+      .sort((a, b) => {
+        const numA = parseInt(a.replace('day', ''), 10);
+        const numB = parseInt(b.replace('day', ''), 10);
+        return numA - numB;
+      });
+
+    const attractions = [];
+    dayKeys.forEach(dayKey => {
+      const dayAttractions = itineraryData[dayKey];
+      if (Array.isArray(dayAttractions)) {
+        dayAttractions.forEach(attraction => {
+          if (attraction && attraction.name) {
+            attractions.push(attraction);
+          }
+        });
+      }
+    });
+    return attractions;
+  }
+
+  const handleTabClick = async (id, createdTime) => {
     try {
+      setShowLoadingModal(true);
+      const itineraryData = await getItineraryDataByItineraryId(id);
+      console.log('获取的行程详情数据:', itineraryData);
+      const attractions = getAttractions(itineraryData.data.itinerary);
+      const days = Object.keys(itineraryData.data.itinerary).length;
+      const departureDate = createdTime;
+      const destination = attractions[0]?.area;
+      console.log('行程包含的景点:', attractions);
+      console.log('行程天数:', days);
+      console.log('出发日期:', departureDate);
+      console.log('目的地:', destination);
+      const itineraryAllData = await getPlanningRouteByAttractions(attractions, days);
+      const {itinerary, route} = itineraryAllData.data;
+      setShowLoadingModal(false);
+      if (!itinerary || !route) {
+        setResultType('error');
+        setResultMessage('AI行程规划失败，请稍后重试');
+        setShowResultModal(true);
+        return;
+      }
+      const searchData = {
+        destination,
+        departureDate,
+        duration:days
+      };
+      navigate(`/itinerary/${id}`, { state: { searchData, itinerary, routeData: route }});
     }catch (error) {
+      setShowLoadingModal(false);
+      setResultType('error');
+      setResultMessage('AI行程规划失败，请检查网络或稍后重试');
+      setShowResultModal(true);
+      console.error('AI规划接口异常:', err);
     }
-    navigate(`/itinerary/${itinerary.id}`);
   };
 
   return (
@@ -178,7 +240,7 @@ export default function UserProfilePage() {
                                       <Card
                                           key={itinerary.id || index}
                                           className="cursor-pointer transition-all duration-200 hover:shadow-lg"
-                                          onClick={handleTabClick}
+                                          onClick={()=> handleTabClick(itinerary.id, createdTime)}
                                           style={{
                                             borderRadius: '12px',
                                             border: '1px solid #f0f0f0',
@@ -248,6 +310,19 @@ export default function UserProfilePage() {
             />
           </div>
         </div>
+        {/* 新增：AI智能规划等待弹窗 */}
+        <LoadingModal
+          isOpen={showLoadingModal}
+          onClose={() => setShowLoadingModal(false)}
+          message="正在复刻路线"
+          message3="预计需要30秒左右，请耐心等待复刻路线"
+        />
+        <ResultModal
+          isOpen={showResultModal}
+          onClose={() => setShowResultModal(false)}
+          type={resultType}
+          message={resultMessage}
+        />
       </div>
   );
 }

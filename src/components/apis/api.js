@@ -2,9 +2,9 @@ import axios from 'axios';
 
 export const baseURL = () => {
   const hostname = window.location.hostname;
-  // if (hostname.includes("localhost")) {
-  //   return "http://localhost:8080/";
-  // }
+  if (hostname.includes("localhost")) {
+    return "http://localhost:8080/";
+  }
   if (hostname.includes("production")) {
     return "https://sito-web-service-backend-production.up.railway.app/"
   }
@@ -80,8 +80,12 @@ export const getAIPlanningRoute = async (searchData) => {
   return await railWayInstance.get(`route/planner?${params.toString()}`);
 }
 
-export const getPlanningRouteByAttractions = async (attractionIds, days) => {
-  railWayInstance.post('route/attraction-planner', attractionIds, days);
+export const getPlanningRouteByAttractions = async (attractions, days) => {
+  return await railWayInstance.post(`route/plannerByAttractions/${days}`, attractions);
+}
+
+export const getItineraryDataByItineraryId = async (id) => {
+  return await instance.get(`itineraries/itineraryData/${id}`);
 }
 
 export const login = async (userData) => {
