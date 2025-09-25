@@ -15,6 +15,8 @@ const TestItineraryResults = lazy(() => import('../TestItineraryResults'));
 const Login = lazy(() => import('../components/auth/Login'));
 const Register = lazy(() => import('../components/auth/Register'));
 const TokenTestPage = lazy(() => import('../components/debug/TokenTestPage'));
+const UserProfilePage = lazy(() => import('../components/pages/user/UserProfilePage'));
+
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -75,6 +77,10 @@ export const router = createBrowserRouter([
       {
         path: 'token-test',
         element: <TokenTestPage />
+      },
+      {
+        path: 'user/profile',
+        element: <UserProfilePage />
       }
     ]
   }

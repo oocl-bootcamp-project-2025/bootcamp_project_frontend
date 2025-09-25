@@ -127,6 +127,18 @@ export const isLogin = async () => {
     return await instance.get('/accounts/isLogin');
 }
 
+export const fetchItineraries = async (phoneNumber) => {
+  try {
+    const response = await instance.get(`itineraries/${phoneNumber}`);
+    console.log("----------------------------------------------------------------------");
+    console.log('response:', response);
+    return response.data; // 返回响应数据
+  } catch (error) {
+    console.error('Error fetching itineraries:', error);
+    throw error; // 可以选择抛出错误以便调用者处理
+  }
+};
+
 // 测试API调用函数
 export const testTokenApi = async () => {
     console.log('开始测试token API调用...');
