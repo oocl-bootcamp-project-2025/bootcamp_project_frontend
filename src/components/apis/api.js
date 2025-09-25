@@ -2,9 +2,9 @@ import axios from 'axios';
 
 export const baseURL = () => {
   const hostname = window.location.hostname;
-  if (hostname.includes("localhost")) {
-    return "http://localhost:8080/";
-  }
+  // if (hostname.includes("localhost")) {
+  //   return "http://localhost:8080/";
+  // }
   if (hostname.includes("production")) {
     return "https://sito-web-service-backend-production.up.railway.app/"
   }
