@@ -16,6 +16,7 @@ export default function Homepage() {
   const navigate = useNavigate();
 
   const [destination, setDestination] = useState('');
+  const [cities, setCities] = useState([]);
   const [filteredCities, setFilteredCities] = useState([]);
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [departureDate, setDepartureDate] = useState('');
@@ -25,6 +26,7 @@ export default function Homepage() {
   const [showDepartureTime, setShowDepartureTime] = useState(false);
   const [showReturnTime, setShowReturnTime] = useState(false);
   const [preference, setPreference] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [showLoadingModal, setShowLoadingModal] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
   const [resultType, setResultType] = useState('error');
@@ -42,11 +44,67 @@ export default function Homepage() {
     { id: '6', label: '拍照出片', icon: Camera, color: 'bg-pink-100 text-pink-700 border-pink-200' }
   ];
 
+  const fetchCities = async () => {
+    setLoading(true);
+    try {
+      // 模拟API请求延迟
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      // 模拟API返回数据
+      const response = {
+        status: 200,
+        data: [
+          { name: '北京', province: '北京市' },
+          { name: '上海', province: '上海市' },
+          { name: '广州', province: '广东省' },
+          { name: '深圳', province: '广东省' },
+          { name: '杭州', province: '浙江省' },
+          { name: '南京', province: '江苏省' },
+          { name: '成都', province: '四川省' },
+          { name: '西安', province: '陕西省' },
+          { name: '武汉', province: '湖北省' },
+          { name: '重庆', province: '重庆市' },
+          { name: '天津', province: '天津市' },
+          { name: '苏州', province: '江苏省' },
+          { name: '青岛', province: '山东省' },
+          { name: '长沙', province: '湖南省' },
+          { name: '厦门', province: '福建省' }
+        ]
+      };
+      setCities(response.data);
+    } catch (error) {
+      console.error('获取城市数据失败:', error);
+      // 设置一些默认城市数据作为备选
+      setCities([
+        { name: '北京', province: '北京市' },
+        { name: '上海', province: '上海市' },
+        { name: '广州', province: '广东省' }
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 在组件挂载时获取城市数据
+  useEffect(() => {
+    fetchCities();
+  }, []);
+
+  //城市过滤逻辑
+  const filterCities = (cityList, query) => {
+    if (!query || query.trim() === '') return [];
+    const searchTerm = query.toLowerCase();
+    return cityList.filter(city =>
+      city.name.toLowerCase().includes(searchTerm) ||
+      city.province.toLowerCase().includes(searchTerm)
+    );
+  };
+
   // 处理目的地输入
   const handleDestinationChange = (value) => {
     setDestination(value);
     if (value.length > 0) {
-      const filtered = filterCities(CHINESE_CITIES, value);
+      const filtered = filterCities(cities, value);
       setFilteredCities(filtered);
       setShowCityDropdown(true);
     } else {
@@ -66,7 +124,7 @@ export default function Homepage() {
     setTimeout(() => {
       setShowCityDropdown(false);
       // 只有选择了城市列表中的城市才有效，否则清空
-      if (!CHINESE_CITIES.some(city => city.name === destination)) {
+      if (!cities.some(city => city.name === destination)) {
         setDestination('');
       }
     }, 200);
@@ -95,18 +153,22 @@ export default function Homepage() {
       alert('请选择目的地');
       return;
     }
+
     if (!departureDate) {
       alert('请选择出发日期');
       return;
     }
+
     if (!returnDate) {
       alert('请选择返回日期');
       return;
     }
+
     if (!preference.length) {
       alert('请选择旅行偏好');
       return;
     }
+
     const searchData = {
       destination: destination.trim(),
       departureDate,
@@ -239,7 +301,7 @@ export default function Homepage() {
                 value={destination}
                 onChange={(e) => handleDestinationChange(e.target.value)}
 
-                placeholder="搜索城市名称或拼音"
+                placeholder={loading ? "加载城市中..." : "搜索城市名称或省份"}
                 className="w-full"
                 style={{
                   height: '40px',
@@ -248,16 +310,30 @@ export default function Homepage() {
                   boxShadow: 'none'
                 }}
                 onFocus={(e) => {
-                  e.target.style.border = '3px solid #ff7518';
-                  e.target.style.boxShadow = '0 0 0 2px rgba(255, 117, 24, 0.2)';
-                }}
+  e.target.style.border = '3px solid #ff7518';
+  e.target.style.boxShadow = '0 0 0 2px rgba(255, 117, 24, 0.2)';
+  if (destination.trim()) {
+    // 如果输入框有值，尝试再次过滤和显示下拉框
+    const filtered = filterCities(cities, destination);
+    if (filtered.length > 0) {
+      setFilteredCities(filtered);
+      setShowCityDropdown(true);
+    }
+  }
+}}
                 onBlur={(e) => {
                   e.target.style.border = 'none';
                   e.target.style.boxShadow = 'none';
                   handleDestinationBlur();
                 }}
               />
-              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
+              {loading ? (
+  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
+  </div>
+) : (
+  <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
+)}
             </div>
 
             {/* 城市下拉选择 */}

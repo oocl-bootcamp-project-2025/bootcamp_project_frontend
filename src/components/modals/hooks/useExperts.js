@@ -1,6 +1,7 @@
 import { message } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { isLogin as isLoginApi } from '../../apis/api';
 /**
  * 达人列表相关的状态管理Hook
  * @param {Object} attraction - 景点信息
@@ -92,7 +93,7 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
   };
 
   // 处理预约
-  const handleBooking = (expert) => {
+  const handleBooking = async (expert) => {
     const attractionHasBooking = bookedExperts.some(bookedExpert =>
       bookedExpert.attractionId === attraction.id ||
       bookedExpert.attractionName === attraction.name
@@ -104,13 +105,20 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
     //localStorage.removeItem('token');
     localStorage.setItem('token', 'mock-token');
 
-    const isLoggedIn = !!localStorage.getItem('token');
-    if (!isLoggedIn) {
-      setLoginModalVisible(true);
-      return;
+    try {
+      const response = await isLoginApi();
+      console.log('isLogin response:', response);
+      if (response.status === 200) {
+        setSelectedExpert(expert);
+        setConfirmModalVisible(true);
+      }
+    } catch (error) {
+      if (error.response.status === 403) {
+        setLoginModalVisible(true);
+      } else {
+        alert('验证登录状态时出错，请稍后重试');
+      }
     }
-    setSelectedExpert(expert);
-    setConfirmModalVisible(true);
   };
 
   // 取消预约
@@ -135,6 +143,7 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
   // 登录弹窗处理
   const handleGoLogin = () => {
     setLoginModalVisible(false);
+
     navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
   };
 
