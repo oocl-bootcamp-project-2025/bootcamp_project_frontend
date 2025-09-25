@@ -1,11 +1,24 @@
 import axios from 'axios';
 
+const baseURL = () => {
+  const hostname = window.location.hostname;
+  // if (hostname.includes("localhost")) {
+  //   return "http://localhost:8080/";
+  // }
+  if (hostname.includes("production")) {
+    return "https://sito-web-service-backend-production.up.railway.app/"
+  }
+  else {
+    return "https://sito-service.up.railway.app/"
+  }
+}
+
 const instance = axios.create({
-  baseURL: 'http://localhost:8080/',
+  baseURL: baseURL(),
 });
 
 const railWayInstance = axios.create({
-  baseURL: 'https://sito-service.up.railway.app/',
+  baseURL: baseURL(),
 });
 
 // 全局变量存储认证相关的回调函数
@@ -25,11 +38,11 @@ instance.interceptors.request.use(
     console.log('=== 请求拦截器 ===');
     console.log('请求URL:', config.baseURL + config.url);
     console.log('请求方法:', config.method);
-    
+
     // 从认证系统获取token
     const token = authCallbacks.getToken();
     console.log('从认证系统获取的token:', token ? `${token.substring(0, 20)}...` : '无');
-    
+
     // 如果存在 token，则添加到请求头
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
@@ -37,7 +50,7 @@ instance.interceptors.request.use(
     } else {
       console.log('没有找到token，跳过Authorization header');
     }
-    
+
     console.log('================');
     return config;
   },
@@ -62,11 +75,11 @@ instance.interceptors.response.use(
     console.log('响应状态:', error.response?.status);
     console.log('响应数据:', error.response?.data);
     console.log('请求URL:', error.config?.url);
-    
+
     // 如果是401或403错误，说明token无效，需要重新登录
     if (error.response?.status === 401 || error.response?.status === 403) {
       console.log(`检测到${error.response.status}错误，token可能无效`);
-      
+
       // 调用认证系统的token过期处理函数
       if (authCallbacks.onTokenExpired) {
         authCallbacks.onTokenExpired();
@@ -79,7 +92,7 @@ instance.interceptors.response.use(
         }
       }
     }
-    
+
     console.log('========================');
     return Promise.reject(error);
   }
