@@ -2,7 +2,6 @@ import { message } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { isLogin as isLoginApi } from '../../apis/api';
-import { mockExperts } from '../data/mockExpertsData';
 /**
  * 达人列表相关的状态管理Hook
  * @param {Object} attraction - 景点信息
@@ -144,6 +143,7 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
   // 登录弹窗处理
   const handleGoLogin = () => {
     setLoginModalVisible(false);
+
     navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
   };
 

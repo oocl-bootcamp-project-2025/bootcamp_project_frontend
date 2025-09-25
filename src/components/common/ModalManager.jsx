@@ -6,7 +6,8 @@ export default function ModalManager() {
     selectedAttraction,
     isExpertListOpen,
     closeExpertList,
-    addBooking
+    addBooking,
+    cancelBooking
   } = useAppContext();
 
   // 处理专家选择 及预约信息
@@ -30,6 +31,12 @@ export default function ModalManager() {
     closeExpertList();
   };
 
+  const handleGoLoginWithClose = () => {
+    closeExpertList(); // 关闭专家列表模态框
+    // 导航到登录页面，带上当前URL作为重定向参数
+    window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+  };
+
   return (
     <>
       {/* 专家列表模态框 */}
@@ -37,6 +44,7 @@ export default function ModalManager() {
         attraction={selectedAttraction}
         isOpen={isExpertListOpen}
         onClose={closeExpertList}
+        onGoLogin={handleGoLoginWithClose}
         onSelectExpert={handleSelectExpert}
       />
     </>
