@@ -4,16 +4,16 @@ const instance = axios.create({
     baseURL: 'http://localhost:8080/',
 });
 
+
 let baseURL = 'http://localhost:8080/';
 if (typeof process !== 'undefined') {
   baseURL = process.env.REACT_APP_BACKEND_BASEURL;
 }
-console.log('API Base URL:', baseURL);
-
 
 const railWayInstance = axios.create({
   baseURL: baseURL,
 });
+
 // 添加请求拦截器，为每个请求自动添加 Authorization 请求头
 instance.interceptors.request.use(
     config => {
