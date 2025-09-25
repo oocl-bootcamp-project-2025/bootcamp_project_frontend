@@ -76,6 +76,15 @@ const Register = () => {
   return (
     <div className="auth-page">
       <div className="register-card">
+        {/* 右上角关闭按钮 */}
+        <button
+          className="close-login-btn"
+          onClick={() => navigate("/")}
+          aria-label="关闭注册"
+          type="button"
+        >
+          <span>×</span>
+        </button>
         {/* 品牌logo */}
         <div className="register-logo">
           <div className="logo-block">

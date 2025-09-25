@@ -163,6 +163,15 @@ const Login = () => {
   return (
     <div className="auth-page">
       <div className="login-card">
+        {/* 右上角关闭按钮 */}
+        <button
+          className="close-login-btn"
+          onClick={() => navigate("/")}
+          aria-label="关闭登录"
+          type="button"
+        >
+          <span>×</span>
+        </button>
         {/* 品牌logo */}
         <div className="login-logo">
           <div className="logo-block">
