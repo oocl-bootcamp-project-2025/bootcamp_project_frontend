@@ -24,6 +24,7 @@ export default function ItineraryWrapper() {
     selectedAttraction,
     bookings,
     itinerary,
+    routeData,
     navigateToPage,
     addBooking,
     updateItinerary,
@@ -115,6 +116,7 @@ export default function ItineraryWrapper() {
       searchData={searchData}
       bookings={bookings}
       itinerary={itinerary}
+      routeData={routeData}
       onBack={handleBackToHome}
       onViewExpertArticle={handleViewExpertArticle}
       onFindExperts={handleFindExperts}

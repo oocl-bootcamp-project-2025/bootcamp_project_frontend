@@ -4,10 +4,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import './css/Homepage.css';
+import LoadingModal from '../modals/LoadingModal';
+import ResultModal from '../modals/ResultModal';
 
 // 导入常量和工具函数
 import { CHINESE_CITIES, TIME_OPTIONS } from '../../constants';
 import { calculateDuration, filterCities } from '../../utils';
+import { getAIPlanningRoute } from '../apis/api';
 
 export default function Homepage() {
   const navigate = useNavigate();
@@ -24,17 +27,21 @@ export default function Homepage() {
   const [showReturnTime, setShowReturnTime] = useState(false);
   const [preference, setPreference] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showLoadingModal, setShowLoadingModal] = useState(false);
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [resultType, setResultType] = useState('error');
+  const [resultMessage, setResultMessage] = useState('');
   const departureTimeRef = useRef(null);
   const returnTimeRef = useRef(null);
   const cityDropdownRef = useRef(null);
 
   const preferenceOptions = [
-    { id: 'niche', label: '小众探索', icon: Compass, color: 'bg-purple-100 text-purple-700 border-purple-200' },
-    { id: 'culture', label: '文化历史', icon: Building, color: 'bg-blue-100 text-blue-700 border-blue-200' },
-    { id: 'nature', label: '自然风光', icon: Mountain, color: 'bg-green-100 text-green-700 border-green-200' },
-    { id: 'food', label: '美食购物', icon: UtensilsCrossed, color: 'bg-red-100 text-red-700 border-red-200' },
-    { id: 'leisure', label: '休闲娱乐', icon: Coffee, color: 'bg-orange-100 text-orange-700 border-orange-200' },
-    { id: 'photo', label: '拍照出片', icon: Camera, color: 'bg-pink-100 text-pink-700 border-pink-200' }
+    { id: '1', label: '小众探索', icon: Compass, color: 'bg-purple-100 text-purple-700 border-purple-200' },
+    { id: '2', label: '文化历史', icon: Building, color: 'bg-blue-100 text-blue-700 border-blue-200' },
+    { id: '3', label: '自然风光', icon: Mountain, color: 'bg-green-100 text-green-700 border-green-200' },
+    { id: '4', label: '美食购物', icon: UtensilsCrossed, color: 'bg-red-100 text-red-700 border-red-200' },
+    { id: '5', label: '休闲娱乐', icon: Coffee, color: 'bg-orange-100 text-orange-700 border-orange-200' },
+    { id: '6', label: '拍照出片', icon: Camera, color: 'bg-pink-100 text-pink-700 border-pink-200' }
   ];
 
   const fetchCities = async () => {
@@ -141,7 +148,7 @@ export default function Homepage() {
 
   const dateOptions = getDateOptions();
 
-  const handleStartPlanning = () => {
+  const handleStartPlanning = async () => {
     if (!destination.trim()) {
       alert('请选择目的地');
       return;
@@ -171,9 +178,25 @@ export default function Homepage() {
       preference,
       duration: calculateDuration(departureDate, returnDate)
     };
-    // 使用useNavigate进行路由跳转，传递搜索数据
-    navigate('/itinerary', { state: { searchData } });
-
+    setShowLoadingModal(true);
+    try {
+      const response = await getAIPlanningRoute(searchData);
+      const { itinerary, route } = response.data || {};
+      setShowLoadingModal(false);
+      if (!itinerary || !route) {
+        setResultType('error');
+        setResultMessage('AI行程规划失败，请稍后重试');
+        setShowResultModal(true);
+        return;
+      }
+      navigate('/itinerary', { state: { searchData, itinerary, routeData: route } });
+    } catch (err) {
+      setShowLoadingModal(false);
+      setResultType('error');
+      setResultMessage('AI行程规划失败，请检查网络或稍后重试');
+      setShowResultModal(true);
+      console.error('AI规划接口异常:', err);
+    }
   };
 
   const getMaxReturnDate = () => {
@@ -508,6 +531,19 @@ export default function Homepage() {
 
         </div>
       </div>
+
+      {/* 新增：AI智能规划等待弹窗 */}
+      <LoadingModal
+        isOpen={showLoadingModal}
+        onClose={() => setShowLoadingModal(false)}
+      />
+      {/* 新增：AI规划失败弹窗 */}
+      <ResultModal
+        isOpen={showResultModal}
+        onClose={() => setShowResultModal(false)}
+        type={resultType}
+        message={resultMessage}
+      />
     </div>
   );
 }

@@ -1,7 +1,12 @@
 import axios from 'axios';
+import {useNavigate} from "react-router";
 
 const instance = axios.create({
   baseURL: 'http://localhost:8080/',
+});
+
+const railWayInstance = axios.create({
+  baseURL: 'https://sito-service.up.railway.app/',
 });
 
 // 添加请求拦截器，为每个请求自动添加 Authorization 请求头
@@ -30,6 +35,20 @@ export const saveItinerary = async (itineraryData) => {
 
 export const getAIPlanningRoute = async (searchData) => {
   return await instance.post('route/process', searchData);
+  // 处理参数
+  const area = searchData.destination;
+  // preference转为数字数组并拼接成字符串
+  const preferenceArr = (searchData.preference || []).map(Number);
+  const days = searchData.duration;
+
+  // 构建查询字符串
+  const params = new URLSearchParams();
+  params.append('area', area);
+  params.append('preference', preferenceArr.join(','));
+  params.append('days', days);
+
+  // GET请求
+  return await railWayInstance.get(`route/planner?${params.toString()}`);
 }
 
 export const login = async (userData) => {

@@ -1,26 +1,29 @@
-import { saveItinerary } from '@/components/apis/api';
-import itineraryTestData3 from '@/components/pages/testdata/ItineraryTestData3';
 import { Calendar, ChevronLeft, Clock, MapPin, Plus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import AMapComponent from '../map/AMapComponent';
-import ResultModal from '../modals/ResultModal';
-import SaveItineraryModal from '../modals/SaveItineraryModal';
 import { Button } from '../ui/button';
 import './css/ItineraryOverviewCard.css';
 import './css/ItineraryResults.css';
 import './css/ItineraryStatistics.css';
+import SaveItineraryModal from '../modals/SaveItineraryModal';
+import ResultModal from '../modals/ResultModal';
+import { saveItinerary } from '@/components/apis/api';
+import itineraryTestData2 from '@/components/pages/testdata/ItineraryTestData2';
+import itineraryTestData3 from '@/components/pages/testdata/ItineraryTestData3';
+import itineraryTestData4 from '@/components/pages/testdata/ItineraryTestData4';
 
 export default function ItineraryResults({
-  searchData,
-  bookings = [],
-  itinerary,
-  onBack,
-  onViewExpertArticle,
-  onFindExperts,
-  onReplaceAttraction,
-  onResetItinerary,
-  onUpdateItinerary
-}) {
+                                           searchData,
+                                           bookings = [],
+                                           itinerary,
+                                           routeData,
+                                           onBack,
+                                           onViewExpertArticle,
+                                           onFindExperts,
+                                           onReplaceAttraction,
+                                           onResetItinerary,
+                                           onUpdateItinerary
+                                         }) {
   const [selectedTab, setSelectedTab] = useState('overview');
   const [isExpanded, setIsExpanded] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -36,8 +39,7 @@ export default function ItineraryResults({
   // 初始化行程数据 - 使用 testdata2 的 itinerary 部分
   const [currentItinerary, setCurrentItinerary] = useState(itinerary || itineraryTestData3.itinerary);
 
-  // 添加路线数据
-  const routeData = itineraryTestData3.route;
+  routeData = routeData || itineraryTestData3.route;
 
   // 处理景点拖拽移动
   const handleAttractionMove = (draggedItem, targetItem) => {
@@ -79,7 +81,6 @@ export default function ItineraryResults({
       itineraryData: currentItinerary
     };
     await saveItinerary(itineraryData).then(response => {
-      console.log("保存行程响应:", response);
       if (response.status !== 201) {
         throw new Error('保存失败');
       }

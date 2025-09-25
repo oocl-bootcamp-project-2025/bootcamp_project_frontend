@@ -73,7 +73,7 @@ export const ExpertCard = ({
               <Space size="small" style={{ fontSize: '11px', color: COLORS.gray }}>
                 <span>
                   <EnvironmentOutlined style={{ marginRight: '2px', fontSize: FONT_SIZES.small }} />
-                  位置ID: {expert.locationId}
+                  {expert.location}
                 </span>
               </Space>
             </div>
