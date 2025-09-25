@@ -11,7 +11,8 @@ import './css/Homepage.css';
 import preferenceOptionsValue from '@/common/preferenceOptionsValue';
 import { TIME_OPTIONS } from '../../constants';
 import { calculateDuration } from '../../utils';
-import { getAIPlanningRoute, getCities } from '../apis/api';
+
+import { getAIPlanningRoute, isLogin } from '../apis/api';
 
 export default function Homepage() {
   const navigate = useNavigate();
@@ -42,7 +43,6 @@ export default function Homepage() {
     setLoading(true);
     try {
       // API返回数据
-      const response = await getCities();
       const formattedCities = response.data.map(city => ({
         name: city[0],  // First element is the city name
         province: city[1] // Second element is the province
@@ -244,10 +244,41 @@ export default function Homepage() {
           </div>
         </div>
         <button
-          onClick={() => {
-            // 如果onGoToMyPage函数不存在，则定义一个默认行为
-            const goToMyPage = window.onGoToMyPage || (() => navigate('/my-page'));
-            goToMyPage();
+          onClick={async () => {
+            try {
+
+              const response = await isLogin();
+
+              if (response.data.status === 200) {
+                // 已登录，直接导航到个人资料页面
+                console.log('API确认已登录，跳转到用户页面');
+                navigate('/user/profile');
+              } else {
+                // 未登录，导航到登录页面，并设置登录成功后的重定向路径
+                console.log('API确认未登录，跳转到登录页面');
+                navigate(`/login?redirect=${encodeURIComponent('/user/profile')}`);
+              }
+            } catch (error) {
+              console.error('检查登录状态失败:', error);
+              // 如果API请求失败，检查本地存储作为备用方案
+              const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+              const phoneNumber = localStorage.getItem('last_login_phone');
+
+              console.log('API失败，检查localStorage:');
+              console.log('token:', token);
+              console.log('phoneNumber:', phoneNumber);
+
+              if (token && phoneNumber) {
+                // 有本地登录信息，直接跳转
+                console.log('localStorage确认已登录，跳转到用户页面');
+                navigate('/user/profile');
+              } else {
+                // 没有登录信息，导航到登录页面
+                console.log('localStorage确认未登录，跳转到登录页面');
+                navigate(`/login?redirect=${encodeURIComponent('/user/profile')}`);
+              }
+            }
+            console.log('=== 登录状态检查结束 ===');
           }}
           className="btn-mobile-icon bg-gradient-to-r from-brand-orange to-brand-yellow text-white shadow-sm hover:shadow-md"
         >
