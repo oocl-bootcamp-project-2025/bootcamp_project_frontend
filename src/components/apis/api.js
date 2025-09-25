@@ -120,7 +120,7 @@ export const register = async (userData) => {
 }
 
 export const getCities = async () => {
-    return await instance.post('/cities');
+  return await instance.get('viewpoints/areas_with_location');
 }
 
 export const isLogin = async () => {

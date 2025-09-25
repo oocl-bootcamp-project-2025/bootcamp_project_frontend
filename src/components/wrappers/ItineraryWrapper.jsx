@@ -1,9 +1,8 @@
 import { Modal } from 'antd';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../context/AppProvider';
 import ItineraryResults from '../pages/ItineraryResults';
-
 export default function ItineraryWrapper() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,6 +37,8 @@ export default function ItineraryWrapper() {
     openArticleModal,
     openExpertList
   } = useAppContext();
+  const [selectedAttractionVisitDate, setSelectedAttractionVisitDate] = useState(null);
+
   // 事件处理函数
   const handleBackToHome = useCallback(() => {
     // Show confirmation dialog before leaving
@@ -68,8 +69,9 @@ export default function ItineraryWrapper() {
   }, [setSelectedExpert, setSelectedAttractionName, openArticleModal]);
 
 
-  const handleFindExperts = useCallback((attraction) => {
+  const handleFindExperts = useCallback((attraction, visitDate) => {
     setSelectedAttraction(attraction);
+    setSelectedAttractionVisitDate(visitDate);
     openExpertList();
   }, [setSelectedAttraction, openExpertList]);
 

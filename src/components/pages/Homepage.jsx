@@ -1,5 +1,5 @@
 import { Alert, Button, Input } from 'antd';
-import { Building, Calendar, Camera, ChevronDown, Coffee, Compass, MapPin, Mountain, Search, Users, UtensilsCrossed } from 'lucide-react';
+import { Calendar, ChevronDown, MapPin, Search, Users } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,10 +8,10 @@ import ResultModal from '../modals/ResultModal';
 import './css/Homepage.css';
 
 // 导入常量和工具函数
-import { CHINESE_CITIES, TIME_OPTIONS } from '../../constants';
-import { calculateDuration, filterCities } from '../../utils';
-import { getAIPlanningRoute } from '../apis/api';
 import preferenceOptionsValue from '@/common/preferenceOptionsValue';
+import { TIME_OPTIONS } from '../../constants';
+import { calculateDuration } from '../../utils';
+import { getAIPlanningRoute, getCities } from '../apis/api';
 
 export default function Homepage() {
   const navigate = useNavigate();
@@ -41,31 +41,14 @@ export default function Homepage() {
   const fetchCities = async () => {
     setLoading(true);
     try {
-      // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      // 模拟API返回数据
-      const response = {
-        status: 200,
-        data: [
-          { name: '北京', province: '北京市' },
-          { name: '上海', province: '上海市' },
-          { name: '广州', province: '广东省' },
-          { name: '深圳', province: '广东省' },
-          { name: '杭州', province: '浙江省' },
-          { name: '南京', province: '江苏省' },
-          { name: '成都', province: '四川省' },
-          { name: '西安', province: '陕西省' },
-          { name: '武汉', province: '湖北省' },
-          { name: '重庆', province: '重庆市' },
-          { name: '天津', province: '天津市' },
-          { name: '苏州', province: '江苏省' },
-          { name: '青岛', province: '山东省' },
-          { name: '长沙', province: '湖南省' },
-          { name: '厦门', province: '福建省' }
-        ]
-      };
-      setCities(response.data);
+      // API返回数据
+      const response = await getCities();
+      const formattedCities = response.data.map(city => ({
+        name: city[0],  // First element is the city name
+        province: city[1] // Second element is the province
+      }));
+      setCities(formattedCities);
+      console.log('获取城市数据成功:', formattedCities);
     } catch (error) {
       console.error('获取城市数据失败:', error);
       // 设置一些默认城市数据作为备选
@@ -323,40 +306,40 @@ export default function Homepage() {
                   value={destination}
                   onChange={(e) => handleDestinationChange(e.target.value)}
 
-                placeholder={loading ? "加载城市中..." : "搜索城市名称或省份"}
-                className="w-full"
-                style={{
-                  height: '40px',
-                  borderRadius: '12px',
-                  border: 'none',
-                  boxShadow: 'none'
-                }}
-                onFocus={(e) => {
-  e.target.style.border = '3px solid #ff7518';
-  e.target.style.boxShadow = '0 0 0 2px rgba(255, 117, 24, 0.2)';
-  if (destination.trim()) {
-    // 如果输入框有值，尝试再次过滤和显示下拉框
-    const filtered = filterCities(cities, destination);
-    if (filtered.length > 0) {
-      setFilteredCities(filtered);
-      setShowCityDropdown(true);
-    }
-  }
-}}
-                onBlur={(e) => {
-                  e.target.style.border = 'none';
-                  e.target.style.boxShadow = 'none';
-                  handleDestinationBlur();
-                }}
-              />
-              {loading ? (
-  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
-  </div>
-) : (
-  <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
-)}
-            </div>
+                  placeholder={loading ? "加载城市中..." : "搜索城市名称或省份"}
+                  className="w-full"
+                  style={{
+                    height: '40px',
+                    borderRadius: '12px',
+                    border: 'none',
+                    boxShadow: 'none'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.border = '3px solid #ff7518';
+                    e.target.style.boxShadow = '0 0 0 2px rgba(255, 117, 24, 0.2)';
+                    if (destination.trim()) {
+                      // 如果输入框有值，尝试再次过滤和显示下拉框
+                      const filtered = filterCities(cities, destination);
+                      if (filtered.length > 0) {
+                        setFilteredCities(filtered);
+                        setShowCityDropdown(true);
+                      }
+                    }
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.border = 'none';
+                    e.target.style.boxShadow = 'none';
+                    handleDestinationBlur();
+                  }}
+                />
+                {loading ? (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
+                  </div>
+                ) : (
+                  <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
+                )}
+              </div>
 
               {/* 城市下拉选择 */}
               {showCityDropdown && filteredCities.length > 0 && (
