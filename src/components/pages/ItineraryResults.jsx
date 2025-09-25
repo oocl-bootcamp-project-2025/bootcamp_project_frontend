@@ -117,7 +117,7 @@ export default function ItineraryResults({
       return;
     }
     const itineraryData = {
-      title: (searchData.destination && searchData.days) ? `${searchData.destination}${searchData.days}天游` : '默认自助游行程',
+      title: (searchData.destination && searchData.duration) ? `${searchData.destination}${searchData.duration}天深度游` : '默认自助深度游行程',
       phoneNumber: phoneNumber,
       description: generatePreferenceDescription(),
       startDate: searchData?.departureDate || '',
