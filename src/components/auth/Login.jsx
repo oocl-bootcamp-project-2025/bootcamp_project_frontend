@@ -15,6 +15,16 @@ import './css/Login.css';
 // navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
 // README！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
 
+// 验证登录要这样：：：：  ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+// import { useAuth } from '../../contexts/AuthContext';
+// const { isAuthenticated } = useAuth();
+// if (!isAuthenticated) {
+//   navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+//   return null; // 或者显示加载中
+// }
+// 验证登录要这样：：：：  ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+
+// 登录组件
 
 const Login = () => {
   // 状态管理
@@ -28,7 +38,7 @@ const Login = () => {
   const navigate = useNavigate();
   
   // 使用认证上下文
-  const { saveToken, isAuthenticated } = useAuth();
+  const { saveToken, savePhone, isAuthenticated } = useAuth();
 
   // 获取redirect参数
   const searchParams = new URLSearchParams(location.search);
@@ -114,12 +124,11 @@ const Login = () => {
         const token = response?.data;
         if (token) {
           console.log('登录成功，准备保存token:', token);
-           //  当前登录的手机号保存到localStorage
-          localStorage.setItem('last_login_phone', phone);
           
-          // 使用认证系统保存token
+          // 🎯 使用认证系统保存手机号和token
+          savePhone(phone);
           saveToken(token);
-          console.log('Token已通过认证系统保存');
+          console.log('Token和手机号已通过认证系统保存');
           
           // 处理登录后的操作
           handlePostLoginActions();
