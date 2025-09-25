@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const baseURL = () => {
+const baseURL = () => {
   const hostname = window.location.hostname;
   // if (hostname.includes("localhost")) {
   //   return "http://localhost:8080/";
@@ -17,10 +17,20 @@ const instance = axios.create({
   baseURL: baseURL(),
 });
 
-
 const railWayInstance = axios.create({
   baseURL: baseURL(),
 });
+
+// 全局变量存储认证相关的回调函数
+let authCallbacks = {
+  getToken: () => localStorage.getItem('auth_token'),
+  onTokenExpired: null
+};
+
+// 设置认证回调函数（由AuthProvider调用）
+export const setAuthCallbacks = (callbacks) => {
+  authCallbacks = { ...authCallbacks, ...callbacks };
+};
 
 // 添加请求拦截器，为每个请求自动添加 Authorization 请求头
 instance.interceptors.request.use(
@@ -29,31 +39,22 @@ instance.interceptors.request.use(
     console.log('请求URL:', config.baseURL + config.url);
     console.log('请求方法:', config.method);
 
-    // 从 localStorage 获取 token
-    const token = localStorage.getItem('token');
-    console.log('从localStorage获取的token:', token);
+    // 从认证系统获取token
+    const token = authCallbacks.getToken();
+    console.log('从认证系统获取的token:', token ? `${token.substring(0, 20)}...` : '无');
 
     // 如果存在 token，则添加到请求头
     if (token) {
-      config.headers['Authorization'] = `${token}`;
-      console.log('已添加Authorization header:', config.headers['Authorization']);
-      console.log('完整的请求headers:', config.headers);
-
-      setTimeout(() => {
-        console.log('请求拦截器延时测试');
-      }, 100000);
+      config.headers['Authorization'] = `Bearer ${token}`;
+      console.log('已添加Authorization header');
     } else {
       console.log('没有找到token，跳过Authorization header');
-      setTimeout(() => {
-        console.log('请求拦截器无token延时测试');
-      }, 100000);
     }
 
     console.log('================');
     return config;
   },
   error => {
-    // 对请求错误做些什么
     console.error('请求拦截器错误:', error);
     return Promise.reject(error);
   }
@@ -66,7 +67,6 @@ instance.interceptors.response.use(
     console.log('响应状态:', response.status);
     console.log('响应URL:', response.config.url);
     console.log('===============');
-    // 响应成功，直接返回
     return response;
   },
   error => {
@@ -78,18 +78,18 @@ instance.interceptors.response.use(
 
     // 如果是401或403错误，说明token无效，需要重新登录
     if (error.response?.status === 401 || error.response?.status === 403) {
-      console.log(`检测到${error.response.status}错误，token可能无效，清除token并跳转到登录页`);
+      console.log(`检测到${error.response.status}错误，token可能无效`);
 
-      // 清除无效的token
-      localStorage.removeItem('token');
-
-      // 获取当前页面路径，用于登录后重定向
-      const currentPath = window.location.pathname + window.location.search;
-
-      // 如果不是在登录页面，则重定向到登录页面
-      if (!window.location.pathname.includes('/login')) {
-        console.log('准备重定向到登录页，当前路径:', currentPath);
-        window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+      // 调用认证系统的token过期处理函数
+      if (authCallbacks.onTokenExpired) {
+        authCallbacks.onTokenExpired();
+      } else {
+        // 后备方案：直接清除token并跳转
+        localStorage.removeItem('auth_token');
+        const currentPath = window.location.pathname + window.location.search;
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+        }
       }
     }
 
@@ -99,8 +99,8 @@ instance.interceptors.response.use(
 );
 
 export const saveItinerary = async (itineraryData) => {
-  return await railWayInstance.post('itineraries', itineraryData);
-};
+  return await instance.post('trips', itineraryData);
+}
 
 export const getAIPlanningRoute = async (searchData) => {
   // 处理参数
@@ -116,7 +116,7 @@ export const getAIPlanningRoute = async (searchData) => {
   params.append('days', days);
 
   // GET请求
-  return await railWayInstance.get(`route/planner?${params.toString()}`);
+  return await instance.get(`route/plannerByAI?${params.toString()}`);
 }
 
 export const login = async (userData) => {
@@ -128,23 +128,27 @@ export const register = async (userData) => {
 }
 
 export const getCities = async () => {
-  return await instance.get('viewpoints/areas_with_location');
+  return await instance.post('/cities');
 }
 
 export const isLogin = async () => {
   return await instance.get('/accounts/isLogin');
 }
 
-export const fetchItineraries = async (phoneNumber) => {
-  try {
-    const response = await instance.get(`itineraries/${phoneNumber}`);
-    console.log("----------------------------------------------------------------------");
-    console.log('response:', response);
-    return response.data; // 返回响应数据
-  } catch (error) {
-    console.error('Error fetching itineraries:', error);
-    throw error; // 可以选择抛出错误以便调用者处理
+// 调试工具函数
+export const debugTokenStatus = () => {
+  const token = authCallbacks.getToken();
+  console.log('=== Token状态调试 ===');
+  console.log('当前时间:', new Date().toLocaleString());
+  console.log('当前URL:', window.location.href);
+  console.log('localStorage中是否有token:', !!token);
+  if (token) {
+    console.log('Token值:', `${token.substring(0, 20)}...`);
+    console.log('Token长度:', token.length);
   }
+  console.log('localStorage所有键:', Object.keys(localStorage));
+  console.log('====================');
+  return !!token;
 };
 
 // 测试API调用函数
@@ -159,20 +163,4 @@ export const testTokenApi = async () => {
     console.log('testTokenApi 失败:', error);
     throw error;
   }
-};
-
-// 调试工具函数
-export const debugTokenStatus = () => {
-  const token = localStorage.getItem('token');
-  console.log('=== Token状态调试 ===');
-  console.log('当前时间:', new Date().toLocaleString());
-  console.log('当前URL:', window.location.href);
-  console.log('localStorage中是否有token:', !!token);
-  if (token) {
-    console.log('Token值:', token);
-    console.log('Token长度:', token.length);
-  }
-  console.log('localStorage所有键:', Object.keys(localStorage));
-  console.log('====================');
-  return !!token;
 };

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import './css/Login.css';
-import { login as loginApi } from '../apis/api';
+import { LockOutlined, PhoneOutlined } from '@ant-design/icons';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { PhoneOutlined, LockOutlined } from '@ant-design/icons';
+import { useAuth } from '../../contexts/AuthContext';
+import { login as loginApi } from '../apis/api-new';
+import './css/Login.css';
 
 
 // README！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
@@ -25,19 +26,67 @@ const Login = () => {
   const [registerMsg, setRegisterMsg] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
+  
+  // 使用认证上下文
+  const { saveToken, isAuthenticated } = useAuth();
 
   // 获取redirect参数
   const searchParams = new URLSearchParams(location.search);
   const redirect = searchParams.get('redirect') || '/';
+  const action = searchParams.get('action'); // 获取action参数
+
+  // 处理登录后的待办事项
+  const handlePostLoginActions = () => {
+    // 检查是否有待处理的预约
+    const pendingBooking = sessionStorage.getItem('pendingBooking');
+    if (pendingBooking && action === 'booking') {
+      try {
+        const bookingData = JSON.parse(pendingBooking);
+        // 检查时间戳，如果超过5分钟就过期
+        if (Date.now() - bookingData.timestamp < 5 * 60 * 1000) {
+          console.log('检测到待处理的预约，准备处理:', bookingData);
+          // 清除已保存的预约信息
+          sessionStorage.removeItem('pendingBooking');
+          
+          // 在URL中添加预约信息，让目标页面知道需要自动执行预约
+          const redirectUrl = new URL(redirect, window.location.origin);
+          redirectUrl.searchParams.set('autoBooking', 'true');
+          redirectUrl.searchParams.set('expertId', bookingData.expertId);
+          redirectUrl.searchParams.set('attractionId', bookingData.attractionId);
+          
+          console.log('登录成功，将跳转到预约页面:', redirectUrl.pathname + redirectUrl.search);
+          navigate(redirectUrl.pathname + redirectUrl.search);
+          return;
+        } else {
+          console.log('预约信息已过期，清除');
+          sessionStorage.removeItem('pendingBooking');
+        }
+      } catch (error) {
+        console.error('处理待办预约时出错:', error);
+        sessionStorage.removeItem('pendingBooking');
+      }
+    }
+    
+    // 正常跳转
+    console.log('登录成功，跳转到:', redirect);
+    navigate(redirect);
+  };
 
   // 自动填充手机号和显示注册成功提示
   useEffect(() => {
+    // 如果已经登录，直接跳转
+    if (isAuthenticated) {
+      console.log('用户已登录，跳转到:', redirect);
+      navigate(redirect);
+      return;
+    }
+    
     const regPhone = localStorage.getItem('registerPhone');
     if (regPhone) {
       setPhone(regPhone);
       localStorage.removeItem('registerPhone');
     }
-  }, []);
+  }, [isAuthenticated, redirect, navigate]);
 
   // 表单验证（留空，供后续填写）
   const validateForm = () => {
@@ -60,13 +109,20 @@ const Login = () => {
     setError('');
     try {
       const response = await loginApi({"phone": phone, "password": password});
+      console.log('登录API响应:', response);
       if (response.status === 201 || response.status === 200) {
         const token = response?.data;
         if (token) {
-          localStorage.setItem('token', token);
-          console.log('登录成功，token已保存:   ' + token);
-          // 登录成功后跳转到redirect
-          window.location.href = redirect;
+          console.log('登录成功，准备保存token:', token);
+           //  当前登录的手机号保存到localStorage
+          localStorage.setItem('last_login_phone', phone);
+          
+          // 使用认证系统保存token
+          saveToken(token);
+          console.log('Token已通过认证系统保存');
+          
+          // 处理登录后的操作
+          handlePostLoginActions();
         } else {
           setError('登录成功，但未获取到token');
         }

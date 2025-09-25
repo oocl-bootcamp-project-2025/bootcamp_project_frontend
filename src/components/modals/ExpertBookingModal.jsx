@@ -7,14 +7,9 @@ export default function ExpertBookingModal({
   onCancel,
   onConfirm,
   date,
-  startTime,
-  endTime,
   serviceName,
   price
 }) {
-  const formatDateTime = () => {
-    return `${date} ${startTime} - ${endTime}`;
-  };
 
   return (
     <Modal
@@ -53,7 +48,7 @@ export default function ExpertBookingModal({
             <div style={{ marginBottom: '20px' }}>
               <Text strong style={{ fontSize: '16px' }}>预约日期和时间</Text>
               <div style={{ marginTop: '8px', color: '#666' }}>
-                {formatDateTime()}
+                {date}
               </div>
             </div>
 

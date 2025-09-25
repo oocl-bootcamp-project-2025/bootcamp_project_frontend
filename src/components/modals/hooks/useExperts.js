@@ -1,7 +1,9 @@
 import { message } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { isLogin as isLoginApi } from '../../apis/api';
+import { useAuth } from '../../../contexts/AuthContext';
+import { isLogin as isLoginApi } from '../../apis/api-new';
+import { baseURL } from '../../apis/api';
 /**
  * 达人列表相关的状态管理Hook
  * @param {Object} attraction - 景点信息
@@ -21,8 +23,8 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
   const [bookingSuccessVisible, setBookingSuccessVisible] = useState(false);
   const [bookedExperts, setBookedExperts] = useState([]); // 添加已预约达人状态
   const [showFailedModal, setShowFailedModal] = useState(false); // 添加预约失败状态
-
   const navigate = useNavigate();
+  const { isAuthenticated, getToken } = useAuth(); // 🎯 获取认证状态
 
   // 获取达人数据
   const fetchExperts = async () => {
@@ -37,7 +39,7 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
       }
 
       // 调用后端API获取达人数据
-      const response = await fetch(`http://localhost:8080/experts/${attraction.id}`, {
+      const response = await fetch(`${baseURL()}experts/${attraction.id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -79,6 +81,41 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
     }
   }, [isOpen, attraction]);
 
+  // 检查自动预约参数
+  useEffect(() => {
+    if (isOpen && experts.length > 0) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const shouldAutoBook = urlParams.get('autoBooking') === 'true';
+      const expertId = urlParams.get('expertId');
+      const attractionId = urlParams.get('attractionId');
+
+      if (shouldAutoBook && expertId && attractionId &&
+          attractionId === attraction?.id?.toString()) {
+        console.log('检测到自动预约参数，准备执行自动预约');
+
+        // 查找匹配的专家
+        const expertToBook = experts.find(expert => expert.id.toString() === expertId);
+        if (expertToBook) {
+          console.log('找到匹配的专家，执行自动预约:', expertToBook);
+
+          // 清除URL参数
+          urlParams.delete('autoBooking');
+          urlParams.delete('expertId');
+          urlParams.delete('attractionId');
+          const newUrl = window.location.pathname +
+                        (urlParams.toString() ? '?' + urlParams.toString() : '');
+          window.history.replaceState({}, '', newUrl);
+
+          // 自动执行预约（跳过登录检查，因为已经登录了）
+          setSelectedExpert(expertToBook);
+          setConfirmModalVisible(true);
+        } else {
+          console.log('未找到匹配的专家，expertId:', expertId);
+        }
+      }
+    }
+  }, [isOpen, experts, attraction]);
+
   // 添加模拟预约请求函数
   const mockBookingRequest = async () => {
     // 模拟网络延迟 1-2 秒
@@ -98,25 +135,32 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
       bookedExpert.attractionId === attraction.id ||
       bookedExpert.attractionName === attraction.name
     );
+
     if (attractionHasBooking) {
       message.warning('该景点已预约达人服务,请先取消当前预约');
       return;
     }
-    //localStorage.removeItem('token');
-    localStorage.setItem('token', 'mock-token');
+
+    if (!isAuthenticated) {
+      console.log('用户未登录，显示登录提示');
+      setSelectedExpert(expert); // 设置选中的专家，用于登录跳转时保存信息
+      setLoginModalVisible(true);
+      return;
+    }
 
     try {
+      console.log('用户已登录，验证服务端认证状态...');
       const response = await isLoginApi();
-      console.log('isLogin response:', response);
-      if (response.status === 200) {
-        setSelectedExpert(expert);
-        setConfirmModalVisible(true);
-      }
+      console.log('服务端认证验证成功:', response);
+      setSelectedExpert(expert);
+      setConfirmModalVisible(true);
     } catch (error) {
-      if (error.response.status === 403) {
+      console.log('服务端认证验证失败:', error);
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        console.log('Token已过期，显示登录提示');
         setLoginModalVisible(true);
       } else {
-        alert('验证登录状态时出错，请稍后重试');
+        message.error('验证登录状态时出错，请稍后重试');
       }
     }
   };
@@ -144,7 +188,19 @@ export const useExperts = (attraction, isOpen, onClose, onSelectExpert) => {
   const handleGoLogin = () => {
     setLoginModalVisible(false);
 
-    navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+    // 保存当前要预约的达人信息到sessionStorage，登录后自动执行预约
+    if (selectedExpert) {
+      sessionStorage.setItem('pendingBooking', JSON.stringify({
+        expertId: selectedExpert.id,
+        expertName: selectedExpert.name,
+        attractionId: attraction.id,
+        attractionName: attraction.name,
+        timestamp: Date.now()
+      }));
+    }
+
+    const currentUrl = window.location.pathname + window.location.search;
+    navigate(`/login?redirect=${encodeURIComponent(currentUrl)}&action=booking`);
   };
 
   const handleCancelLoginModal = () => {

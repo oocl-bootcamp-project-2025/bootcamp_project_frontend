@@ -2,8 +2,8 @@ import { Suspense } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { RouterProvider } from "react-router-dom";
-import { router } from './router/index.jsx';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import { router } from './router/index.jsx';
 
 export default function App() {
   return (
