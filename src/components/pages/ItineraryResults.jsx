@@ -122,7 +122,7 @@ export default function ItineraryResults({
       description: generatePreferenceDescription(),
       startDate: searchData?.departureDate || '',
       allNumber: getTotalAttractions(),
-      itineraryData: { itinerary:currentItinerary, route:routeData }
+      itineraryData: JSON.stringify({ itinerary: currentItinerary})
     };
     await saveItinerary(itineraryData).then(response => {
       if (response.status !== 201) {
