@@ -4,7 +4,6 @@ const instance = axios.create({
   baseURL: 'http://localhost:8080/',
 });
 
-
 let baseURL = 'http://localhost:8080/';
 if (typeof process !== 'undefined') {
   baseURL = process.env.REACT_APP_BACKEND_BASEURL;
