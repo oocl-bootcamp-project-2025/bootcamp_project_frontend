@@ -178,3 +178,8 @@
   color: white;
   font-weight: bold;
 }
+
+/* 彻底删除 Tabs 下方的线条 */
+.no-ink-bar .ant-tabs-ink-bar {
+  display: none !important;
+}
