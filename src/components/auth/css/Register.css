@@ -1,0 +1,272 @@
+/* 基础样式重置 */
+/** {*/
+/*    margin: 0;*/
+/*    padding: 0;*/
+/*    box-sizing: border-box;*/
+/*    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;*/
+/*}*/
+
+/* 认证页面容器 */
+.auth-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1rem;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+/* 注册卡片 */
+.register-card {
+    width: 100%;
+    max-width: 480px;
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+    padding: 2rem 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.register-card:hover {
+    transform: translateY(-0.25rem);
+    box-shadow: 0 0.75rem 1.75rem rgba(0, 0, 0, 0.15);
+}
+
+/* Logo部分 */
+.register-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.logo-image {
+    width: 4rem;
+    height: 4rem;
+    object-fit: contain;
+    margin-bottom: 0.75rem;
+    transition: transform 0.3s ease;
+}
+
+.register-logo:hover .logo-image {
+    transform: scale(1.05);
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+    margin: 0.5rem 0;
+}
+
+.logo-subtext {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #555;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+/* 品牌样式 */
+.logo-block {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 0.75rem;
+    background: linear-gradient(135deg, #f7931e 0%, #ff6b35 100%);
+    box-shadow: 0 0.5rem 1.5rem rgba(217, 123, 58, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.75rem auto;
+}
+
+.logo-brand-text {
+    font-family: 'Brush Script MT', 'Pacifico', 'Dancing Script', cursive, sans-serif;
+    font-size: 1.25rem;
+    color: #fff;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.10);
+    user-select: none;
+}
+
+/* 表单样式 */
+.register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #555;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #bdbdbd;
+    font-size: 1rem;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    padding-left: 2.5rem;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+/* 手机号输入框特殊样式 */
+#phone.form-input {
+    letter-spacing: 0.125rem;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.2);
+}
+
+.form-input:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
+/* 显示/隐藏密码按钮 */
+.toggle-password {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 0.875rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s ease;
+}
+
+.toggle-password:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.toggle-password:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* 注册按钮 */
+.register-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #eeae69;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 0.75rem;
+}
+
+.register-button:hover {
+    background-color: #fb9c8b;
+}
+
+.register-button:active {
+    transform: scale(0.98);
+}
+
+.register-button:disabled {
+    background-color: #bc967f;
+    cursor: not-allowed;
+}
+
+/* 链接样式 */
+.login-link {
+    color: #faa88a;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.2s ease;
+    margin-left: 0.5rem;
+}
+
+.login-link:hover {
+    color: #faa88a;
+    text-decoration: underline;
+}
+
+/* 登录区域 */
+.login-section {
+    margin-top: 1.25rem;
+    text-align: center;
+    color: #666;
+    font-size: 0.875rem;
+}
+
+/* 错误消息 */
+.error-message {
+    background-color: #fff0f0;
+    color: #e53e3e;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    text-align: center;
+    animation: shake 0.5s ease;
+}
+
+/* 错误动画 */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-0.25rem); }
+    20%, 40%, 60%, 80% { transform: translateX(0.25rem); }
+}
+
+/* 响应式样式 */
+@media (max-width: 480px) {
+    .register-card {
+        padding: 1.5rem 1rem;
+    }
+
+    .logo-text {
+        font-size: 1.25rem;
+    }
+
+    .logo-subtext {
+        font-size: 0.75rem;
+    }
+
+    .form-input {
+        padding: 0.625rem 0.875rem;
+        padding-left: 2.25rem;
+    }
+
+    .register-button {
+        padding: 0.625rem;
+    }
+}

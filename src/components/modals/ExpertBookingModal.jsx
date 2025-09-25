@@ -25,6 +25,7 @@ export default function ExpertBookingModal({
       closeIcon={
         <Button
           type="text"
+          onClick={onCancel}
           style={{
             color: '#ff6b35',
             fontSize: '15px',

@@ -1796,6 +1796,10 @@
     background-color: var(--color-purple-50);
   }
 
+  .font-\[Alex_Brush\] {
+    font-family: 'Alex Brush', cursive;
+  }
+
   .bg-purple-100 {
     background-color: var(--color-purple-100);
   }

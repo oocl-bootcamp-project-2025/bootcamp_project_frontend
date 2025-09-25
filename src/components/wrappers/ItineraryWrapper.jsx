@@ -1,3 +1,4 @@
+import { Modal } from 'antd';
 import { useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../context/AppProvider';
@@ -23,6 +24,7 @@ export default function ItineraryWrapper() {
     selectedAttraction,
     bookings,
     itinerary,
+    routeData,
     navigateToPage,
     addBooking,
     updateItinerary,
@@ -36,11 +38,28 @@ export default function ItineraryWrapper() {
     openArticleModal,
     openExpertList
   } = useAppContext();
-
   // 事件处理函数
   const handleBackToHome = useCallback(() => {
-    navigate('/home');
-  }, [navigate]);
+    // Show confirmation dialog before leaving
+    Modal.confirm({
+      title: '确定要离开行程规划页面吗？',
+      content: '离开后将取消所有已预约的达人服务',
+      okText: '狠心离开',
+      cancelText: '继续规划',
+      okButtonProps: {
+        style: {
+          background: '#ff6b35',
+          borderColor: '#ff6b35',
+        }
+      },
+      onOk: () => {
+        // Clear all bookings
+        setBookings([]);
+        // Navigate back to home
+        navigate('/home');
+      }
+    });
+  }, [navigate, setBookings]);
 
   const handleViewExpertArticle = useCallback((expert, attractionName) => {
     setSelectedExpert(expert);
@@ -95,7 +114,8 @@ export default function ItineraryWrapper() {
     <ItineraryResults
       searchData={searchData}
       bookings={bookings}
-      itinerary={itinerary}
+      itinerary={location.state?.itinerary || {}}
+      routeData={location.state?.routeData || {}}
       onBack={handleBackToHome}
       onViewExpertArticle={handleViewExpertArticle}
       onFindExperts={handleFindExperts}

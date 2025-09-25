@@ -1,6 +1,5 @@
 import { Calendar, ChevronLeft, Clock, MapPin, Plus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { UserOutlined } from '@ant-design/icons';
 import AMapComponent from '../map/AMapComponent';
 import { Button } from '../ui/button';
 import './css/ItineraryOverviewCard.css';
@@ -9,18 +8,22 @@ import './css/ItineraryStatistics.css';
 import SaveItineraryModal from '../modals/SaveItineraryModal';
 import ResultModal from '../modals/ResultModal';
 import { saveItinerary } from '@/components/apis/api';
+import itineraryTestData2 from '@/components/pages/testdata/ItineraryTestData2';
+import itineraryTestData3 from '@/components/pages/testdata/ItineraryTestData3';
+import itineraryTestData4 from '@/components/pages/testdata/ItineraryTestData4';
 
 export default function ItineraryResults({
-  searchData,
-  bookings = [],
-  itinerary,
-  onBack,
-  onViewExpertArticle,
-  onFindExperts,
-  onReplaceAttraction,
-  onResetItinerary,
-  onUpdateItinerary
-}) {
+                                           searchData,
+                                           bookings = [],
+                                           itinerary,
+                                           routeData,
+                                           onBack,
+                                           onViewExpertArticle,
+                                           onFindExperts,
+                                           onReplaceAttraction,
+                                           onResetItinerary,
+                                           onUpdateItinerary
+                                         }) {
   const [selectedTab, setSelectedTab] = useState('overview');
   const [isExpanded, setIsExpanded] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -31,74 +34,12 @@ export default function ItineraryResults({
   const [showResultModal, setShowResultModal] = useState(false);
   const [resultType, setResultType] = useState('success');
   const [resultMessage, setResultMessage] = useState('');
+  const [bookingInfos, setBookingInfos] = useState({});
 
-  // 初始化行程数据
-  const [currentItinerary, setCurrentItinerary] = useState(itinerary || {
-    day1: [
-      {
-        id: 'attraction1',
-        name: '天安门广场',
-        description: '中华人民共和国首都北京市的城市广场，位于北京市中心',
-        duration: '2小时',
-        time: '09:00-11:00',
-        location: '东城区',
-        images: ['https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=500'],
-        experts: []
-      },
-      {
-        id: 'attraction2',
-        name: '故宫博物院',
-        description: '明清两朝的皇家宫殿，现为综合性博物馆',
-        duration: '3小时',
-        time: '13:00-16:00',
-        location: '东城区',
-        images: ['https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=500'],
-        experts: []
-      }
-    ],
-    day2: [
-      {
-        id: 'attraction3',
-        name: '长城',
-        description: '中国古代的军事防御工程',
-        duration: '4小时',
-        time: '09:00-13:00',
-        location: '延庆区',
-        images: ['https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=500'],
-        experts: []
-      }
-    ],
-    day3: [
-      {
-        id: 'attraction4',
-        name: '颐和园',
-        description: '中国清朝时期皇家园林',
-        duration: '3小时',
-        time: '10:00-13:00',
-        location: '海淀区',
-        images: ['https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=500'],
-        experts: []
-      },{
-      id: 'attraction5',
-      name: '测试中',
-      description: '明清两朝的皇家宫殿，现为综合性博物馆',
-      duration: '3小时',
-      time: '13:00-16:00',
-      location: '东城区',
-      images: ['https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=500'],
-      experts: []
-       },{
-      id: 'attraction6',
-       name: '网络',
-      description: '明清两朝的皇家宫殿，现为综合性博物馆',
-      duration: '1小时',
-      time: '16:30-17:30',
-      location: '东城区',
-      images: ['https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=500'],
-      experts: []
-}
-    ]
-  });
+  // 初始化行程数据 - 使用 testdata2 的 itinerary 部分
+  const [currentItinerary, setCurrentItinerary] = useState(itinerary || itineraryTestData3.itinerary);
+
+  routeData = routeData || itineraryTestData3.route;
 
   // 处理景点拖拽移动
   const handleAttractionMove = (draggedItem, targetItem) => {
@@ -133,25 +74,26 @@ export default function ItineraryResults({
       setShowResultModal(true);
       return;
     }
-      const itineraryData = {
-        phoneNumber,
-        startDate: searchData?.departureDate || '',
-        allNumber: getTotalAttractions(),
-        itineraryData: currentItinerary
-      };
-      await saveItinerary(itineraryData).then(response => {
-        if (response.code !== 201) {
-          throw new Error('保存失败');
-        }
-        setShowSaveModal(false);
-        setResultType('success');
-        setResultMessage('行程已成功保存！我们已将行程链接发送到您的手机，请注意查收短信。');
-        setShowResultModal(true);
-      }).catch(error => {
-        setResultType('error');
-        setResultMessage('保存失败，请检查网络连接后重试。如问题持续存在，请联系客服。');
-        setShowResultModal(true);
-      })
+    const itineraryData = {
+      title: (searchData.destination && searchData.days) ? `${searchData.destination}${searchData.days}天游` : '默认自助游行程',
+      phoneNumber: phoneNumber,
+      startDate: searchData?.departureDate || '',
+      allNumber: getTotalAttractions(),
+      itineraryData: currentItinerary
+    };
+    await saveItinerary(itineraryData).then(response => {
+      if (response.status !== 201) {
+        throw new Error('保存失败');
+      }
+      setShowSaveModal(false);
+      setResultType('success');
+      setResultMessage('行程已成功保存！我们已将行程链接发送到您的手机，请注意查收短信。');
+      setShowResultModal(true);
+    }).catch(error => {
+      setResultType('error');
+      setResultMessage('保存失败，请检查网络连接后重试。如问题持续存在，请联系客服。');
+      setShowResultModal(true);
+    })
   };
   // 处理触摸开始
   const handleTouchStart = (e) => {
@@ -293,6 +235,18 @@ export default function ItineraryResults({
     return searchData?.travelers || 0;
   };
 
+  // 辅助函数：格式化图片和时长
+  function parseImages(images) {
+    if (!images) return [];
+    if (Array.isArray(images)) return images;
+    return images.split(',');
+  }
+  function formatDuration(duration) {
+    if (typeof duration === 'number') return `${duration}小时`;
+    if (typeof duration === 'string' && duration.match(/^\d+$/)) return `${duration}小时`;
+    return duration || '2小时';
+  }
+
   // 构建Tabs的items数据
   const tabItems = [
     {
@@ -342,15 +296,15 @@ export default function ItineraryResults({
 
                     <div className="attractions-list">
                       {attractions.map((attraction, idx) => (
-                        <div key={attraction.id} className="attraction-overview-item">
-                          {attraction.images && attraction.images[0] && (
-                            <img src={attraction.images[0]} alt={attraction.name} className="attraction-thumb" />
+                        <div key={attraction.id || idx} className="attraction-overview-item">
+                          {parseImages(attraction.images)[0] && (
+                            <img src={parseImages(attraction.images)[0]} alt={attraction.name} className="attraction-thumb" />
                           )}
                           <div className="attraction-details">
                             <div className="attraction-name">{attraction.name}</div>
                             <div className="attraction-time-info">
                               <span className="arrival-time">{attraction.time?.split('-')[0] || '09:00'}</span>
-                              <span className="duration">· {attraction.duration || '2小时'}</span>
+                              <span className="duration">· {formatDuration(attraction.duration)}</span>
                             </div>
                           </div>
                         </div>
@@ -376,29 +330,47 @@ export default function ItineraryResults({
 
           <div className="attractions-timeline">
             {(currentItinerary[dayKey] || []).map((attraction, attractionIndex) => (
-              <div key={attraction.id} className="attraction-item">
+              <div key={attraction.id || attractionIndex} className="attraction-item">
                 <div className="time-dot">
                   <Clock className="w-4 h-4" />
                   <span>{attraction.time?.split('-')[0] || '09:00'}</span>
-                  <small>({attraction.duration || '2小时'})</small>
+                  <small>({formatDuration(attraction.duration)})</small>
                 </div>
 
                 <div className="attraction-card">
-                  {attraction.images && attraction.images[0] && (
-                    <img src={attraction.images[0]} alt={attraction.name} />
+                  {parseImages(attraction.images)[0] && (
+                    <img src={parseImages(attraction.images)[0]} alt={attraction.name} />
                   )}
 
                   <div className="attraction-info">
                     <h4>{attraction.name}</h4>
                     <p>{attraction.description}</p>
 
+                    {/* 添加预约信息提示框 */}
+                    {bookings && bookings.some(booking =>
+                      booking.attraction?.name === attraction.name || booking.attraction?.id === attraction.id
+                    ) && (
+                        <div className="booking-info-tag">
+                          <Clock className="w-4 h-4" style={{ width: '20px' }} />
+                          <div>
+                            <p style={{ color: '#ff6b35', margin: 0 }}>已预约:</p>
+                            <span>{bookings.find(b =>
+                              b.attraction?.name === attraction.name ||
+                              b.attraction?.id === attraction.id
+                            )?.expert?.name}</span>
+                            <span>{bookings.find(b =>
+                              b.attraction?.name === attraction.name ||
+                              b.attraction?.id === attraction.id
+                            )?.service}</span>
+                          </div>
+                        </div>
+                      )}
+
                     <div className="attraction-actions">
                       <button
                         className="action-btn primary width-auto"
-                        style={{ minWidth: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                         onClick={() => onFindExperts && onFindExperts(attraction)}
                       >
-                        <UserOutlined style={{ fontSize: '16px',paddingLeft :'1px' }} />
                         找达人
                       </button>
                     </div>
@@ -452,6 +424,7 @@ export default function ItineraryResults({
           selectedTab={selectedTab}
           itinerary={currentItinerary}
           searchData={searchData}
+          routeData={routeData}
         />
 
         {/* 我的位置按钮 */}
