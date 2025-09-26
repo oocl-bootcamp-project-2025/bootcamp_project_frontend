@@ -557,11 +557,11 @@ export default function ItineraryResults({
               </div>
             ))}
 
-            {/* 添加更多景点 */}
-            <div className="add-attraction">
-              <Plus className="w-5 h-5" />
-              <span>添加更多景点</span>
-            </div>
+            {/*/!* 添加更多景点 *!/*/}
+            {/*<div className="add-attraction">*/}
+            {/*  <Plus className="w-5 h-5" />*/}
+            {/*  <span>添加更多景点</span>*/}
+            {/*</div>*/}
           </div>
         </div>
       )
