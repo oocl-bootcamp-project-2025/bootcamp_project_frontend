@@ -271,7 +271,7 @@ export default function UserProfilePage() {
 
                                           <div className="flex items-center text-gray-500">
                                             <Clock className="w-4 h-4 mr-2" style={{ color: '#ff9248' }} />
-                                            <span className="text-sm">创建于 {createdTime}</span>
+                                            <span className="text-sm">开始于 {createdTime}</span>
                                           </div>
                                         </div>
                                       </Card>
