@@ -188,6 +188,7 @@ export default function Homepage() {
       }
       navigate('/itinerary', { state: { searchData, itinerary, routeData: route } });
     } catch (err) {
+      window.location.href = '/home';
       setShowLoadingModal(false);
       setResultType('error');
       setResultMessage('AI行程规划失败，请检查网络或稍后重试');
