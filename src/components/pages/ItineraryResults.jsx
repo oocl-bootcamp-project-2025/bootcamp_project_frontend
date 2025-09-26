@@ -175,7 +175,7 @@ export default function ItineraryResults({
         return;
       }
       const itineraryData = {
-        title: (searchData.destination && searchData.duration) ? `${searchData.destination}${searchData.duration}天深度游` : '默认自助深度游行程',
+        title: (searchData.destination && searchData.duration) ? `${searchData.destination}${searchData.duration}天深度游` : '北京3天深度游',
         phoneNumber: phoneNumber,
         description: generatePreferenceDescription(),
         startDate: searchData?.departureDate || '',
@@ -606,16 +606,16 @@ export default function ItineraryResults({
         />
 
         {/* 我的位置按钮 */}
-        <button className="location-button">
-          <MapPin className="w-5 h-5" />
-          我的位置
-        </button>
+        {/*<button className="location-button">*/}
+        {/*  <MapPin className="w-5 h-5" />*/}
+        {/*  我的位置*/}
+        {/*</button>*/}
 
         {/* 地图控制按钮 */}
-        <div className="map-controls">
-          <button className="map-control-btn">+</button>
-          <button className="map-control-btn">-</button>
-        </div>
+        {/*<div className="map-controls">*/}
+        {/*  <button className="map-control-btn">+</button>*/}
+        {/*  <button className="map-control-btn">-</button>*/}
+        {/*</div>*/}
 
         {/* 定位按钮 */}
         <button className="navigation-button">
