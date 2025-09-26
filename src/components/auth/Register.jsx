@@ -11,6 +11,7 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [phoneError, setPhoneError] = useState(''); // 新增：手机号验证错误
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -18,17 +19,60 @@ const Register = () => {
   const searchParams = new URLSearchParams(location.search);
   const redirect = searchParams.get('redirect') || '/';
 
-  // 表单验证（留空，供后续填写）
+  // 实时验证手机号
+  const validatePhoneRealtime = (phoneValue) => {
+    if (!phoneValue) {
+      setPhoneError('');
+      return;
+    }
+    
+    const phoneRegex = /^1[3-9]\d{9}$/;
+    if (phoneValue.length < 11) {
+      setPhoneError('手机号长度不足11位');
+    } else if (phoneValue.length > 11) {
+      setPhoneError('手机号不能超过11位');
+    } else if (!/^1/.test(phoneValue)) {
+      setPhoneError('手机号必须以1开头');
+    } else if (!/^1[3-9]/.test(phoneValue)) {
+      setPhoneError('手机号第二位必须是3-9');
+    } else if (!/^\d+$/.test(phoneValue)) {
+      setPhoneError('手机号只能包含数字');
+    } else if (!phoneRegex.test(phoneValue)) {
+      setPhoneError('请输入正确的手机号格式');
+    } else {
+      setPhoneError('');
+    }
+  };
+
+  // 处理手机号输入
+  const handlePhoneChange = (e) => {
+    const value = e.target.value;
+    // 只允许输入数字
+    const numericValue = value.replace(/\D/g, '');
+    setPhone(numericValue);
+    validatePhoneRealtime(numericValue);
+    // 清除全局错误信息
+    if (error) setError('');
+  };
+
+  // 表单验证
   const validateForm = () => {
-    // 后续自行添加验证逻辑
-    // 验证输入发手机号是否为11个数字
-    if (!/^\d{11}$/.test(phone)) {
-      setError('请输入有效的手机号');
+    // 验证手机号是否符合中国大陆手机号规则
+    const phoneRegex = /^1[3-9]\d{9}$/;
+    if (!phoneRegex.test(phone)) {
+      setError('请输入正确的手机号码格式（以1开头，第二位为3-9，共11位数字）');
       return false;
     }
+    
+    // 如果有实时验证错误，也不能提交
+    if (phoneError) {
+      setError('请先修正手机号格式错误');
+      return false;
+    }
+    
     // 验证密码是否为6-16个字符
     if (!/^\w{6,16}$/.test(password)) {
-      setError('请输入有效的密码');
+      setError('请输入有效的密码（6-16位字母、数字或下划线）');
       return false;
     }
     return true;
@@ -107,14 +151,25 @@ const Register = () => {
               <input
                 id="phone"
                 type="text"
-                className="form-input"
-                placeholder="请输入手机号"
+                className={`form-input ${phoneError ? 'error' : ''}`}
+                placeholder="请输入11位手机号码"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={handlePhoneChange}
                 disabled={isLoading}
                 maxLength={11}
               />
             </div>
+            {/* 手机号验证错误提示 */}
+            {phoneError && (
+              <div className="field-error-message" style={{
+                color: '#ff4d4f',
+                fontSize: '12px',
+                marginTop: '4px',
+                marginLeft: '8px'
+              }}>
+                {phoneError}
+              </div>
+            )}
           </div>
 
           {/* 密码输入框 */}

@@ -41,7 +41,7 @@ const MapCore = ({
                 return;
             }
 
-            console.log("Initializing map...");
+            //console.log("Initializing map...");
 
             // 创建地图实例
             const map = new window.AMap.Map('mapContainer', {
@@ -62,7 +62,7 @@ const MapCore = ({
 
             // 地图加载完成事件
             map.on('complete', () => {
-                console.log("Map loaded successfully");
+                //console.log("Map loaded successfully");
                 setIsLoading(false);
                 onMapLoading(false);
                 clearTimeout(timeoutId);

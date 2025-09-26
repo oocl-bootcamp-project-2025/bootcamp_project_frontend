@@ -29,8 +29,8 @@ const MapRoutes = ({ map, locations, routeData }) => {
 
     // 使用testdata2中的route数据绘制驾车路线
     const drawDrivingRoute = (routeData) => {
-        console.log('=== MapRoutes.drawDrivingRoute 开始 ===');
-        console.log('接收到的 routeData:', routeData);
+        //console.log('=== MapRoutes.drawDrivingRoute 开始 ===');
+        //console.log('接收到的 routeData:', routeData);
 
         if (!map || !window.AMap || !routeData) {
             console.warn('地图实例、AMap 或路线数据未准备好');
@@ -43,7 +43,7 @@ const MapRoutes = ({ map, locations, routeData }) => {
         try {
             // 获取路线的起点和终点信息
             const { origin, destination, paths } = routeData;
-            console.log(`🚗 开始绘制驾车路线: 起点=${origin}, 终点=${destination}, 路径数=${paths?.length || 0}`);
+            // //console.log(`🚗 开始绘制驾车路线: 起点=${origin}, 终点=${destination}, 路径数=${paths?.length || 0}`);
 
             if (!paths || paths.length === 0) {
                 console.warn('⚠️ 没有可用的路径数据');
@@ -52,7 +52,7 @@ const MapRoutes = ({ map, locations, routeData }) => {
 
             // 使用第一条路径（通常是推荐路径）
             const primaryPath = paths[0];
-            console.log(`🛣️ 使用主路径: 距离=${primaryPath.distance}米, 时长=${primaryPath.cost.duration}秒, 步骤数=${primaryPath.steps.length}`);
+            // //console.log(`🛣️ 使用主路径: 距离=${primaryPath.distance}米, 时长=${primaryPath.cost.duration}秒, 步骤数=${primaryPath.steps.length}`);
 
             // 收集所有路径点
             const allPathPoints = [];
@@ -60,12 +60,12 @@ const MapRoutes = ({ map, locations, routeData }) => {
             primaryPath.steps.forEach((step, stepIndex) => {
                 if (step.polyline) {
                     const stepPoints = parsePolyline(step.polyline);
-                    console.log(`📍 步骤 ${stepIndex + 1}: ${step.instruction}, 路径点数: ${stepPoints.length}`);
+                    // //console.log(`📍 步骤 ${stepIndex + 1}: ${step.instruction}, 路径点数: ${stepPoints.length}`);
                     allPathPoints.push(...stepPoints);
                 }
             });
 
-            console.log(`🗺️ 总路径点数: ${allPathPoints.length}`);
+            // //console.log(`🗺️ 总路径点数: ${allPathPoints.length}`);
 
             if (allPathPoints.length > 0) {
                 // 创建主路线
@@ -102,7 +102,7 @@ const MapRoutes = ({ map, locations, routeData }) => {
                         });
                         startMarker.setMap(map);
                         routeLinesRef.current.push(startMarker);
-                        console.log('✅ 起点标记已添加');
+                        //console.log('✅ 起点标记已添加');
                     }
                 }
 
@@ -121,7 +121,7 @@ const MapRoutes = ({ map, locations, routeData }) => {
                         });
                         endMarker.setMap(map);
                         routeLinesRef.current.push(endMarker);
-                        console.log('✅ 终点标记已添加');
+                        //console.log('✅ 终点标记已添加');
                     }
                 }
                 */
@@ -152,7 +152,7 @@ const MapRoutes = ({ map, locations, routeData }) => {
 
                             alternativeLine.setMap(map);
                             routeLinesRef.current.push(alternativeLine);
-                            console.log(`✅ 备选路径 ${pathIndex + 1} 已添加`);
+                            // //console.log(`✅ 备选路径 ${pathIndex + 1} 已添加`);
                         }
                     });
                 }
@@ -165,13 +165,13 @@ const MapRoutes = ({ map, locations, routeData }) => {
                             bounds.extend(new window.AMap.LngLat(point[0], point[1]));
                         });
                         map.setFitView(bounds, false, [50, 50, 50, 50]); // 添加边距
-                        console.log('✅ 地图视野已调整到路线范围');
+                        // //console.log('✅ 地图视野已调整到路线范围');
                     } catch (error) {
                         console.warn('地图视野调整失败:', error);
                     }
                 }
 
-                console.log(`✅ 驾车路线绘制完成，包含 ${allPathPoints.length} 个路径点`);
+                //console.log(`✅ 驾车路线绘制完成，包含 ${allPathPoints.length} 个路径点`);
             } else {
                 console.warn('⚠️ 没有有效路径点，无法绘制路线');
             }
@@ -180,7 +180,7 @@ const MapRoutes = ({ map, locations, routeData }) => {
             console.error('💥 绘制驾车路线时发生错误:', error);
         }
 
-        console.log('=== MapRoutes.drawDrivingRoute 结束 ===');
+        //console.log('=== MapRoutes.drawDrivingRoute 结束 ===');
     };
 
     // 根据天数获取路线颜色（保留原有功能作为备用）
@@ -197,8 +197,8 @@ const MapRoutes = ({ map, locations, routeData }) => {
 
     // 绘制同一天景点之间的路线（备用功能，如果没有routeData时使用）
     const drawDayRoutes = (locations) => {
-        console.log('=== MapRoutes.drawDayRoutes 开始 ===');
-        console.log('接收到的 locations:', locations);
+        //console.log('=== MapRoutes.drawDayRoutes 开始 ===');
+        //console.log('接收到的 locations:', locations);
 
         if (!map || !window.AMap) {
             console.warn('地图实例或 AMap 未准备好');
@@ -250,7 +250,7 @@ const MapRoutes = ({ map, locations, routeData }) => {
             }
         });
 
-        console.log('=== MapRoutes.drawDayRoutes 结束 ===');
+        //console.log('=== MapRoutes.drawDayRoutes 结束 ===');
     };
 
     // 监听routeData和locations变化，重新绘制路线

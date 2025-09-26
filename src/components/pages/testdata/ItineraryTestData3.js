@@ -2,25 +2,25 @@ const itineraryTestData3 = {
   "itinerary": {
     "day1": [
       {
-        "id": 40,
+        "id": 93,
         "area": "北京",
         "name": "故宮博物院",
         "description": "故宮博物院是中國最大的古代文化藝術博物館，原為明清皇宮。",
         "location": "東城區",
         "longitude": 116.3972,
         "latitude": 39.9163,
-        "images": "https://example.com/forbidden_1.jpg,https://example.com/forbidden_2.jpg",
+        "images": "https://th.bing.com/th/id/OIP.4gY8qfCoUR9xHYvKN21VJgHaEZ?w=266&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
         "duration": 3
       },
       {
-        "id": 33,
+        "id": 137,
         "area": "北京",
         "name": "北海公園",
         "description": "北海公園是北京著名的皇家園林，擁有湖泊和古建築。",
         "location": "西城區",
         "longitude": 116.3831,
         "latitude": 39.9284,
-        "images": "https://example.com/beihai_1.jpg,https://example.com/beihai_2.jpg",
+        "images": "https://th.bing.com/th/id/OIP.SXNg5OtHUH5ca0iYAZG79AHaEK?w=328&h=184&c=7&r=0&o=7&am…",
         "duration": 2
       },
       {
@@ -31,7 +31,7 @@ const itineraryTestData3 = {
         "location": "朝陽區",
         "longitude": 116.4563,
         "latitude": 39.9335,
-        "images": "https://example.com/sanlitun_1.jpg,https://example.com/sanlitun_2.jpg",
+        "images": "https://th.bing.com/th/id/OIP.o2HXpiCd338RgJoySmKddgHaE7?w=263&h=180&c=7&r=0&o=7&am…",
         "duration": 2
       }
     ],
@@ -44,7 +44,7 @@ const itineraryTestData3 = {
         "location": "朝陽區",
         "longitude": 116.3906,
         "latitude": 39.9917,
-        "images": "https://example.com/birdsnest_1.jpg,https://example.com/birdsnest_2.jpg",
+        "images": "https://th.bing.com/th/id/OIP.gI2paIfgh1r3mWV9-PEwXQHaE7?w=255&h=180&c=7&r=0&o=7&am…",
         "duration": 2
       },
       {
@@ -55,7 +55,7 @@ const itineraryTestData3 = {
         "location": "朝陽區",
         "longitude": 116.3906,
         "latitude": 39.991,
-        "images": "https://example.com/watercube_1.jpg,https://example.com/watercube_2.jpg",
+        "images": "https://th.bing.com/th/id/OIP.qrTd_YNE_IkpzM2xVwDB4gHaD4?w=319&h=180&c=7&r=0&o=7&am…",
         "duration": 1
       },
       {
@@ -66,7 +66,7 @@ const itineraryTestData3 = {
         "location": "延慶區",
         "longitude": 116.0119,
         "latitude": 40.3588,
-        "images": "https://example.com/greatwall_1.jpg,https://example.com/greatwall_2.jpg",
+        "images": "https://th.bing.com/th/id/OIP.O72IJ_5BXMdaHmp8-gmUgQHaEJ?w=290&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
         "duration": 4
       }
     ],
@@ -79,7 +79,7 @@ const itineraryTestData3 = {
         "location": "海淀區",
         "longitude": 116.273,
         "latitude": 39.9991,
-        "images": "https://example.com/summerpalace_1.jpg,https://example.com/summerpalace_2.jpg",
+        "images": "https://th.bing.com/th/id/OIP.x-6vPCUZYjEl725Z5IWx5gHaEk?w=296&h=183&c=7&r=0&o=7&am…",
         "duration": 3
       },
       {
@@ -90,7 +90,7 @@ const itineraryTestData3 = {
         "location": "海淀區",
         "longitude": 116.1956,
         "latitude": 39.998,
-        "images": "https://example.com/xiangshan_1.jpg,https://example.com/xiangshan_2.jpg",
+        "images": "https://th.bing.com/th/id/OIP.D5zyz-DY_v6Nwanp_MEYtQHaE7?w=251&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
         "duration": 2
       },
       {
@@ -101,7 +101,7 @@ const itineraryTestData3 = {
         "location": "北京市中心",
         "longitude": 116.233,
         "latitude": 39.5412,
-        "images": "https://example.com/image1.jpg,https://example.com/image2.jpg",
+        "images": "https://th.bing.com/th/id/OIP.XPcvL34MknOYiDNB1yixiQHaE7?w=255&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
         "duration": 3
       }
     ]

@@ -1,21 +1,20 @@
 // router/index.js
-import { lazy } from 'react';
 import { createBrowserRouter } from "react-router-dom";
 import AuthWrappedLayout from "../layout/AuthWrappedLayout";
 
-// Lazy load components for better performance
-const Homepage = lazy(() => import('../components/pages/Homepage'));
-const AMapComponent = lazy(() => import('../components/map/AMapComponent'));
-const MapContainer = lazy(() => import('../components/map/MapContainer'));
-const ItineraryWrapper = lazy(() => import('../components/wrappers/ItineraryWrapper'));
-const ExpertProfilePage = lazy(() => import('../components/pages/ExpertProfilePage'));
-const PostDetailPage = lazy(() => import('../components/pages/PostDetailPage'));
-const ItineraryResults = lazy(() => import('../components/pages/ItineraryResults'));
-const TestItineraryResults = lazy(() => import('../TestItineraryResults'));
-const Login = lazy(() => import('../components/auth/Login'));
-const Register = lazy(() => import('../components/auth/Register'));
-const TokenTestPage = lazy(() => import('../components/debug/TokenTestPage'));
-const UserProfilePage = lazy(() => import('../components/pages/user/UserProfilePage'));
+// 直接导入组件（临时禁用懒加载以解决加载问题）
+import Login from '../components/auth/Login';
+import Register from '../components/auth/Register';
+import TokenTestPage from '../components/debug/TokenTestPage';
+import AMapComponent from '../components/map/AMapComponent';
+import MapContainer from '../components/map/MapContainer';
+import ExpertProfilePage from '../components/pages/ExpertProfilePage';
+import Homepage from '../components/pages/Homepage';
+import ItineraryResults from '../components/pages/ItineraryResults';
+import PostDetailPage from '../components/pages/PostDetailPage';
+import UserProfilePage from '../components/pages/user/UserProfilePage';
+import ItineraryWrapper from '../components/wrappers/ItineraryWrapper';
+import TestItineraryResults from '../TestItineraryResults';
 
 export const router = createBrowserRouter([
   {
