@@ -37,7 +37,7 @@ export default function Homepage() {
   const departureTimeRef = useRef(null);
   const returnTimeRef = useRef(null);
   const cityDropdownRef = useRef(null);
-  const { isAuthenticated, getToken } = useAuth(); // 🎯 获取认证状态
+  const { isAuthenticated, getToken, getPhone } = useAuth(); // 🎯 获取认证状态
 
   const preferenceOptions = preferenceOptionsValue;
 
@@ -274,17 +274,17 @@ export default function Homepage() {
               }
             } catch (error) {
               console.error('检查登录状态失败:', error);
-              // 如果API请求失败，检查本地存储作为备用方案
-              const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-              const phoneNumber = localStorage.getItem('last_login_phone');
+              // 如果API请求失败，检查AuthContext作为备用方案
+              const token = getToken();
+              const phoneNumber = getPhone();
 
-              console.log('API失败，检查localStorage:');
+              console.log('API失败，检查AuthContext:');
               console.log('token:', token);
               console.log('phoneNumber:', phoneNumber);
 
               if (token && phoneNumber) {
                 // 有本地登录信息，直接跳转
-                console.log('localStorage确认已登录，跳转到用户页面');
+                console.log('AuthContext确认已登录，跳转到用户页面');
                 navigate('/user/profile');
               } else {
                 // 没有登录信息，导航到登录页面

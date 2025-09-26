@@ -29,13 +29,13 @@ instance.interceptors.request.use(
     console.log('请求URL:', config.baseURL + config.url);
     console.log('请求方法:', config.method);
 
-    // 从 localStorage 获取 token
-    const token = localStorage.getItem('token');
+    // 从 localStorage 获取 token（使用与 AuthContext 一致的key）
+    const token = localStorage.getItem('auth_token');
     console.log('从localStorage获取的token:', token);
 
     // 如果存在 token，则添加到请求头
     if (token) {
-      config.headers['Authorization'] = `${token}`;
+      config.headers['Authorization'] = `Bearer ${token}`;
       console.log('已添加Authorization header:', config.headers['Authorization']);
       console.log('完整的请求headers:', config.headers);
 

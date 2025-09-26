@@ -6,12 +6,17 @@ const AuthContext = createContext();
 
 // Token存储的key
 const TOKEN_KEY = 'auth_token';
+const PHONE_KEY = 'auth_phone';
 
 // 认证Provider组件
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => {
     // 初始化时从localStorage获取token
     return localStorage.getItem(TOKEN_KEY);
+  });
+  const [phone, setPhone] = useState(() => {
+    // 初始化时从localStorage获取phone
+    return localStorage.getItem(PHONE_KEY);
   });
   const [isAuthenticated, setIsAuthenticated] = useState(!!token);
   const navigate = useNavigate();
@@ -24,11 +29,20 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(true);
   };
 
-  // 清除token
+  // 保存phone到localStorage和state
+  const savePhone = (newPhone) => {
+    console.log('AuthContext: 保存phone', newPhone);
+    localStorage.setItem(PHONE_KEY, newPhone);
+    setPhone(newPhone);
+  };
+
+  // 清除token和phone
   const clearToken = () => {
-    console.log('AuthContext: 清除token');
+    console.log('AuthContext: 清除token和phone');
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(PHONE_KEY);
     setToken(null);
+    setPhone(null);
     setIsAuthenticated(false);
   };
 
@@ -44,14 +58,23 @@ export const AuthProvider = ({ children }) => {
     return token || localStorage.getItem(TOKEN_KEY);
   };
 
+  // 获取当前phone
+  const getPhone = () => {
+    return phone || localStorage.getItem(PHONE_KEY);
+  };
+
   // 监听token变化，同步更新认证状态
   useEffect(() => {
     const storedToken = localStorage.getItem(TOKEN_KEY);
+    const storedPhone = localStorage.getItem(PHONE_KEY);
     if (storedToken !== token) {
       setToken(storedToken);
       setIsAuthenticated(!!storedToken);
     }
-  }, [token]);
+    if (storedPhone !== phone) {
+      setPhone(storedPhone);
+    }
+  }, [token, phone]);
 
   // 监听localStorage变化（适用于多标签页同步）
   useEffect(() => {
@@ -60,7 +83,12 @@ export const AuthProvider = ({ children }) => {
         const newToken = e.newValue;
         setToken(newToken);
         setIsAuthenticated(!!newToken);
-        console.log('AuthContext: 检测到storage变化', newToken);
+        console.log('AuthContext: 检测到token storage变化', newToken);
+      }
+      if (e.key === PHONE_KEY) {
+        const newPhone = e.newValue;
+        setPhone(newPhone);
+        console.log('AuthContext: 检测到phone storage变化', newPhone);
       }
     };
 
@@ -70,11 +98,14 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     token,
+    phone,
     isAuthenticated,
     saveToken,
+    savePhone,
     clearToken,
     logout,
-    getToken
+    getToken,
+    getPhone
   };
 
   return (

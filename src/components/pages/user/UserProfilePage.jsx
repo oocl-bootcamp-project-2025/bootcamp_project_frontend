@@ -1,3 +1,5 @@
+import LoadingModal from '@/components/modals/LoadingModal';
+import ResultModal from '@/components/modals/ResultModal';
 import { Button, Card, Spin, Tabs, message } from 'antd';
 import { ArrowLeft, Book, Clock, MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -5,12 +7,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext'; // 🎯 添加认证上下文
 import { fetchItineraries, getItineraryDataByItineraryId, getPlanningRouteByAttractions } from '../../apis/api.js';
 import './UserProfilePage.css';
-import LoadingModal from '@/components/modals/LoadingModal';
-import ResultModal from '@/components/modals/ResultModal';
 
 export default function UserProfilePage() {
   const navigate = useNavigate();
-  const { isAuthenticated, getToken } = useAuth(); // 🎯 使用认证上下文
+  const { isAuthenticated, getToken, getPhone, logout } = useAuth(); // 🎯 添加getPhone方法
   const [activeTab, setActiveTab] = useState('itineraries');
   const [userItineraries, setUserItineraries] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -26,8 +26,8 @@ export default function UserProfilePage() {
       setLoading(true);
       setError(null);
 
-      // 从localStorage获取用户电话号码
-      const phoneNumber = localStorage.getItem('last_login_phone');
+      // 从AuthContext获取用户电话号码
+      const phoneNumber = getPhone();
       if (!phoneNumber) {
         throw new Error('用户未登录或电话号码不存在');
       }
@@ -323,6 +323,39 @@ export default function UserProfilePage() {
           type={resultType}
           message={resultMessage}
         />
+        
+        {/* 登出链接 */}
+        <div style={{ 
+          textAlign: 'center', 
+          marginTop: '40px', 
+          paddingBottom: '20px',
+          borderTop: '1px solid #f0f0f0',
+          paddingTop: '20px'
+        }}>
+          <button
+            onClick={() => {
+              // 使用AuthContext的logout方法，登出后跳转到首页
+              logout('/');
+            }}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#999',
+              fontSize: '14px',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              padding: '0'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.color = '#666';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.color = '#999';
+            }}
+          >
+            登出账户
+          </button>
+        </div>
       </div>
   );
 }

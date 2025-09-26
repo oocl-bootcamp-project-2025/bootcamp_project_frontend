@@ -117,11 +117,19 @@ const Login = () => {
     if (!validateForm()) return;
     setIsLoading(true);
     setError('');
+    
+    console.log('=== 开始登录流程 ===');
+    console.log('手机号:', phone);
+    console.log('密码长度:', password.length);
+    
     try {
       const response = await loginApi({"phone": phone, "password": password});
       console.log('登录API响应:', response);
+      
       if (response.status === 201 || response.status === 200) {
         const token = response?.data;
+        console.log('收到的token:', token);
+        
         if (token) {
           console.log('登录成功，准备保存token:', token);
           
@@ -133,21 +141,34 @@ const Login = () => {
           // 处理登录后的操作
           handlePostLoginActions();
         } else {
+          console.error('登录成功但未获取到token');
           setError('登录成功，但未获取到token');
         }
       } else {
-        setError('登录失败，未知响应码');
+        console.error('登录失败，响应状态:', response.status);
+        setError('登录失败，未知响应码: ' + response.status);
       }
     } catch (err) {
+      console.error('登录异常:', err);
+      console.error('错误响应:', err.response);
+      
       const status = err?.response?.status;
+      const errorData = err?.response?.data;
+      
+      console.log('错误状态码:', status);
+      console.log('错误数据:', errorData);
+      
       if (status === 400) {
         setError('请求参数错误，请检查手机号和密码');
       } else if (status === 404) {
         setError('用户不存在，请注册或检查手机号');
       } else if (status === 401) {
         setError('密码错误，请重试');
+      } else if (status === 500) {
+        setError('服务器错误，请稍后重试');
       } else {
-        setError('登录失败，请重试');
+        
+        setError(`登录失败，请重试 (状态码: ${status})`);
       }
     } finally {
       setIsLoading(false);

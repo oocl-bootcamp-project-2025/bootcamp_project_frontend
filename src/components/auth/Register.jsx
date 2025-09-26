@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import './css/Register.css';
-import { register } from '@/components/apis/api';
-import { useNavigate, useLocation } from 'react-router';
+import { register } from '@/components/apis/api-new';
+import { LockOutlined, PhoneOutlined } from '@ant-design/icons';
 import { message } from 'antd';
-import { PhoneOutlined, LockOutlined } from '@ant-design/icons';
+import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
+import './css/Register.css';
 
 const Register = () => {
   const [phone, setPhone] = useState('');
