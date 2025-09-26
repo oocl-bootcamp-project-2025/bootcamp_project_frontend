@@ -10,6 +10,8 @@ import { Button } from '../ui/button';
 import './css/ItineraryOverviewCard.css';
 import './css/ItineraryResults.css';
 import './css/ItineraryStatistics.css';
+import {useAuth} from "@/contexts/AuthContext";
+import {message} from "antd";
 
 function calculateDayDate(departureDate, dayIndex) {
   if (!departureDate) return "2025年9月22日"; // Fallback date
@@ -57,6 +59,11 @@ export default function ItineraryResults({
 
   // 初始化行程数据 - 使用 testdata2 的 itinerary 部分
   const [currentItinerary, setCurrentItinerary] = useState(itinerary || itineraryTestData3.itinerary);
+
+
+  const { isAuthenticated, getToken, getPhone } = useAuth(); // 🎯 获取认证状态
+
+
 
   routeData = routeData || itineraryTestData3.route;
 
@@ -143,36 +150,52 @@ export default function ItineraryResults({
     return `${preferenceText}游`;
   };
 
+
+  // add phone from auth context
+  const phoneLogin = getPhone();
+
   // 新增：处理保存行程
   const handleSaveItinerary = async (phoneNumber) => {
-    // 参数校验
-    if (!phoneNumber) {
-      setResultType('error');
-      setResultMessage('请输入有效的手机号');
-      setShowResultModal(true);
-      return;
-    }
-    const itineraryData = {
-      title: (searchData.destination && searchData.duration) ? `${searchData.destination}${searchData.duration}天深度游` : '默认自助深度游行程',
-      phoneNumber: phoneNumber,
-      description: generatePreferenceDescription(),
-      startDate: searchData?.departureDate || '',
-      allNumber: getTotalAttractions(),
-      itineraryData: JSON.stringify({ itinerary: currentItinerary })
-    };
-    await saveItinerary(itineraryData).then(response => {
-      if (response.status !== 200) {
-        throw new Error('保存失败');
+    if (phoneNumber!== phoneLogin) {
+      message.error('请使用登录时的手机号保存行程');
+    }else
+    {
+
+      // test
+      console.log('=== 保存行程 ===');
+      console.log('用户手机号:', phoneNumber);
+      console.log('================');
+
+      // 参数校验
+      if (!phoneNumber) {
+        setResultType('error');
+        setResultMessage('请输入有效的手机号');
+        setShowResultModal(true);
+        return;
       }
-      setShowSaveModal(false);
-      setResultType('success');
-      setResultMessage('行程已成功保存！我们已将行程链接发送到您的手机，请注意查收短信。');
-      setShowResultModal(true);
-    }).catch(error => {
-      setResultType('error');
-      setResultMessage('保存失败，请检查网络连接后重试。如问题持续存在，请联系客服。');
-      setShowResultModal(true);
-    })
+      const itineraryData = {
+        title: (searchData.destination && searchData.duration) ? `${searchData.destination}${searchData.duration}天深度游` : '默认自助深度游行程',
+        phoneNumber: phoneNumber,
+        description: generatePreferenceDescription(),
+        startDate: searchData?.departureDate || '',
+        allNumber: getTotalAttractions(),
+        itineraryData: JSON.stringify({ itinerary: currentItinerary })
+      };
+      await saveItinerary(itineraryData).then(response => {
+        if (response.status !== 200) {
+          throw new Error('保存失败');
+        }
+        setShowSaveModal(false);
+        setResultType('success');
+        setResultMessage('行程已成功保存！我们已将行程链接发送到您的手机，请注意查收短信。');
+        setShowResultModal(true);
+      }).catch(error => {
+        setResultType('error');
+        setResultMessage('保存失败，请检查网络连接后重试。如问题持续存在，请联系客服。');
+        setShowResultModal(true);
+      })
+    }
+
   };
   // 处理触摸开始
   const handleTouchStart = (e) => {
