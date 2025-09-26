@@ -68,7 +68,7 @@ const MapMarkers = ({
                 let allMarkers = [];
 
                 if (locations && locations.length > 0) {
-                    console.log(`Creating ${locations.length} markers`);
+                    // console.log(`Creating ${locations.length} markers`);
 
                     // 使用同步方式创建标记，确保事件绑定可靠
                     locations.forEach((location, index) => {
@@ -130,7 +130,7 @@ const MapMarkers = ({
                                 console.error(`Failed to bind hover events for ${location.name}:`, eventError);
                             }
 
-                            console.log(`Marker ${index + 1}/${locations.length} created for ${location.name}`);
+                            // console.log(`Marker ${index + 1}/${locations.length} created for ${location.name}`);
                         } else {
                             console.warn("Invalid location position:", location);
                         }
