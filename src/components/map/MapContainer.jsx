@@ -19,18 +19,18 @@ const MapContainer = ({ selectedTab, itinerary, searchData, routeData }) => {
 
     // 获取景点坐标的辅助函数（优先使用数据中的经纬度）
     const getAttractionPosition = async (attraction) => {
-        console.log(`🔍 开始获取景点 "${attraction.name}" 的坐标...`);
+        // //console.log(`🔍 开始获取景点 "${attraction.name}" 的坐标...`);
 
         try {
             // 优先使用景点数据中的经纬度字段
             if (attraction.longitude && attraction.latitude) {
                 const position = [attraction.longitude, attraction.latitude];
-                console.log(`✅ 从景点数据直接获取 "${attraction.name}" 坐标:`, position);
+                // //console.log(`✅ 从景点数据直接获取 "${attraction.name}" 坐标:`, position);
                 return position;
             }
 
             // 如果没有经纬度数据，回退到地理编码
-            console.log(`⚠️ 景点 "${attraction.name}" 没有经纬度数据，尝试地理编码...`);
+            // //console.log(`⚠️ 景点 "${attraction.name}" 没有经纬度数据，尝试地理编码...`);
 
             // 如果高德地图未加载，返回默认坐标
             if (!window.AMap) {
@@ -58,13 +58,13 @@ const MapContainer = ({ selectedTab, itinerary, searchData, routeData }) => {
 
             // 如果是测试数据中的景点，直接返回
             if (testPositions[attraction.name]) {
-                console.log(`✅ 从测试数据获取景点 "${attraction.name}" 坐标:`, testPositions[attraction.name]);
+                //console.log(`✅ 从测试数据获取景点 "${attraction.name}" 坐标:`, testPositions[attraction.name]);
                 return testPositions[attraction.name];
             }
 
             // 尝试使用地理编码API
             return new Promise((resolve, reject) => {
-                console.log(`🌐 尝试通过地理编码API获取景点 "${attraction.name}" 坐标...`);
+                //console.log(`🌐 尝试通过地理编码API获取景点 "${attraction.name}" 坐标...`);
 
                 // API v2.0 直接使用，无需手动加载插件
                 if (!window.AMap.Geocoder) {
@@ -79,10 +79,10 @@ const MapContainer = ({ selectedTab, itinerary, searchData, routeData }) => {
                     extensions: 'all'
                 });
 
-                console.log(`📍 开始地理编码查询: "${attraction.name}", 城市: ${searchData?.destination || '北京'}`);
+                //console.log(`📍 开始地理编码查询: "${attraction.name}", 城市: ${searchData?.destination || '北京'}`);
 
                 geocoder.getLocation(attraction.name, (status, result) => {
-                    // console.log(`📋 景点 "${attraction.name}" 地理编码API响应:`, {
+                    // //console.log(`📋 景点 "${attraction.name}" 地理编码API响应:`, {
                     //     status,
                     //     resultCount: result?.geocodes?.length || 0,
                     //     result
@@ -93,7 +93,7 @@ const MapContainer = ({ selectedTab, itinerary, searchData, routeData }) => {
                         const location = geocode.location;
                         const position = [location.lng, location.lat];
 
-                        // console.log(`🎉 景点 "${attraction.name}" 坐标获取成功:`, position, `地址: ${geocode.formattedAddress}`);
+                        // //console.log(`🎉 景点 "${attraction.name}" 坐标获取成功:`, position, `地址: ${geocode.formattedAddress}`);
                         resolve(position);
                     } else {
                         // 尝试POI搜索作为备选
@@ -107,7 +107,7 @@ const MapContainer = ({ selectedTab, itinerary, searchData, routeData }) => {
                                 if (searchStatus === 'complete' && searchResult.poiList && searchResult.poiList.pois.length > 0) {
                                     const poi = searchResult.poiList.pois[0];
                                     const position = [poi.location.lng, poi.location.lat];
-                                    // console.log(`🎉 景点 "${attraction.name}" POI搜索成功:`, position);
+                                    // //console.log(`🎉 景点 "${attraction.name}" POI搜索成功:`, position);
                                     resolve(position);
                                 } else {
                                     console.warn(`❌ 景点 "${attraction.name}" 所有搜索方式都失败，使用默认坐标`);
@@ -131,8 +131,8 @@ const MapContainer = ({ selectedTab, itinerary, searchData, routeData }) => {
     const loadAllLocations = async () => {
         if (!itinerary || !window.AMap) return;
 
-        console.log('=== 开始加载景点坐标 ===');
-        console.log('行程数据:', itinerary);
+        // //console.log('=== 开始加载景点坐标 ===');
+        // //console.log('行程数据:', itinerary);
         setIsLoadingLocations(true);
 
         try {
@@ -140,10 +140,10 @@ const MapContainer = ({ selectedTab, itinerary, searchData, routeData }) => {
 
             for (const [dayKey, dayIndex] of Object.keys(itinerary).map((key, idx) => [key, idx])) {
                 const dayAttractions = itinerary[dayKey] || [];
-                // console.log(`处理第${dayIndex + 1}天 (${dayKey})，景点数量: ${dayAttractions.length}`);
+                // //console.log(`处理第${dayIndex + 1}天 (${dayKey})，景点数量: ${dayAttractions.length}`);
 
                 for (const attraction of dayAttractions) {
-                    // console.log(`正在处理景点:`, {
+                    // //console.log(`正在处理景点:`, {
                     //     name: attraction.name,
                     //     longitude: attraction.longitude,
                     //     latitude: attraction.latitude,
@@ -161,11 +161,11 @@ const MapContainer = ({ selectedTab, itinerary, searchData, routeData }) => {
                         isCurrentDay: selectedTab === 'overview' || selectedTab === dayKey
                     });
 
-                    console.log(`✅ 景点 "${attraction.name}" 坐标设置完成:`, position);
+                    // //console.log(`✅ 景点 "${attraction.name}" 坐标设置完成:`, position);
                 }
             }
 
-            console.log('=== 所有景点坐标加载完成 ===', locations);
+            //console.log('=== 所有景点坐标加载完成 ===', locations);
             setAllLocations(locations);
         } catch (error) {
             console.error('加载景点坐标时出错:', error);
@@ -241,7 +241,7 @@ const MapContainer = ({ selectedTab, itinerary, searchData, routeData }) => {
                 }
 
                 // 调整地图视图
-                console.log("Calling adjustMapView with validLocations:", validLocations);
+                //console.log("Calling adjustMapView with validLocations:", validLocations);
                 adjustMapView(validLocations);
 
             } catch (error) {
@@ -262,12 +262,12 @@ const MapContainer = ({ selectedTab, itinerary, searchData, routeData }) => {
     // 调整地图视图的辅助函数
     const adjustMapView = (validLocations) => {
         try {
-            console.log("adjustMapView called with:", validLocations);
+            //console.log("adjustMapView called with:", validLocations);
             const positions = validLocations
                 .filter(loc => loc.position && loc.position.length === 2)
                 .map(loc => loc.position);
 
-            console.log("Filtered positions:", positions);
+            //console.log("Filtered positions:", positions);
 
             if (positions.length > 0) {
                 // 计算边界
@@ -285,7 +285,7 @@ const MapContainer = ({ selectedTab, itinerary, searchData, routeData }) => {
                 minLat -= latPadding;
                 maxLat += latPadding;
 
-                console.log("Calculated bounds:", { minLng, maxLng, minLat, maxLat });
+                //console.log("Calculated bounds:", { minLng, maxLng, minLat, maxLat });
 
                 try {
                     // 直接使用中心点和缩放级别方法，更可靠
@@ -319,11 +319,11 @@ const MapContainer = ({ selectedTab, itinerary, searchData, routeData }) => {
                     setIsUpdatingView(false);
                     clearTimeout(updateTimeoutRef.current);
                     setPrevSelectedTab(selectedTab);
-                    console.log("Map view update completed");
+                    //console.log("Map view update completed");
                 }, 1000);
 
             } else {
-                console.log("No valid positions found");
+                //console.log("No valid positions found");
                 setIsUpdatingView(false);
                 clearTimeout(updateTimeoutRef.current);
             }

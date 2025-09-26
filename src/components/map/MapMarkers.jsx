@@ -68,7 +68,7 @@ const MapMarkers = ({
                 let allMarkers = [];
 
                 if (locations && locations.length > 0) {
-                    // console.log(`Creating ${locations.length} markers`);
+                    // //console.log(`Creating ${locations.length} markers`);
 
                     // 使用同步方式创建标记，确保事件绑定可靠
                     locations.forEach((location, index) => {
@@ -96,7 +96,7 @@ const MapMarkers = ({
 
                             // 添加点击事件 - 显示信息窗口
                             const handleClick = () => {
-                                console.log("Marker clicked:", location.name);
+                                //console.log("Marker clicked:", location.name);
                                 // 点击时显示信息窗口，类似悬停效果
                                 const cardContent = ReactDOMServer.renderToString(
                                     <Card name={location.name} day={location.day} />
@@ -108,7 +108,7 @@ const MapMarkers = ({
                             // 确保事件绑定成功
                             try {
                                 marker.on('click', handleClick);
-                                console.log(`Click event bound for ${location.name}`);
+                                //console.log(`Click event bound for ${location.name}`);
                             } catch (eventError) {
                                 console.error(`Failed to bind click event for ${location.name}:`, eventError);
                             }
@@ -130,14 +130,14 @@ const MapMarkers = ({
                                 console.error(`Failed to bind hover events for ${location.name}:`, eventError);
                             }
 
-                            // console.log(`Marker ${index + 1}/${locations.length} created for ${location.name}`);
+                            // //console.log(`Marker ${index + 1}/${locations.length} created for ${location.name}`);
                         } else {
                             console.warn("Invalid location position:", location);
                         }
                     });
 
                     // 同步完成后立即更新
-                    console.log(`All ${allMarkers.length} markers created successfully`);
+                    //console.log(`All ${allMarkers.length} markers created successfully`);
                     markersRef.current = allMarkers;
                     if (onMarkersUpdate) {
                         onMarkersUpdate(allMarkers);
