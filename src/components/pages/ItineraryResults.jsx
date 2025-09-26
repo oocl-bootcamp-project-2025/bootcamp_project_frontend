@@ -606,16 +606,16 @@ export default function ItineraryResults({
         />
 
         {/* 我的位置按钮 */}
-        <button className="location-button">
-          <MapPin className="w-5 h-5" />
-          我的位置
-        </button>
+        {/*<button className="location-button">*/}
+        {/*  <MapPin className="w-5 h-5" />*/}
+        {/*  我的位置*/}
+        {/*</button>*/}
 
         {/* 地图控制按钮 */}
-        <div className="map-controls">
-          <button className="map-control-btn">+</button>
-          <button className="map-control-btn">-</button>
-        </div>
+        {/*<div className="map-controls">*/}
+        {/*  <button className="map-control-btn">+</button>*/}
+        {/*  <button className="map-control-btn">-</button>*/}
+        {/*</div>*/}
 
         {/* 定位按钮 */}
         <button className="navigation-button">
