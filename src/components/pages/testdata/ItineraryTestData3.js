@@ -2,7 +2,7 @@ const itineraryTestData3 = {
   "itinerary": {
     "day1": [
       {
-        "id": 40,
+        "id": 93,
         "area": "北京",
         "name": "故宮博物院",
         "description": "故宮博物院是中國最大的古代文化藝術博物館，原為明清皇宮。",
@@ -13,7 +13,7 @@ const itineraryTestData3 = {
         "duration": 3
       },
       {
-        "id": 33,
+        "id": 137,
         "area": "北京",
         "name": "北海公園",
         "description": "北海公園是北京著名的皇家園林，擁有湖泊和古建築。",
