@@ -167,7 +167,7 @@ const Login = () => {
       } else if (status === 500) {
         setError('服务器错误，请稍后重试');
       } else {
-        
+
         setError(`登录失败，请重试 (状态码: ${status})`);
       }
     } finally {
@@ -179,6 +179,25 @@ const Login = () => {
   const handleGoRegister = (e) => {
     e.preventDefault();
     navigate(`/register?redirect=${encodeURIComponent(redirect)}`);
+  };
+
+  // 暂不登录，跳回原来页面
+  const handleSkipLogin = (e) => {
+    e.preventDefault();
+    
+    // 检查redirect目标是否需要登录权限的页面
+    const protectedPaths = ['/user/profile', '/user/', '/profile'];
+    const needsAuth = protectedPaths.some(path => redirect.includes(path));
+    
+    if (needsAuth) {
+      // 如果原页面需要登录，则跳转到首页
+      console.log('原页面需要登录权限，跳转到首页');
+      navigate('/');
+    } else {
+      // 否则跳转回原页面
+      console.log('用户选择暂不登录，跳转到:', redirect);
+      navigate(redirect);
+    }
   };
 
   return (
@@ -264,6 +283,32 @@ const Login = () => {
           <div className="register-section">
             还没有账号？
             <a href="#" className="register-link" onClick={handleGoRegister}>立即注册</a>
+          </div>
+
+          {/* 暂不登录按钮 */}
+          <div className="skip-login-section" style={{ textAlign: 'center', marginTop: '20px' }}>
+            <button
+              type="button"
+              className="skip-login-btn"
+              onClick={handleSkipLogin}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#999',
+                fontSize: '14px',
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                padding: '8px 16px'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.color = '#666';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.color = '#999';
+              }}
+            >
+              暂不登录
+            </button>
           </div>
         </form>
       </div>
