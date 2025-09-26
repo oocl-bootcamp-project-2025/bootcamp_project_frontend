@@ -3,7 +3,7 @@ import loadingGif from '../../assets/loading.gif';
 import './css/ResultModal.css';
 import './css/loadingmodal.css';
 
-const LoadingModal = ({ isOpen, onClose, message = 'AI正在智能规划路线', message2 = '请耐心等待...', message3='预计需要1分钟左右，请耐心等待AI为您生成专属路线', spinnerColor = '#ff7518' }) => {
+const LoadingModal = ({ isOpen, onClose, message = 'AI正在智能规划路线', message2 = '请耐心等待...', message3='预计需要1分钟左右，耐心等待AI为您生成专属路线', spinnerColor = '#ff7518' }) => {
   if (!isOpen) return null;
 
   useEffect(() => {
