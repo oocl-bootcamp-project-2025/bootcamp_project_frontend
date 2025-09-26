@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import './css/Register.css';
-import { register } from '@/components/apis/api';
-import { useNavigate, useLocation } from 'react-router';
+import { register } from '@/components/apis/api-new';
+import { LockOutlined, PhoneOutlined } from '@ant-design/icons';
 import { message } from 'antd';
-import { PhoneOutlined, LockOutlined } from '@ant-design/icons';
+import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
+import './css/Register.css';
 
 const Register = () => {
   const [phone, setPhone] = useState('');
@@ -76,6 +76,15 @@ const Register = () => {
   return (
     <div className="auth-page">
       <div className="register-card">
+        {/* 右上角关闭按钮 */}
+        <button
+          className="close-login-btn"
+          onClick={() => navigate("/")}
+          aria-label="关闭注册"
+          type="button"
+        >
+          <span>×</span>
+        </button>
         {/* 品牌logo */}
         <div className="register-logo">
           <div className="logo-block">

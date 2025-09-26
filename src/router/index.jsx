@@ -43,6 +43,10 @@ export const router = createBrowserRouter([
         element: <ItineraryWrapper />
       },
       {
+        path: 'itinerary/:id',
+        element: <ItineraryWrapper />
+      },
+      {
         path: 'results',
         element: <ItineraryResults />
       },

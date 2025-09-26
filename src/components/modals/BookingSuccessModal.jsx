@@ -53,9 +53,9 @@ export default function BookingSuccessModal({
             <div style={{ marginBottom: '20px' }}>
               <Text strong style={{ fontSize: '16px' }}>预约服务为：{serviceName}</Text>
             </div>
-            <div style={{ marginBottom: '20px' }}>
-              <Text strong style={{ fontSize: '16px' }}>预约时间为：{bookingDateTime}</Text>
-            </div>
+            {/*<div style={{ marginBottom: '20px' }}>*/}
+            {/*  <Text strong style={{ fontSize: '16px' }}>预约时间为：{bookingDateTime}</Text>*/}
+            {/*</div>*/}
           </div>
         </div>
         <Button

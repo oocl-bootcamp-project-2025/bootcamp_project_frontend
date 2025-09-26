@@ -9,10 +9,11 @@ import './css/Homepage.css';
 
 // 导入常量和工具函数
 import preferenceOptionsValue from '@/common/preferenceOptionsValue';
+import { useAuth } from "@/contexts/AuthContext";
 import { TIME_OPTIONS } from '../../constants';
 import { calculateDuration } from '../../utils';
 
-import { getAIPlanningRoute, isLogin } from '../apis/api';
+import { getAIPlanningRoute, getCities } from '../apis/api';
 
 export default function Homepage() {
   const navigate = useNavigate();
@@ -36,14 +37,17 @@ export default function Homepage() {
   const departureTimeRef = useRef(null);
   const returnTimeRef = useRef(null);
   const cityDropdownRef = useRef(null);
+  const { isAuthenticated, getToken, getPhone } = useAuth(); // 🎯 获取认证状态
 
   const preferenceOptions = preferenceOptionsValue;
 
   const fetchCities = async () => {
     setLoading(true);
     try {
+      const cityList = await getCities();
+      console.log('城市列表', cityList);
       // API返回数据
-      const formattedCities = response.data.map(city => ({
+      const formattedCities = cityList.data.map(city => ({
         name: city[0],  // First element is the city name
         province: city[1] // Second element is the province
       }));
@@ -125,6 +129,19 @@ export default function Homepage() {
 
   const dateOptions = getDateOptions();
 
+  const handleReturnDateChange = (e) => {
+    const selectedDate = new Date(e.target.value);
+    const maxDate = new Date(getMaxReturnDate());
+
+    if (selectedDate > maxDate) {
+      // Either show an error message or reset to max allowed date
+      setReturnDate(getMaxReturnDate());
+      alert('最长旅行时间为5天');
+    } else {
+      setReturnDate(e.target.value);
+    }
+  };
+
   const handleStartPlanning = async () => {
     if (!destination.trim()) {
       alert('请选择目的地');
@@ -182,7 +199,7 @@ export default function Homepage() {
   const getMaxReturnDate = () => {
     if (!departureDate) return '';
     const dep = new Date(departureDate);
-    dep.setDate(dep.getDate() + 6);
+    dep.setDate(dep.getDate() + 4);
     return dep.toISOString().split('T')[0];
   };
 
@@ -246,10 +263,7 @@ export default function Homepage() {
         <button
           onClick={async () => {
             try {
-
-              const response = await isLogin();
-
-              if (response.data.status === 200) {
+              if (isAuthenticated) {
                 // 已登录，直接导航到个人资料页面
                 console.log('API确认已登录，跳转到用户页面');
                 navigate('/user/profile');
@@ -260,17 +274,17 @@ export default function Homepage() {
               }
             } catch (error) {
               console.error('检查登录状态失败:', error);
-              // 如果API请求失败，检查本地存储作为备用方案
-              const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-              const phoneNumber = localStorage.getItem('last_login_phone');
+              // 如果API请求失败，检查AuthContext作为备用方案
+              const token = getToken();
+              const phoneNumber = getPhone();
 
-              console.log('API失败，检查localStorage:');
+              console.log('API失败，检查AuthContext:');
               console.log('token:', token);
               console.log('phoneNumber:', phoneNumber);
 
               if (token && phoneNumber) {
                 // 有本地登录信息，直接跳转
-                console.log('localStorage确认已登录，跳转到用户页面');
+                console.log('AuthContext确认已登录，跳转到用户页面');
                 navigate('/user/profile');
               } else {
                 // 没有登录信息，导航到登录页面
@@ -452,7 +466,7 @@ export default function Homepage() {
                   <Input
                     type="date"
                     value={returnDate}
-                    onChange={(e) => setReturnDate(e.target.value)}
+                    onChange={handleReturnDateChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     style={{ colorScheme: 'light', height: '36px' }}
                     min={departureDate || undefined}

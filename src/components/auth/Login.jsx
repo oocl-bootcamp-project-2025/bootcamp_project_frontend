@@ -15,6 +15,16 @@ import './css/Login.css';
 // navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
 // README！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
 
+// 验证登录要这样：：：：  ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+// import { useAuth } from '../../contexts/AuthContext';
+// const { isAuthenticated } = useAuth();
+// if (!isAuthenticated) {
+//   navigate(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+//   return null; // 或者显示加载中
+// }
+// 验证登录要这样：：：：  ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+
+// 登录组件
 
 const Login = () => {
   // 状态管理
@@ -28,7 +38,7 @@ const Login = () => {
   const navigate = useNavigate();
   
   // 使用认证上下文
-  const { saveToken, isAuthenticated } = useAuth();
+  const { saveToken, savePhone, isAuthenticated } = useAuth();
 
   // 获取redirect参数
   const searchParams = new URLSearchParams(location.search);
@@ -107,38 +117,58 @@ const Login = () => {
     if (!validateForm()) return;
     setIsLoading(true);
     setError('');
+    
+    console.log('=== 开始登录流程 ===');
+    console.log('手机号:', phone);
+    console.log('密码长度:', password.length);
+    
     try {
       const response = await loginApi({"phone": phone, "password": password});
       console.log('登录API响应:', response);
+      
       if (response.status === 201 || response.status === 200) {
         const token = response?.data;
+        console.log('收到的token:', token);
+        
         if (token) {
           console.log('登录成功，准备保存token:', token);
-           //  当前登录的手机号保存到localStorage
-          localStorage.setItem('last_login_phone', phone);
           
-          // 使用认证系统保存token
+          // 🎯 使用认证系统保存手机号和token
+          savePhone(phone);
           saveToken(token);
-          console.log('Token已通过认证系统保存');
+          console.log('Token和手机号已通过认证系统保存');
           
           // 处理登录后的操作
           handlePostLoginActions();
         } else {
+          console.error('登录成功但未获取到token');
           setError('登录成功，但未获取到token');
         }
       } else {
-        setError('登录失败，未知响应码');
+        console.error('登录失败，响应状态:', response.status);
+        setError('登录失败，未知响应码: ' + response.status);
       }
     } catch (err) {
+      console.error('登录异常:', err);
+      console.error('错误响应:', err.response);
+      
       const status = err?.response?.status;
+      const errorData = err?.response?.data;
+      
+      console.log('错误状态码:', status);
+      console.log('错误数据:', errorData);
+      
       if (status === 400) {
         setError('请求参数错误，请检查手机号和密码');
       } else if (status === 404) {
         setError('用户不存在，请注册或检查手机号');
       } else if (status === 401) {
         setError('密码错误，请重试');
+      } else if (status === 500) {
+        setError('服务器错误，请稍后重试');
       } else {
-        setError('登录失败，请重试');
+
+        setError(`登录失败，请重试 (状态码: ${status})`);
       }
     } finally {
       setIsLoading(false);
@@ -151,9 +181,37 @@ const Login = () => {
     navigate(`/register?redirect=${encodeURIComponent(redirect)}`);
   };
 
+  // 暂不登录，跳回原来页面
+  const handleSkipLogin = (e) => {
+    e.preventDefault();
+    
+    // 检查redirect目标是否需要登录权限的页面
+    const protectedPaths = ['/user/profile', '/user/', '/profile'];
+    const needsAuth = protectedPaths.some(path => redirect.includes(path));
+    
+    if (needsAuth) {
+      // 如果原页面需要登录，则跳转到首页
+      console.log('原页面需要登录权限，跳转到首页');
+      navigate('/');
+    } else {
+      // 否则跳转回原页面
+      console.log('用户选择暂不登录，跳转到:', redirect);
+      navigate(redirect);
+    }
+  };
+
   return (
     <div className="auth-page">
       <div className="login-card">
+        {/* 右上角关闭按钮 */}
+        <button
+          className="close-login-btn"
+          onClick={() => navigate("/")}
+          aria-label="关闭登录"
+          type="button"
+        >
+          <span>×</span>
+        </button>
         {/* 品牌logo */}
         <div className="login-logo">
           <div className="logo-block">
@@ -225,6 +283,32 @@ const Login = () => {
           <div className="register-section">
             还没有账号？
             <a href="#" className="register-link" onClick={handleGoRegister}>立即注册</a>
+          </div>
+
+          {/* 暂不登录按钮 */}
+          <div className="skip-login-section" style={{ textAlign: 'center', marginTop: '20px' }}>
+            <button
+              type="button"
+              className="skip-login-btn"
+              onClick={handleSkipLogin}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#999',
+                fontSize: '14px',
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                padding: '8px 16px'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.color = '#666';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.color = '#999';
+              }}
+            >
+              暂不登录
+            </button>
           </div>
         </form>
       </div>

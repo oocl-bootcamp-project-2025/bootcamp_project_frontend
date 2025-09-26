@@ -1,3 +1,4 @@
+import preferenceOptionsValue from '@/common/preferenceOptionsValue';
 import { saveItinerary } from '@/components/apis/api';
 import itineraryTestData3 from '@/components/pages/testdata/ItineraryTestData3';
 import { Calendar, ChevronLeft, Clock, MapPin, Plus } from 'lucide-react';
@@ -9,6 +10,8 @@ import { Button } from '../ui/button';
 import './css/ItineraryOverviewCard.css';
 import './css/ItineraryResults.css';
 import './css/ItineraryStatistics.css';
+import {useAuth} from "@/contexts/AuthContext";
+import {message} from "antd";
 
 function calculateDayDate(departureDate, dayIndex) {
   if (!departureDate) return "2025年9月22日"; // Fallback date
@@ -29,9 +32,9 @@ function calculateDayDate(departureDate, dayIndex) {
 
   return `${year}年${month}月${day}日星期${weekDay}`;
 }
-import preferenceOptionsValue from '@/common/preferenceOptionsValue';
 
 export default function ItineraryResults({
+  itineraryId,
   searchData,
   bookings = [],
   itinerary,
@@ -58,6 +61,11 @@ export default function ItineraryResults({
   // 初始化行程数据 - 使用 testdata2 的 itinerary 部分
   const [currentItinerary, setCurrentItinerary] = useState(itinerary || itineraryTestData3.itinerary);
 
+
+  const { isAuthenticated, getToken, getPhone } = useAuth(); // 🎯 获取认证状态
+
+
+
   routeData = routeData || itineraryTestData3.route;
 
   // 处理景点拖拽移动
@@ -69,12 +77,48 @@ export default function ItineraryResults({
     const [removed] = newItinerary[sourceDayKey].splice(sourceIndex, 1);
     newItinerary[targetDayKey].splice(targetIndex, 0, removed);
 
-    setCurrentItinerary(newItinerary);
-    onUpdateItinerary && onUpdateItinerary(newItinerary);
+    // Recalculate arrival times after moving
+    const updatedItinerary = calculateArrivalTimes(newItinerary);
+    setCurrentItinerary(updatedItinerary);
+    onUpdateItinerary && onUpdateItinerary(updatedItinerary);
   };
 
   // 处理景点替换
+  // const handleReplaceAttraction = (attractionId) => {
+  //   onReplaceAttraction && onReplaceAttraction(attractionId, {
+  //     id: 'new-attraction',
+  //     name: '新景点',
+  //     description: '替换后的景点',
+  //     duration: '2小时',
+  //     location: '新位置'
+  //   });
+  // };
   const handleReplaceAttraction = (attractionId) => {
+    let updatedItinerary = { ...currentItinerary };
+    let found = false;
+
+    Object.keys(updatedItinerary).forEach(dayKey => {
+      if (found) {
+        return;
+      }
+      const index = updatedItinerary[dayKey].findIndex(attr => attr.id === attractionId);
+      if (index !== -1) {
+        updatedItinerary[dayKey][index] = {
+          id: 'new-attraction',
+          name: '新景点',
+          description: '替换后的景点',
+          duration: '2小时',
+          location: '新位置'
+        };
+        found = true;
+      }
+    });
+    if (found) {
+      // Recalculate arrival times after replacement
+      updatedItinerary = calculateArrivalTimes(updatedItinerary);
+      setCurrentItinerary(updatedItinerary);
+      onUpdateItinerary && onUpdateItinerary(updatedItinerary);
+    }
     onReplaceAttraction && onReplaceAttraction(attractionId, {
       id: 'new-attraction',
       name: '新景点',
@@ -107,36 +151,52 @@ export default function ItineraryResults({
     return `${preferenceText}游`;
   };
 
+
+  // add phone from auth context
+  const phoneLogin = getPhone();
+
   // 新增：处理保存行程
   const handleSaveItinerary = async (phoneNumber) => {
-    // 参数校验
-    if (!phoneNumber) {
-      setResultType('error');
-      setResultMessage('请输入有效的手机号');
-      setShowResultModal(true);
-      return;
-    }
-    const itineraryData = {
-      title: (searchData.destination && searchData.days) ? `${searchData.destination}${searchData.days}天游` : '默认自助游行程',
-      phoneNumber: phoneNumber,
-      description: generatePreferenceDescription(),
-      startDate: searchData?.departureDate || '',
-      allNumber: getTotalAttractions(),
-      itineraryData: JSON.stringify({ itinerary: currentItinerary})
-    };
-    await saveItinerary(itineraryData).then(response => {
-      if (response.status !== 201) {
-        throw new Error('保存失败');
+    if (phoneNumber!== phoneLogin) {
+      message.error('请使用登录时的手机号保存行程');
+    }else
+    {
+
+      // test
+      console.log('=== 保存行程 ===');
+      console.log('用户手机号:', phoneNumber);
+      console.log('================');
+
+      // 参数校验
+      if (!phoneNumber) {
+        setResultType('error');
+        setResultMessage('请输入有效的手机号');
+        setShowResultModal(true);
+        return;
       }
-      setShowSaveModal(false);
-      setResultType('success');
-      setResultMessage('行程已成功保存！我们已将行程链接发送到您的手机，请注意查收短信。');
-      setShowResultModal(true);
-    }).catch(error => {
-      setResultType('error');
-      setResultMessage('保存失败，请检查网络连接后重试。如问题持续存在，请联系客服。');
-      setShowResultModal(true);
-    })
+      const itineraryData = {
+        title: (searchData.destination && searchData.duration) ? `${searchData.destination}${searchData.duration}天深度游` : '默认自助深度游行程',
+        phoneNumber: phoneNumber,
+        description: generatePreferenceDescription(),
+        startDate: searchData?.departureDate || '',
+        allNumber: getTotalAttractions(),
+        itineraryData: JSON.stringify({ itinerary: currentItinerary })
+      };
+      await saveItinerary(itineraryData).then(response => {
+        if (response.status !== 200) {
+          throw new Error('保存失败');
+        }
+        setShowSaveModal(false);
+        setResultType('success');
+        setResultMessage('行程已成功保存！我们已将行程链接发送到您的手机，请注意查收短信。');
+        setShowResultModal(true);
+      }).catch(error => {
+        setResultType('error');
+        setResultMessage('保存失败，请检查网络连接后重试。如问题持续存在，请联系客服。');
+        setShowResultModal(true);
+      })
+    }
+
   };
   // 处理触摸开始
   const handleTouchStart = (e) => {
@@ -289,6 +349,65 @@ export default function ItineraryResults({
     if (typeof duration === 'string' && duration.match(/^\d+$/)) return `${duration}小时`;
     return duration || '2小时';
   }
+
+  const parseHours = (duration) => {
+    if (!duration) {
+      return 2;
+    }
+    if (typeof duration === 'number') {
+      return duration;
+    }
+    if (typeof duration === 'string') {
+      if (duration.match(/^\d+$/)) {
+        return parseInt(duration, 10);
+      }
+      const match = duration.match(/(\d+)/);
+      if (match) {
+        return parseInt(match[1], 10);
+      }
+    }
+    return 2
+  }
+
+  const addHoursToTime = (timeString, hours) => {
+    const [hourStr, minuteStr] = timeString.split(':');
+    let hour = parseInt(hourStr, 10);
+    let minute = parseInt(minuteStr, 10) || 0;
+    hour += Math.floor(hours);
+
+    const fractionalHour = hours - Math.floor(hours);
+    minute += Math.round(fractionalHour * 60);
+    if (minute >= 60) {
+      hour += Math.floor(minute / 60);
+      minute %= 60;
+    }
+
+    return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+  }
+
+  const calculateArrivalTimes = (itinerary) => {
+    // Deep clone
+    const updatedItinerary = JSON.parse(JSON.stringify(itinerary));
+    Object.keys(updatedItinerary).forEach(dayKey => {
+      let currentTime = "09:00";
+      updatedItinerary[dayKey] = updatedItinerary[dayKey].map((attraction, index) => {
+        const updatedAttraction = { ...attraction, time: `${currentTime}-` };
+        const hours = parseHours(attraction.duration);
+        currentTime = addHoursToTime(currentTime, hours);
+
+        return updatedAttraction;
+      });
+    });
+
+    return updatedItinerary;
+  }
+
+  useEffect(() => {
+    if (currentItinerary) {
+      const updatedItinerary = calculateArrivalTimes(currentItinerary);
+      setCurrentItinerary(updatedItinerary);
+    }
+  }, [currentItinerary]);
 
   // 构建Tabs的items数据
   const tabItems = [

@@ -3,6 +3,8 @@ import { useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../context/AppProvider';
 import ItineraryResults from '../pages/ItineraryResults';
+import { useParams } from 'react-router-dom';
+
 export default function ItineraryWrapper() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -14,6 +16,10 @@ export default function ItineraryWrapper() {
     returnDate: '2024-03-17',
     preference: 'culture'
   };
+  // 从路由中拿取id
+  const { id } = useParams();
+
+  console.log('ItineraryWrapper收到的路径ID:', id);
 
   // 使用应用上下文
   const {
@@ -57,7 +63,7 @@ export default function ItineraryWrapper() {
         // Clear all bookings
         setBookings([]);
         // Navigate back to home
-        navigate('/home');
+        window.location.href = '/home';
       }
     });
   }, [navigate, setBookings]);
