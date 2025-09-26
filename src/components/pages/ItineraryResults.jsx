@@ -175,7 +175,7 @@ export default function ItineraryResults({
         return;
       }
       const itineraryData = {
-        title: (searchData.destination && searchData.duration) ? `${searchData.destination}${searchData.duration}天深度游` : '默认自助深度游行程',
+        title: (searchData.destination && searchData.duration) ? `${searchData.destination}${searchData.duration}天深度游` : '北京3天深度游',
         phoneNumber: phoneNumber,
         description: generatePreferenceDescription(),
         startDate: searchData?.departureDate || '',

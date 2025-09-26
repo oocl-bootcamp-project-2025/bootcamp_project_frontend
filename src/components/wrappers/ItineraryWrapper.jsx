@@ -12,8 +12,8 @@ export default function ItineraryWrapper() {
   // 从路由state中获取搜索数据，或使用默认数据
   const searchData = location.state?.searchData || {
     destination: '北京',
-    departureDate: '2024-03-15',
-    returnDate: '2024-03-17',
+    departureDate: '2025-09-26',
+    returnDate: '2025-09-28',
     preference: 'culture'
   };
   // 从路由中拿取id
