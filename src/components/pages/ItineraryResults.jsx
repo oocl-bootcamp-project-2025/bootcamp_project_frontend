@@ -34,6 +34,7 @@ function calculateDayDate(departureDate, dayIndex) {
 }
 
 export default function ItineraryResults({
+  itineraryId,
   searchData,
   bookings = [],
   itinerary,
