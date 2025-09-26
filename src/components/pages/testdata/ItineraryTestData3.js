@@ -9,7 +9,7 @@ const itineraryTestData3 = {
         "location": "東城區",
         "longitude": 116.3972,
         "latitude": 39.9163,
-        "images": "https://example.com/forbidden_1.jpg,https://example.com/forbidden_2.jpg",
+        "images": "https://th.bing.com/th/id/OIP.4gY8qfCoUR9xHYvKN21VJgHaEZ?w=266&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
         "duration": 3
       },
       {
@@ -20,7 +20,7 @@ const itineraryTestData3 = {
         "location": "西城區",
         "longitude": 116.3831,
         "latitude": 39.9284,
-        "images": "https://example.com/beihai_1.jpg,https://example.com/beihai_2.jpg",
+        "images": "https://th.bing.com/th/id/OIP.SXNg5OtHUH5ca0iYAZG79AHaEK?w=328&h=184&c=7&r=0&o=7&am…",
         "duration": 2
       },
       {
@@ -31,7 +31,7 @@ const itineraryTestData3 = {
         "location": "朝陽區",
         "longitude": 116.4563,
         "latitude": 39.9335,
-        "images": "https://example.com/sanlitun_1.jpg,https://example.com/sanlitun_2.jpg",
+        "images": "https://th.bing.com/th/id/OIP.o2HXpiCd338RgJoySmKddgHaE7?w=263&h=180&c=7&r=0&o=7&am…",
         "duration": 2
       }
     ],
