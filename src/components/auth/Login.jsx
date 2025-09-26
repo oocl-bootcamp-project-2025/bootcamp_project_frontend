@@ -98,10 +98,12 @@ const Login = () => {
     }
   }, [isAuthenticated, redirect, navigate]);
 
-  // 表单验证（留空，供后续填写）
+  // 表单验证
   const validateForm = () => {
-    if (!/^[\d]{11}$/.test(phone)) {
-      setError('请输入有效的手机号');
+    // 验证手机号是否符合中国大陆手机号规则
+    const phoneRegex = /^1[3-9]\d{9}$/;
+    if (!phoneRegex.test(phone)) {
+      setError('请输入正确的手机号码格式（以1开头，第二位为3-9，共11位数字）');
       return false;
     }
     if (!/^\w{6,16}$/.test(password)) {
